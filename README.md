@@ -66,6 +66,21 @@ scripts/prepare-assets.mjs pipeline de imagens
 oficiais cadastradas pela loja. A escala em `globals.css` foi derivada delas.
 Não há dourado de propósito: o contraste frio/quente já é a assinatura.
 
+**Fundo claro, azul como tinta.** O papel é `#fbf9f5` — branco quente, não
+branco puro: a diferença é de poucos pontos, mas é o que separa "papel" de
+"tela de escritório" e faz o azul assentar em vez de vibrar. Duas ilhas
+permanecem escuras de propósito: a seção **Processo** (quebra de ritmo no meio
+da página) e o **rodapé** (ancora a base e devolve a marca ao fim da leitura).
+
+**Contraste foi medido, não estimado.** Inverter um tema não é trocar cores:
+texto claro a 40% sobre marinho rende contraste alto, mas azul a 40% sobre
+quase-branco despenca para ~2,4:1. Toda a escala de texto secundário foi
+recalculada para o piso de 4,5:1 (3:1 em corpo grande), verificando a cor
+composta real de cada elemento sobre o fundo do seu container.
+
+**Os ladrilhos de foto têm filete.** Os packshots têm fundo branco; sem a
+moldura de `1px` eles sangrariam direto na página.
+
 **A rota tracejada é o motivo da marca.** O logo tem um laço pontilhado com um
 avião de papel. Em `RotaDeVoo.tsx` esse traço atravessa a página, revelado por
 máscara conforme a seção entra, com o avião correndo o caminho pelo scroll.
