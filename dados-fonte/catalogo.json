@@ -1,0 +1,410 @@
+{
+  "empresa": {
+    "id": 7827,
+    "name": "Thaby Importados",
+    "orders_email": "thabyimportados@hotmail.com",
+    "type": null,
+    "segment": null,
+    "is_catalog_seed_template": false,
+    "erp": null,
+    "goal": null,
+    "logo": "company_logos/8OddLcb88cjm26QVB6bjJB2A4QFA3FPJgtdsRD3G.jpg",
+    "valid_until": "2026-09-29",
+    "search_index_ready_at": "2026-04-21T23:46:59.000000Z",
+    "max_products_image_size": "1000",
+    "max_users_admin": 2,
+    "max_users_seller": 5,
+    "max_users_client": 2,
+    "created_at": "2025-09-15T12:34:51.000000Z",
+    "updated_at": "2026-04-21T23:46:59.000000Z",
+    "trial": false,
+    "trial_stage": 0,
+    "trial_stage_changed_at": null,
+    "trial_card_added_at": null,
+    "trial_payment_provider": null,
+    "trial_checkout_session_id": null,
+    "trial_payment_customer_id": null,
+    "trial_payment_subscription_id": null,
+    "trial_payment_method_id": null,
+    "about": null,
+    "primary_color": "#3b548f",
+    "secondary_color": "#bb3c45",
+    "pedidos": 1,
+    "whatsapp": 1,
+    "city": "Sorriso",
+    "country": "Brasil",
+    "state": "MT",
+    "path": "thabyimportados",
+    "public_user": "{\"id\":22665}",
+    "has_sub_categories": 1,
+    "facebook": null,
+    "instagram": "thabyimportados",
+    "tiktok": "thabyimportados2",
+    "reseller_id": null,
+    "importer": 0,
+    "exchange_rate": null,
+    "price_table_config": null,
+    "price_table_active": 0,
+    "promo_price_active": 1,
+    "pedido_pro": "0",
+    "variations_active": 0,
+    "cpf_required": 0,
+    "cnpj_required": 0,
+    "cnpj": "41639143000125",
+    "additional_name": null,
+    "additional_field_required": 0,
+    "tag_active": 0,
+    "whatsapp_phone": "5566999952450",
+    "address": "Sorriso-MT",
+    "zipcode": null,
+    "neighborhood": null,
+    "street": null,
+    "number": null,
+    "complement": null,
+    "lat": null,
+    "lng": null,
+    "sub_account_of": null,
+    "is_blocked": false,
+    "blocked_at": null,
+    "internal_notes": null,
+    "max_products_qte": null,
+    "billing_owner_company_id": null,
+    "settings": {
+      "id": 567,
+      "company_id": 7827,
+      "code_label": null,
+      "code_2_label": null,
+      "ean_label": null,
+      "entity_label": null,
+      "main_seller_id": null,
+      "hide_other_sellers_for_client": 0,
+      "hide_other_sellers_for_seller": 1,
+      "show_stock": 0,
+      "multi_deposit_stock_enabled": false,
+      "multi_deposit_stock_source": "bling",
+      "multi_deposit_order_split_enabled": false,
+      "show_stock_deposits_on_catalog": false,
+      "max_sellers_discount": 0,
+      "call_to_action_site": 1,
+      "tag_facebook": null,
+      "tag_google": null,
+      "tag_tag_manager": null,
+      "banner_mobile": null,
+      "banner_desktop": null,
+      "logo_2": null,
+      "enable_code_2": 0,
+      "enable_reference": 0,
+      "enable_entity": 0,
+      "enable_embalagem": false,
+      "progressive_discount_enabled": false,
+      "created_at": "2025-09-16T11:07:02.000000Z",
+      "updated_at": "2025-10-06T23:43:12.000000Z",
+      "general_message": "",
+      "minimum_order_value": null,
+      "whatsapp_personalized_message": null,
+      "show_facebook_in_toolbar": 0,
+      "show_instagram_in_toolbar": 0,
+      "show_tiktok_in_toolbar": 0,
+      "show_whatsapp_in_toolbar": 1,
+      "website_link": null,
+      "website_cta": null,
+      "background_image": null,
+      "entity_whatsapp_cta": null,
+      "company_whatsapp_cta": null,
+      "custom_html_footer": null,
+      "show_privacy_policy": 0,
+      "privacy_policy_url": null,
+      "show_entity_on_menu": 0,
+      "landing_page_active": 0,
+      "landing_page_function": null,
+      "landing_page_config": "{\"opcoes\": []}",
+      "country_code": "BR",
+      "calling_code": "+55",
+      "currency_code": "BRL",
+      "currency_symbol": "R$",
+      "language_code": "pt-BR",
+      "brand_key": "default",
+      "media_image_limit_override": null,
+      "media_video_limit_override": null,
+      "media_image_extra_credits_balance": 0,
+      "media_video_extra_credits_balance": 0,
+      "catalog_model_price_source_mode": "fixed_table",
+      "catalog_model_fixed_price_table": 1,
+      "catalog_model_allow_seller_price_table_selection": false,
+      "catalog_model_bounds_mode": "percent_range",
+      "catalog_model_percent_range_default": 50,
+      "client_address_requirement": "disabled",
+      "payment_method_options_enabled": false,
+      "payment_method_options_required": false,
+      "payment_methods_options": null,
+      "delivery_options_enabled": false,
+      "delivery_options_required": false,
+      "delivery_options": null,
+      "hide_pedidos_initial_identifiers": false,
+      "beta_avaiable": false,
+      "show_notice": false,
+      "notice_json": null,
+      "last_notice": null,
+      "billing_provider_routing_config": null,
+      "onboarding_journey_progress_json": null
+    }
+  },
+  "categorias": [
+    {
+      "id": 278550,
+      "name": "ACESSÓRIOS",
+      "image": "companies/7827/categories_images/jnO701b7iRbIX2CUUjV6rIvRSM0KUy4PZBTFqY1K.png"
+    },
+    {
+      "id": 249752,
+      "name": "ACESSÓRIOS DE ALIMENTAÇÃO",
+      "image": "companies/7827/categories_images/oTMG4n9kEJan02Iqvis8v9Oygznwh4WWGL4oWMCp.png"
+    },
+    {
+      "id": 249680,
+      "name": "ACESSÓRIOS E MODA",
+      "image": "companies/7827/categories_images/27se9a32xodFo5A1KDNsRlvSffI0iRFQDGq0GkFk.png"
+    },
+    {
+      "id": 249724,
+      "name": "ALIMENTAÇÃO",
+      "image": "companies/7827/categories_images/X7ZHDMavd2h0pBOj3vKgYlmIw9WTUmGMoGnGP0pq.png"
+    },
+    {
+      "id": 249687,
+      "name": "BELEZA",
+      "image": "companies/7827/categories_images/QyKAiUAVH069wzaIoUB3TgUMbJ4VMFG6YtezBPgP.png"
+    },
+    {
+      "id": 249720,
+      "name": "BEM ESTAR E ESTILO DE VIDA",
+      "image": "companies/7827/categories_images/6H1EhkwXyaswe1NdV6MlOthNOVlUSpuiJsIfXknE.png"
+    },
+    {
+      "id": 249681,
+      "name": "BOLSAS FEMININAS",
+      "image": "companies/7827/categories_images/bIjjn68Nlo9fS4XToGRtFQGVUhStLSMvEZGCdYkp.png"
+    },
+    {
+      "id": 278938,
+      "name": "BONÉS",
+      "image": "companies/7827/categories_images/xVoMiGjOTguS9QlsxPmrB8JO7KqTOWNGFRqgqH9C.png"
+    },
+    {
+      "id": 249739,
+      "name": "BRINQUEDOS",
+      "image": "companies/7827/categories_images/LFG0WAp6hRMwgWKbpDBHm2QsFT8o6UsXa5Z6j3t5.png"
+    },
+    {
+      "id": 249707,
+      "name": "CABELOS",
+      "image": "companies/7827/categories_images/iuMHRojKhqSDHDGmM4wKtycTFfJDEXTGX8PCg7cH.png"
+    }
+  ],
+  "produtos": [
+    {
+      "id": 2426645,
+      "name": "MÁSCARA EM GEL PDRN 4UNID MEDICUBE",
+      "foto1": null,
+      "featured": false
+    },
+    {
+      "id": 2631573,
+      "name": "ACESSORIOS BOLSA CEREJINHA PIPER K",
+      "foto1": null,
+      "featured": false
+    },
+    {
+      "id": 2437967,
+      "name": "Sinus Rinse ( unidade )",
+      "foto1": null,
+      "featured": true
+    },
+    {
+      "id": 2437449,
+      "name": "LENS WIPES UNID",
+      "foto1": "companies/7827/products_imgs/imported/c3c8b722fbf65845461c4e7db244b5c46451be1eea3cdef4c3c7cec231d7efe4.jpg",
+      "featured": true
+    },
+    {
+      "id": 2438049,
+      "name": "Refil VapoPads cada",
+      "foto1": null,
+      "featured": true
+    },
+    {
+      "id": 2439514,
+      "name": "CABO DE AÇO MALA",
+      "foto1": null,
+      "featured": true
+    },
+    {
+      "id": 2439234,
+      "name": "PIRULITO MELLOW BUDDIES OLLY",
+      "foto1": "companies/7827/products_imgs/imported/d4ea172f11ae7b7222e98e9ae31b1fb1ba898ad469f82f0f7d40f16d6997b096.jpg",
+      "featured": true
+    },
+    {
+      "id": 3650064,
+      "name": "MINI BRANDS FILL THE FRIDGE",
+      "foto1": "companies/7827/products_imgs/imported/1500e066aed7bb5e834a98a0b39cd3e87f32ba004528e8fd02ff58e4ae21c4c8.jpg",
+      "featured": true
+    },
+    {
+      "id": 2439579,
+      "name": "PIRULITO FOCUS BUDDIES OLLY",
+      "foto1": "companies/7827/products_imgs/imported/075d88363cc13166fbfababdd143389c3b07388f08b0c7f8af0813c3a57953bb.jpg",
+      "featured": true
+    },
+    {
+      "id": 2426870,
+      "name": "BOMBOM DE CEREJA FABBRI UNIDADE",
+      "foto1": "companies/7827/products_imgs/imported/8274e1c328f56e29bb16b7edec9a79716f7e8df940b742344a66cef77a5f25fe.jpg",
+      "featured": true
+    },
+    {
+      "id": 3733022,
+      "name": "POCKETBAC HOLDER BBW PRETO",
+      "foto1": "companies/7827/products_imgs/imported/cee8864944fa0078172f8d418f5949c9fee984d52755d7cdbe7953d2b6c6ad4d.jpg",
+      "featured": true
+    },
+    {
+      "id": 2437363,
+      "name": "CARRINHO STITCH DISNEY",
+      "foto1": "companies/7827/products_imgs/imported/f737830af7c2d711c2bf936d0f75b08ab56af468a1aa7eaaa29d27971c1f1739.jpg",
+      "featured": true
+    },
+    {
+      "id": 2437631,
+      "name": "TESOURA KIDS PECULA",
+      "foto1": null,
+      "featured": true
+    },
+    {
+      "id": 3733021,
+      "name": "POCKETBAC HOLDER BBW MOCHA",
+      "foto1": "companies/7827/products_imgs/imported/360fb53d607fd7271c5e02df113884a2f893b7ce2427a9fad0d04722a9c3d529.jpg",
+      "featured": true
+    },
+    {
+      "id": 2594929,
+      "name": "ZERO PORE COOLING MASK MEDICUBE",
+      "foto1": null,
+      "featured": false
+    },
+    {
+      "id": 2448440,
+      "name": "Boogie wipes 30 unid",
+      "foto1": null,
+      "featured": false
+    },
+    {
+      "id": 2437432,
+      "name": "BOMBILLA STANLEY COLHER BLACK",
+      "foto1": null,
+      "featured": false
+    },
+    {
+      "id": 2426947,
+      "name": "CANETA GELLY ROLL 0.5MM SAKURA",
+      "foto1": null,
+      "featured": false
+    },
+    {
+      "id": 2438037,
+      "name": "Saco esterilizador latch Munchkin",
+      "foto1": null,
+      "featured": false
+    },
+    {
+      "id": 2426855,
+      "name": "BOLINHAS PELUCIA PARA GATO",
+      "foto1": null,
+      "featured": false
+    },
+    {
+      "id": 2426489,
+      "name": "CORRETIVO SHAPE TAPE TT",
+      "foto1": null,
+      "featured": false
+    },
+    {
+      "id": 2439740,
+      "name": "ON THE GLOW BRONZE PIXI",
+      "foto1": null,
+      "featured": false
+    },
+    {
+      "id": 2438103,
+      "name": "Oxigenio Enlatado 2L",
+      "foto1": null,
+      "featured": false
+    },
+    {
+      "id": 2438036,
+      "name": "Saco esterilizador Medela",
+      "foto1": null,
+      "featured": false
+    },
+    {
+      "id": 2439503,
+      "name": "BOLHA DE SABAO SKIP HOP ZOO 60ML - EAN 7908080810775 _ SKIP HOP",
+      "foto1": null,
+      "featured": false
+    },
+    {
+      "id": 2426502,
+      "name": "SOMBRA AVULSA KIKO",
+      "foto1": null,
+      "featured": false
+    },
+    {
+      "id": 2590544,
+      "name": "TEMPERO PIPOCA KERNEL SEASON 80G SABORES",
+      "foto1": null,
+      "featured": false
+    },
+    {
+      "id": 2453520,
+      "name": "HAIR FINISHING STICK BESTLAND",
+      "foto1": null,
+      "featured": false
+    },
+    {
+      "id": 3550243,
+      "name": "SUPORTE HOME FRAGRANCE BBW DUPLO",
+      "foto1": null,
+      "featured": false
+    },
+    {
+      "id": 2439501,
+      "name": "BOLHA DE SABAO METOO SEREIAS 60ML - EAN 7908080810782 _ METOO",
+      "foto1": null,
+      "featured": false
+    },
+    {
+      "id": 3863144,
+      "name": "KIT PERFUME GUCCI GUILTY EDT 3 PCS",
+      "foto1": "companies/7827/products_imgs/imported/6474d8ded3f6bf434856998cc24ff115d6cd9e5309b1f04f1c8f0a30902d38e9.jpg",
+      "featured": true
+    },
+    {
+      "id": 3669864,
+      "name": "ANIMAL SHEET MASK FOR KIDS",
+      "foto1": null,
+      "featured": true
+    },
+    {
+      "id": 3882749,
+      "name": "SILICONE BOTTLE COVERS TRAVEL",
+      "foto1": null,
+      "featured": true
+    },
+    {
+      "id": 3862151,
+      "name": "ADESIVOS 3D PUFFY VESTIR PRINCESA",
+      "foto1": null,
+      "featured": false
+    }
+  ]
+}

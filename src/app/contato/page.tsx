@@ -1,0 +1,143 @@
+import type { Metadata } from "next";
+import { Mail, MapPin, MessageCircle } from "lucide-react";
+import { CabecalhoPagina } from "@/componentes/layout/CabecalhoPagina";
+import { Migalhas } from "@/componentes/seo/DadosEstruturados";
+import { Revelar } from "@/componentes/ui/Revelar";
+import { FormularioWhatsApp } from "@/componentes/contato/FormularioWhatsApp";
+import { IconeInstagram, IconeTikTok } from "@/componentes/marca/IconesSociais";
+import { LacoTracejado } from "@/componentes/marca/RotaDeVoo";
+import { empresa, linkWhatsApp, mensagensPadrao } from "@/dados/empresa";
+
+export const metadata: Metadata = {
+  title: "Contato",
+  description: `Fale com a Thaby Importados: WhatsApp ${empresa.whatsapp.exibicao}, e-mail e redes. Atendimento direto, de ${empresa.cidade}/${empresa.estado} para todo o Brasil.`,
+  alternates: { canonical: "/contato" },
+};
+
+const trilha = [
+  { nome: "Início", caminho: "/" },
+  { nome: "Contato", caminho: "/contato" },
+];
+
+const canais = [
+  {
+    rotulo: "WhatsApp",
+    valor: empresa.whatsapp.exibicao,
+    detalhe: "O canal principal. É por aqui que tudo acontece.",
+    href: linkWhatsApp(mensagensPadrao.geral),
+    icone: <MessageCircle size={17} strokeWidth={1.4} />,
+  },
+  {
+    rotulo: "E-mail",
+    valor: empresa.email,
+    detalhe: "Para orçamentos maiores e assuntos que pedem histórico.",
+    href: `mailto:${empresa.email}`,
+    icone: <Mail size={17} strokeWidth={1.4} />,
+  },
+  {
+    rotulo: "Instagram",
+    valor: `@${empresa.redes.instagram.usuario}`,
+    detalhe: "Novidades do lote, bastidores e o que acabou de chegar.",
+    href: empresa.redes.instagram.url,
+    icone: <IconeInstagram className="size-[1.05rem]" />,
+  },
+  {
+    rotulo: "TikTok",
+    valor: `@${empresa.redes.tiktok.usuario}`,
+    detalhe: "Abertura de encomenda e achados da semana.",
+    href: empresa.redes.tiktok.url,
+    icone: <IconeTikTok className="size-[1.05rem]" />,
+  },
+];
+
+export default function PaginaContato() {
+  return (
+    <>
+      <Migalhas trilha={trilha} />
+
+      <CabecalhoPagina
+        trilha={trilha}
+        sobrescrita="Atendimento direto"
+        titulo="Fale com quem escolhe as peças."
+        apoio="Sem central, sem robô, sem fila. Do outro lado tem uma pessoa que conhece o acervo e sabe o que dá para trazer."
+      />
+
+      <section className="py-24 md:py-32">
+        <div className="area grid gap-16 lg:grid-cols-12 lg:gap-20">
+          <div className="lg:col-span-7">
+            <Revelar>
+              <h2 className="font-display text-3xl font-light leading-tight text-marfim md:text-4xl">
+                Monte sua mensagem
+              </h2>
+              <p className="mt-4 max-w-lg text-[0.9375rem] font-light leading-relaxed legivel text-marinho-100/50">
+                Preencha o que souber. O site escreve a mensagem, abre o
+                WhatsApp e deixa o envio com você.
+              </p>
+            </Revelar>
+
+            <Revelar atraso={0.12} className="mt-12">
+              <FormularioWhatsApp />
+            </Revelar>
+          </div>
+
+          <div className="lg:col-span-5">
+            <Revelar deslocamento={30} className="lg:sticky lg:top-32">
+              <ul className="flex flex-col divide-y divide-marinho-200/10 border-y border-marinho-200/10">
+                {canais.map((canal) => (
+                  <li key={canal.rotulo}>
+                    <a
+                      href={canal.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group flex items-start gap-5 py-6 transition-colors duration-500"
+                    >
+                      <span className="mt-0.5 grid size-10 shrink-0 place-items-center border border-marinho-200/15 text-marinho-100/55 transition-colors duration-500 group-hover:border-carmim-500 group-hover:bg-carmim-500 group-hover:text-marfim-puro">
+                        {canal.icone}
+                      </span>
+
+                      <span className="min-w-0">
+                        <span className="block font-sans text-[0.5625rem] uppercase tracking-[0.22em] text-marinho-200/35">
+                          {canal.rotulo}
+                        </span>
+                        <span className="mt-1.5 block break-all text-[1.0625rem] font-light text-marfim/85 transition-colors duration-500 group-hover:text-marfim">
+                          {canal.valor}
+                        </span>
+                        <span className="mt-1.5 block text-[0.8125rem] font-light leading-relaxed text-marinho-200/40">
+                          {canal.detalhe}
+                        </span>
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="relative mt-10 overflow-hidden border border-marinho-200/10 bg-marinho-900/40 p-8">
+                <LacoTracejado className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 text-marinho-400/8" />
+
+                <div className="relative flex items-start gap-4">
+                  <MapPin
+                    size={17}
+                    strokeWidth={1.4}
+                    className="mt-1 shrink-0 text-carmim-400/70"
+                  />
+                  <div>
+                    <p className="font-sans text-[0.5625rem] uppercase tracking-[0.22em] text-marinho-200/35">
+                      Base
+                    </p>
+                    <p className="mt-2 text-[1.0625rem] font-light text-marfim/85">
+                      {empresa.regiao}
+                    </p>
+                    <p className="mt-2.5 text-[0.8125rem] font-light leading-relaxed text-marinho-200/40">
+                      Retirada combinada na cidade. Envio com rastreio para
+                      qualquer endereço do Brasil.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </Revelar>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
