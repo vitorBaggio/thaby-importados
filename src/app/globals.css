@@ -34,6 +34,13 @@
   --color-areia: #e9e1d4;
   --color-areia-escura: #d3c7b4;
 
+  /*
+    Ladrilho das fotos. Branco puro sobre o fundo levemente quente: a diferença
+    é mínima de propósito — junto com o filete, lê como moldura de galeria e
+    impede que o fundo branco dos packshots se dissolva na página.
+  */
+  --color-ladrilho: #ffffff;
+
   --font-display: var(--fonte-display), "Cormorant Garamond", Georgia, serif;
   --font-sans: var(--fonte-sans), "Jost", ui-sans-serif, system-ui, sans-serif;
 
@@ -77,14 +84,19 @@
 }
 
 :root {
-  --fundo: #060b18;
-  --tinta: #f7f4ee;
-  color-scheme: dark;
+  /*
+    Branco quente, não branco puro. A diferença é de poucos pontos, mas é o que
+    separa "papel" de "tela de escritório" — e é o que faz o azul da marca
+    assentar em vez de vibrar.
+  */
+  --fundo: #fbf9f5;
+  --tinta: #16244a;
+  color-scheme: light;
 }
 
 @layer base {
   * {
-    border-color: color-mix(in oklab, var(--color-marinho-200) 12%, transparent);
+    border-color: color-mix(in oklab, var(--color-marinho-500) 12%, transparent);
   }
 
   html {
@@ -117,7 +129,7 @@
   }
 
   :focus-visible {
-    outline: 1px solid var(--color-marinho-300);
+    outline: 1px solid var(--color-marinho-500);
     outline-offset: 3px;
   }
 
@@ -127,17 +139,17 @@
   }
 
   ::-webkit-scrollbar-track {
-    background: var(--color-marinho-950);
+    background: var(--fundo);
   }
 
   ::-webkit-scrollbar-thumb {
-    background: var(--color-marinho-800);
-    border: 3px solid var(--color-marinho-950);
+    background: color-mix(in oklab, var(--color-marinho-500) 35%, transparent);
+    border: 3px solid var(--fundo);
     border-radius: 99px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: var(--color-marinho-700);
+    background: color-mix(in oklab, var(--color-marinho-500) 60%, transparent);
   }
 
   img {
@@ -146,15 +158,25 @@
 }
 
 @layer components {
-  /* Grão sutil — tira o "plástico" dos fundos chapados */
+  /*
+    Grão sutil — tira o "plástico" dos fundos chapados.
+    Em fundo claro o grão precisa multiplicar (escurecer os grãos), não
+    sobrepor: com `overlay` o ruído clareia e vira uma névoa suja.
+  */
   .grao::after {
     content: "";
     position: absolute;
     inset: 0;
     pointer-events: none;
+    opacity: 0.09;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 220 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='r'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.86' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23r)'/%3E%3C/svg%3E");
+  }
+
+  /* Mesmo ruído, para os blocos que continuam escuros (rodapé, processo, cortina). */
+  .grao-inverso::after {
     opacity: 0.4;
     mix-blend-mode: overlay;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 220 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='r'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.86' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23r)'/%3E%3C/svg%3E");
   }
 }
 
@@ -163,7 +185,7 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  color: color-mix(in oklab, var(--color-marinho-200) 45%, transparent);
+  color: color-mix(in oklab, var(--color-marinho-500) 35%, transparent);
 
   &::before,
   &::after {
@@ -189,7 +211,23 @@
 }
 
 @utility texto-metal {
-  /* Degradê frio nos títulos sobre fundo escuro — lembra o logo */
+  /*
+    Degradê nos títulos, na mesma direção do degradê do logo manuscrito:
+    fecha no marinho profundo em cima e abre no azul da marca embaixo.
+    É o que impede o título de virar um bloco chapado de tinta.
+  */
+  background-image: linear-gradient(
+    170deg,
+    var(--color-marinho-900) 0%,
+    var(--color-marinho-800) 45%,
+    var(--color-marinho-500) 100%
+  );
+  background-clip: text;
+  color: transparent;
+}
+
+/* Sobre os blocos escuros o degradê precisa correr no sentido inverso. */
+@utility texto-metal-claro {
   background-image: linear-gradient(
     170deg,
     var(--color-marfim-puro) 0%,

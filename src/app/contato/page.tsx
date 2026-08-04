@@ -66,10 +66,10 @@ export default function PaginaContato() {
         <div className="area grid gap-16 lg:grid-cols-12 lg:gap-20">
           <div className="lg:col-span-7">
             <Revelar>
-              <h2 className="font-display text-3xl font-light leading-tight text-marfim md:text-4xl">
+              <h2 className="font-display text-3xl font-light leading-tight text-marinho-900 md:text-4xl">
                 Monte sua mensagem
               </h2>
-              <p className="mt-4 max-w-lg text-[0.9375rem] font-light leading-relaxed legivel text-marinho-100/50">
+              <p className="mt-4 max-w-lg text-[0.9375rem] font-light leading-relaxed legivel text-marinho-800/75">
                 Preencha o que souber. O site escreve a mensagem, abre o
                 WhatsApp e deixa o envio com você.
               </p>
@@ -82,7 +82,7 @@ export default function PaginaContato() {
 
           <div className="lg:col-span-5">
             <Revelar deslocamento={30} className="lg:sticky lg:top-32">
-              <ul className="flex flex-col divide-y divide-marinho-200/10 border-y border-marinho-200/10">
+              <ul className="flex flex-col divide-y divide-marinho-500/12 border-y border-marinho-500/12">
                 {canais.map((canal) => (
                   <li key={canal.rotulo}>
                     <a
@@ -91,18 +91,18 @@ export default function PaginaContato() {
                       rel="noopener noreferrer"
                       className="group flex items-start gap-5 py-6 transition-colors duration-500"
                     >
-                      <span className="mt-0.5 grid size-10 shrink-0 place-items-center border border-marinho-200/15 text-marinho-100/55 transition-colors duration-500 group-hover:border-carmim-500 group-hover:bg-carmim-500 group-hover:text-marfim-puro">
+                      <span className="mt-0.5 grid size-10 shrink-0 place-items-center border border-marinho-500/18 text-marinho-800/65 transition-colors duration-500 group-hover:border-carmim-500 group-hover:bg-carmim-500 group-hover:text-marfim-puro">
                         {canal.icone}
                       </span>
 
                       <span className="min-w-0">
-                        <span className="block font-sans text-[0.5625rem] uppercase tracking-[0.22em] text-marinho-200/35">
+                        <span className="block font-sans text-[0.5625rem] uppercase tracking-[0.22em] text-marinho-700/72">
                           {canal.rotulo}
                         </span>
-                        <span className="mt-1.5 block break-all text-[1.0625rem] font-light text-marfim/85 transition-colors duration-500 group-hover:text-marfim">
+                        <span className="mt-1.5 block break-all text-[1.0625rem] font-light text-marinho-900/85 transition-colors duration-500 group-hover:text-marinho-900">
                           {canal.valor}
                         </span>
-                        <span className="mt-1.5 block text-[0.8125rem] font-light leading-relaxed text-marinho-200/40">
+                        <span className="mt-1.5 block text-[0.8125rem] font-light leading-relaxed text-marinho-700/75">
                           {canal.detalhe}
                         </span>
                       </span>
@@ -111,23 +111,23 @@ export default function PaginaContato() {
                 ))}
               </ul>
 
-              <div className="relative mt-10 overflow-hidden border border-marinho-200/10 bg-marinho-900/40 p-8">
-                <LacoTracejado className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 text-marinho-400/8" />
+              <div className="relative mt-10 overflow-hidden border border-marinho-500/12 bg-areia/45 p-8">
+                <LacoTracejado className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 text-marinho-500/12" />
 
                 <div className="relative flex items-start gap-4">
                   <MapPin
                     size={17}
                     strokeWidth={1.4}
-                    className="mt-1 shrink-0 text-carmim-400/70"
+                    className="mt-1 shrink-0 text-carmim-600/85"
                   />
                   <div>
-                    <p className="font-sans text-[0.5625rem] uppercase tracking-[0.22em] text-marinho-200/35">
+                    <p className="font-sans text-[0.5625rem] uppercase tracking-[0.22em] text-marinho-700/72">
                       Base
                     </p>
-                    <p className="mt-2 text-[1.0625rem] font-light text-marfim/85">
+                    <p className="mt-2 text-[1.0625rem] font-light text-marinho-900/85">
                       {empresa.regiao}
                     </p>
-                    <p className="mt-2.5 text-[0.8125rem] font-light leading-relaxed text-marinho-200/40">
+                    <p className="mt-2.5 text-[0.8125rem] font-light leading-relaxed text-marinho-700/75">
                       Retirada combinada na cidade. Envio com rastreio para
                       qualquer endereço do Brasil.
                     </p>

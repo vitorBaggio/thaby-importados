@@ -46,7 +46,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-            className="flex items-center gap-3.5 text-marinho-200/70"
+            className="flex items-center gap-3.5 text-marinho-700/85"
           >
             <AviaoDePapel className="h-3.5 w-3.5" />
             <span className="sobrescrita">
@@ -65,10 +65,10 @@ export function Hero() {
               <span className="texto-metal">ainda não tem, </span>
             </LinhaTitulo>
             <LinhaTitulo atraso={0.32}>
-              <em className="font-normal not-italic text-carmim-400">
+              <em className="font-normal not-italic text-carmim-500">
                 a gente traz
               </em>{" "}
-              <span className="font-display italic text-marinho-200">
+              <span className="font-display italic text-marinho-700">
                 primeiro.
               </span>
             </LinhaTitulo>
@@ -78,7 +78,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-9 max-w-lg text-fluid-base font-light leading-relaxed legivel text-marinho-100/60"
+            className="mt-9 max-w-lg text-fluid-base font-light leading-relaxed legivel text-marinho-800/70"
           >
             Beleza, perfumaria, moda e acessórios garimpados peça a peça lá fora.
             Procedência conferida, quantidade contada e um atendimento que
@@ -108,14 +108,14 @@ export function Hero() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1.2, delay: 0.8 }}
-            className="mt-16 grid max-w-lg grid-cols-3 gap-6 border-t border-marinho-200/10 pt-8"
+            className="mt-16 grid max-w-lg grid-cols-3 gap-6 border-t border-marinho-500/12 pt-8"
           >
             {indicadores.map((item) => (
               <div key={item.rotulo}>
-                <dt className="font-display text-3xl font-light leading-none text-marfim md:text-4xl">
+                <dt className="font-display text-3xl font-light leading-none text-marinho-900 md:text-4xl">
                   {item.valor}
                 </dt>
-                <dd className="mt-2.5 font-sans text-[0.625rem] uppercase leading-relaxed tracking-[0.16em] text-marinho-200/40">
+                <dd className="mt-2.5 font-sans text-[0.625rem] uppercase leading-relaxed tracking-[0.16em] text-marinho-700/75">
                   {item.rotulo}
                 </dd>
               </div>
@@ -198,7 +198,8 @@ function Moldura({
       className={className}
     >
       <motion.div style={y ? { y } : undefined}>
-        <div className="relative aspect-[4/5] overflow-hidden bg-marfim shadow-[0_40px_90px_-40px_rgba(0,0,0,0.85)]">
+        {/* Sombra bem mais leve: a de fundo escuro viraria um borrão cinza aqui. */}
+        <div className="relative aspect-[4/5] overflow-hidden border border-marinho-500/10 bg-ladrilho shadow-[0_30px_70px_-45px_rgba(22,36,74,0.45)]">
           <RevelarImagem atraso={atraso + 0.15}>
             <Image
               src={src}
@@ -213,7 +214,7 @@ function Moldura({
 
         <figcaption className="mt-3.5 flex items-center gap-2.5">
           <span className="h-px w-5 bg-carmim-500/60" />
-          <span className="sobrescrita text-[0.5625rem] text-marinho-200/50">
+          <span className="sobrescrita text-[0.5625rem] text-marinho-700/78">
             {legenda}
           </span>
         </figcaption>
@@ -222,16 +223,23 @@ function Moldura({
   );
 }
 
-/** Camadas de fundo: brilho radial frio, o laço do logo e uma malha sutil. */
+/**
+ * Camadas de fundo.
+ *
+ * No tema escuro eram brilhos que iluminavam o fundo. Aqui a lógica se inverte:
+ * são veladuras que TINGEM o papel — um sopro de azul no alto e um de carmim no
+ * canto, em opacidade baixíssima. Manter os mesmos valores do tema escuro
+ * deixaria manchas sujas sobre o branco.
+ */
 function Atmosfera() {
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0">
-      <div className="absolute left-1/2 top-0 h-[46rem] w-[58rem] -translate-x-1/2 -translate-y-1/3 rounded-full bg-[radial-gradient(circle,var(--color-marinho-700)_0%,transparent_62%)] opacity-40 blur-3xl" />
-      <div className="absolute -bottom-40 right-0 h-[34rem] w-[34rem] rounded-full bg-[radial-gradient(circle,var(--color-carmim-700)_0%,transparent_65%)] opacity-[0.14] blur-3xl" />
+      <div className="absolute left-1/2 top-0 h-[46rem] w-[58rem] -translate-x-1/2 -translate-y-1/3 rounded-full bg-[radial-gradient(circle,var(--color-marinho-300)_0%,transparent_62%)] opacity-25 blur-3xl" />
+      <div className="absolute -bottom-40 right-0 h-[34rem] w-[34rem] rounded-full bg-[radial-gradient(circle,var(--color-carmim-300)_0%,transparent_65%)] opacity-[0.16] blur-3xl" />
 
-      <LacoTracejado className="absolute -left-24 top-1/2 h-[36rem] w-[36rem] -translate-y-1/2 text-marinho-400/8 md:left-[-6rem]" />
+      <LacoTracejado className="absolute -left-24 top-1/2 h-[36rem] w-[36rem] -translate-y-1/2 text-marinho-500/12 md:left-[-6rem]" />
 
-      <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-marinho-950 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-fundo to-transparent" />
     </div>
   );
 }
@@ -244,13 +252,13 @@ function IndicadorRolagem() {
       transition={{ duration: 1, delay: 1.4 }}
       className="absolute bottom-8 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-3 lg:flex"
     >
-      <span className="font-sans text-[0.5625rem] uppercase tracking-[0.3em] text-marinho-200/35">
+      <span className="font-sans text-[0.5625rem] uppercase tracking-[0.3em] text-marinho-700/72">
         Role
       </span>
       <motion.span
         animate={{ y: [0, 7, 0] }}
         transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
-        className="text-marinho-200/45"
+        className="text-marinho-700/75"
       >
         <ArrowDown size={15} strokeWidth={1.25} />
       </motion.span>

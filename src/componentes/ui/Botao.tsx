@@ -7,10 +7,11 @@ type Porte = "md" | "lg";
 
 const variantes: Record<Variante, string> = {
   solido:
-    "bg-marfim text-marinho-900 hover:bg-marfim-puro border border-marfim",
+    "bg-marinho-900 text-marfim-puro hover:bg-marinho-800 border border-marinho-900 hover:border-marinho-800",
   contorno:
-    "border border-marinho-200/25 text-marfim hover:border-marinho-200/60 hover:bg-marinho-200/[0.06]",
-  fantasma: "text-marfim/70 hover:text-marfim border border-transparent",
+    "border border-marinho-500/30 text-marinho-900 hover:border-marinho-500/60 hover:bg-marinho-500/[0.05]",
+  fantasma:
+    "text-marinho-800/70 hover:text-marinho-900 border border-transparent",
   carmim:
     "bg-carmim-500 text-marfim-puro hover:bg-carmim-600 border border-carmim-500 hover:border-carmim-600",
 };
@@ -100,7 +101,7 @@ export function LinkSublinhado({
     <Link
       href={href}
       className={cn(
-        "group/link relative inline-flex items-center gap-2 text-[0.8125rem] uppercase tracking-[0.16em] text-marfim/75 transition-colors duration-400 hover:text-marfim",
+        "group/link relative inline-flex items-center gap-2 text-[0.8125rem] uppercase tracking-[0.16em] text-marinho-800/75 transition-colors duration-400 hover:text-marinho-900",
         className,
       )}
       {...props}

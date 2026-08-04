@@ -81,7 +81,7 @@ export function AberturaMarca() {
           // `pointer-events-none`: a cortina não precisa receber clique (pular é
           // via listener no window) e assim jamais bloqueia a página, mesmo que
           // a animação de saída falhe.
-          className="abertura grao pointer-events-none fixed inset-0 z-[100] grid place-items-center bg-marinho-950"
+          className="abertura grao grao-inverso pointer-events-none fixed inset-0 z-[100] grid place-items-center bg-marinho-950"
           // Cortina de teatro: a borda de baixo sobe e o palco aparece por baixo.
           initial={{ clipPath: "inset(0% 0% 0% 0%)" }}
           animate={{ clipPath: "inset(0% 0% 0% 0%)" }}

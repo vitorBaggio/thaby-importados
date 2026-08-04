@@ -10,8 +10,13 @@ type Props = {
   prioridade?: boolean;
 };
 
+/*
+  Com o site em fundo claro, o padrão passa a ser a arte original em cores — o
+  azul em degradê e o avião carmim aparecem como a marca foi desenhada. A
+  redução monocromática fica reservada aos blocos escuros (rodapé, cortina).
+*/
 export function Logo({
-  variante = "marfim",
+  variante = "cor",
   tamanho = 56,
   className,
   prioridade = false,
@@ -36,10 +41,10 @@ export function Logo({
 export function Assinatura({ className }: { className?: string }) {
   return (
     <span className={cn("flex flex-col leading-none", className)}>
-      <span className="font-display text-2xl font-normal tracking-tight text-marfim">
+      <span className="font-display text-2xl font-normal tracking-tight text-marinho-900">
         {empresa.nomeCurto}
       </span>
-      <span className="sobrescrita mt-1 text-[0.5rem] text-carmim-400">
+      <span className="sobrescrita mt-1 text-[0.5rem] text-carmim-500">
         Importados
       </span>
     </span>

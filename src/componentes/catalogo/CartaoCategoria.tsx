@@ -26,7 +26,7 @@ export function CartaoCategoria({
       >
         <div
           className={cn(
-            "relative overflow-hidden bg-marfim",
+            "relative overflow-hidden border border-marinho-500/10 bg-ladrilho",
             destaque ? "aspect-[4/3] md:aspect-[16/11]" : "aspect-[4/5]",
           )}
         >
@@ -48,7 +48,7 @@ export function CartaoCategoria({
 
           <span className="pointer-events-none absolute inset-0 bg-marinho-900/0 transition-colors duration-700 group-hover/categoria:bg-marinho-900/[0.05]" />
 
-          <span className="absolute right-4 top-4 grid size-9 translate-y-1 place-items-center border border-marinho-900/10 bg-marfim-puro/80 text-marinho-800 opacity-0 backdrop-blur-sm transition-all duration-500 ease-[var(--ease-suave)] group-hover/categoria:translate-y-0 group-hover/categoria:opacity-100">
+          <span className="absolute right-4 top-4 grid size-9 translate-y-1 place-items-center border border-marinho-900/10 bg-fundo/85 text-marinho-800 opacity-0 backdrop-blur-sm transition-all duration-500 ease-[var(--ease-suave)] group-hover/categoria:translate-y-0 group-hover/categoria:opacity-100">
             <ArrowUpRight size={15} strokeWidth={1.5} />
           </span>
         </div>
@@ -56,19 +56,19 @@ export function CartaoCategoria({
         <div className="flex items-baseline justify-between gap-4 pt-5">
           <h3
             className={cn(
-              "font-display font-light leading-tight text-marfim/90 transition-colors duration-500 group-hover/categoria:text-marfim",
+              "font-display font-light leading-tight text-marinho-900/90 transition-colors duration-500 group-hover/categoria:text-marinho-900",
               destaque ? "text-2xl md:text-3xl" : "text-xl md:text-2xl",
             )}
           >
             {categoria.nome}
           </h3>
 
-          <span className="shrink-0 font-sans text-[0.625rem] uppercase tabular-nums tracking-[0.18em] text-marinho-200/40">
+          <span className="shrink-0 font-sans text-[0.625rem] uppercase tabular-nums tracking-[0.18em] text-marinho-700/75">
             {quantidade > 0 ? `${quantidade} ${quantidade === 1 ? "peça" : "peças"}` : "Sob consulta"}
           </span>
         </div>
 
-        <p className="mt-2.5 max-w-md text-[0.875rem] font-light leading-relaxed legivel text-marinho-100/45">
+        <p className="mt-2.5 max-w-md text-[0.875rem] font-light leading-relaxed legivel text-marinho-800/70">
           {categoria.resumo}
         </p>
       </Link>

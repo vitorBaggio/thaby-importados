@@ -45,7 +45,11 @@ export function CartaoProduto({
           share="morph"
           default="none"
         >
-          <div className="relative aspect-[4/5] overflow-hidden bg-marfim">
+          {/*
+            O filete é obrigatório no tema claro: o packshot tem fundo branco e,
+            sem moldura, a foto sangraria direto na página.
+          */}
+          <div className="relative aspect-[4/5] overflow-hidden border border-marinho-500/10 bg-ladrilho">
             {produto.imagem ? (
               <RevelarImagem atraso={atraso}>
                 <Image
@@ -83,7 +87,7 @@ export function CartaoProduto({
           "focus-visible:translate-y-0 focus-visible:opacity-100",
           selecionado
             ? "border-carmim-500 bg-carmim-500 text-marfim-puro md:translate-y-0 md:opacity-100"
-            : "border-marinho-900/12 bg-marfim-puro/85 text-marinho-800 hover:border-marinho-900/30",
+            : "border-marinho-900/12 bg-fundo/90 text-marinho-800 hover:border-marinho-900/30",
         )}
       >
         {selecionado ? <Check size={15} strokeWidth={1.75} /> : <Plus size={15} strokeWidth={1.5} />}
@@ -91,10 +95,10 @@ export function CartaoProduto({
 
       <div className="flex flex-1 flex-col pt-5">
         <div className="flex items-baseline justify-between gap-4">
-          <span className="sobrescrita text-[0.5625rem] text-carmim-400">
+          <span className="sobrescrita text-[0.5625rem] text-carmim-500">
             {produto.marca ?? categoria?.nome ?? "Importado"}
           </span>
-          <span className="font-sans text-[0.5625rem] uppercase tracking-[0.2em] text-marinho-300/50">
+          <span className="font-sans text-[0.5625rem] uppercase tracking-[0.2em] text-marinho-600/78">
             {produto.origem}
           </span>
         </div>
@@ -102,13 +106,13 @@ export function CartaoProduto({
         <h3 className="mt-2.5 text-[1.0625rem] font-normal leading-snug legivel">
           <Link
             href={`/produtos/${produto.slug}`}
-            className="bg-[linear-gradient(currentColor,currentColor)] bg-[length:0%_1px] bg-left-bottom bg-no-repeat text-marfim/90 transition-[background-size,color] duration-600 ease-[var(--ease-suave)] hover:text-marfim group-hover/cartao:bg-[length:100%_1px]"
+            className="bg-[linear-gradient(currentColor,currentColor)] bg-[length:0%_1px] bg-left-bottom bg-no-repeat text-marinho-900/90 transition-[background-size,color] duration-600 ease-[var(--ease-suave)] hover:text-marinho-900 group-hover/cartao:bg-[length:100%_1px]"
           >
             {produto.nome}
           </Link>
         </h3>
 
-        <p className="mt-auto pt-4 font-sans text-[0.6875rem] uppercase tracking-[0.18em] text-marinho-200/40">
+        <p className="mt-auto pt-4 font-sans text-[0.6875rem] uppercase tracking-[0.18em] text-marinho-700/75">
           Sob consulta
         </p>
       </div>
@@ -128,15 +132,15 @@ function PlaceholderProduto({ produto }: { produto: Produto }) {
       <LacoTracejado className="absolute -right-16 -top-16 h-64 w-64 text-marinho-500/10" />
 
       <span className="relative flex flex-col items-center gap-4 px-6 text-center">
-        <span className="font-display text-5xl font-light leading-none text-marinho-500/35">
+        <span className="font-display text-5xl font-light leading-none text-marinho-500/70">
           {iniciais(produto.marca ?? produto.nome)}
         </span>
-        <span className="sobrescrita text-[0.5rem] text-marinho-600/40">
+        <span className="sobrescrita text-[0.5rem] text-marinho-600/80">
           {categoria?.nome ?? "Acervo"}
         </span>
       </span>
 
-      <span className="absolute bottom-4 left-1/2 -translate-x-1/2 font-sans text-[0.5625rem] uppercase tracking-[0.22em] text-marinho-600/35">
+      <span className="absolute bottom-4 left-1/2 -translate-x-1/2 font-sans text-[0.5625rem] uppercase tracking-[0.22em] text-marinho-600/75">
         Foto sob consulta
       </span>
     </span>

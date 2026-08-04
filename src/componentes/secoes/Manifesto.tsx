@@ -26,7 +26,7 @@ const pilares = [
 export function Manifesto() {
   return (
     <Secao className="overflow-hidden">
-      <LacoTracejado className="pointer-events-none absolute -right-40 top-10 h-[34rem] w-[34rem] text-marinho-400/6" />
+      <LacoTracejado className="pointer-events-none absolute -right-40 top-10 h-[34rem] w-[34rem] text-marinho-500/10" />
 
       <div className="area relative">
         <div className="grid gap-16 lg:grid-cols-12 lg:gap-20">
@@ -46,13 +46,13 @@ export function Manifesto() {
             />
 
             <Revelar atraso={0.1} className="mt-12">
-              <div className="flex flex-col divide-y divide-marinho-200/10 border-y border-marinho-200/10">
+              <div className="flex flex-col divide-y divide-marinho-500/12 border-y border-marinho-500/12">
                 {pilares.map((pilar) => (
                   <div key={pilar.titulo} className="py-7">
-                    <h3 className="font-sans text-[0.8125rem] uppercase tracking-[0.16em] text-marfim/85">
+                    <h3 className="font-sans text-[0.8125rem] uppercase tracking-[0.16em] text-marinho-900/85">
                       {pilar.titulo}
                     </h3>
-                    <p className="mt-3 max-w-md text-[0.9375rem] font-light leading-relaxed legivel text-marinho-100/50">
+                    <p className="mt-3 max-w-md text-[0.9375rem] font-light leading-relaxed legivel text-marinho-800/75">
                       {pilar.texto}
                     </p>
                   </div>
@@ -68,7 +68,7 @@ export function Manifesto() {
           <div className="lg:col-span-6 lg:col-start-8 xl:col-span-6 xl:col-start-7">
             <Revelar deslocamento={40} className="lg:sticky lg:top-32">
               <figure className="relative">
-                <div className="relative aspect-[3/4] overflow-hidden bg-marfim">
+                <div className="relative aspect-[3/4] overflow-hidden border border-marinho-500/10 bg-ladrilho">
                   <RevelarImagem>
                     <Image
                       src="/categorias/acessorios-e-moda.webp"
@@ -80,11 +80,11 @@ export function Manifesto() {
                   </RevelarImagem>
                 </div>
 
-                <div className="absolute -bottom-6 -left-6 hidden max-w-[15rem] border border-marinho-200/12 bg-marinho-900/90 p-6 backdrop-blur-sm md:block">
-                  <p className="font-display text-4xl font-light leading-none text-marfim">
+                <div className="absolute -bottom-6 -left-6 hidden max-w-[15rem] border border-marinho-500/14 bg-fundo/95 p-6 backdrop-blur-sm md:block">
+                  <p className="font-display text-4xl font-light leading-none text-marinho-900">
                     2021
                   </p>
-                  <p className="mt-3 font-sans text-[0.625rem] uppercase leading-relaxed tracking-[0.18em] text-marinho-200/45">
+                  <p className="mt-3 font-sans text-[0.625rem] uppercase leading-relaxed tracking-[0.18em] text-marinho-700/75">
                     Ano em que a primeira encomenda saiu de Sorriso
                   </p>
                 </div>

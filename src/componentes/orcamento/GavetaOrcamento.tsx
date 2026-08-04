@@ -36,7 +36,7 @@ export function GavetaOrcamento() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.45 }}
             onClick={fechar}
-            className="fixed inset-0 z-[70] bg-marinho-950/70 backdrop-blur-sm"
+            className="fixed inset-0 z-[70] bg-marinho-900/45 backdrop-blur-sm"
           />
 
           <motion.aside
@@ -47,19 +47,19 @@ export function GavetaOrcamento() {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed inset-y-0 right-0 z-[80] flex w-full max-w-md flex-col border-l border-marinho-200/10 bg-marinho-900"
+            className="fixed inset-y-0 right-0 z-[80] flex w-full max-w-md flex-col border-l border-marinho-500/12 bg-fundo"
           >
             <LacoTracejado
-              className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 text-marinho-400/8"
+              className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 text-marinho-500/12"
             />
 
-            <header className="relative flex items-start justify-between gap-6 border-b border-marinho-200/10 px-7 py-7">
+            <header className="relative flex items-start justify-between gap-6 border-b border-marinho-500/12 px-7 py-7">
               <div>
-                <p className="sobrescrita text-marinho-200/60">Sua seleção</p>
-                <h2 className="mt-3 font-display text-3xl font-light text-marfim">
+                <p className="sobrescrita text-marinho-700/80">Sua seleção</p>
+                <h2 className="mt-3 font-display text-3xl font-light text-marinho-900">
                   Lista de orçamento
                 </h2>
-                <p className="mt-2 font-sans text-[0.8125rem] font-light text-marinho-200/50">
+                <p className="mt-2 font-sans text-[0.8125rem] font-light text-marinho-700/78">
                   {quantidadeTotal === 0
                     ? "Nenhum item ainda"
                     : `${quantidadeTotal} ${quantidadeTotal === 1 ? "item" : "itens"}`}
@@ -70,7 +70,7 @@ export function GavetaOrcamento() {
                 type="button"
                 onClick={fechar}
                 aria-label="Fechar lista"
-                className="-mr-2 -mt-1 grid size-10 shrink-0 place-items-center text-marfim/60 transition-colors duration-400 hover:text-marfim"
+                className="-mr-2 -mt-1 grid size-10 shrink-0 place-items-center text-marinho-800/75 transition-colors duration-400 hover:text-marinho-900"
               >
                 <X size={20} strokeWidth={1.25} />
               </button>
@@ -80,20 +80,20 @@ export function GavetaOrcamento() {
               <ListaVazia aoFechar={fechar} />
             ) : (
               <>
-                <ul className="flex-1 divide-y divide-marinho-200/8 overflow-y-auto px-7">
+                <ul className="flex-1 divide-y divide-marinho-500/10 overflow-y-auto px-7">
                   {itens.map((item) => (
                     <li key={item.id} className="flex items-start gap-4 py-5">
                       <div className="min-w-0 flex-1">
                         <Link
                           href={`/produtos/${item.slug}`}
                           onClick={fechar}
-                          className="block text-[0.9375rem] font-light leading-snug text-marfim/85 transition-colors duration-400 hover:text-marfim"
+                          className="block text-[0.9375rem] font-light leading-snug text-marinho-900/85 transition-colors duration-400 hover:text-marinho-900"
                         >
                           {item.nome}
                         </Link>
 
                         <div className="mt-3 flex items-center gap-3">
-                          <div className="flex items-center border border-marinho-200/15">
+                          <div className="flex items-center border border-marinho-500/18">
                             <BotaoQuantidade
                               rotulo="Diminuir quantidade"
                               onClick={() =>
@@ -103,7 +103,7 @@ export function GavetaOrcamento() {
                               <Minus size={12} strokeWidth={1.75} />
                             </BotaoQuantidade>
 
-                            <span className="w-8 text-center font-sans text-[0.75rem] tabular-nums text-marfim">
+                            <span className="w-8 text-center font-sans text-[0.75rem] tabular-nums text-marinho-900">
                               {item.quantidade}
                             </span>
 
@@ -121,7 +121,7 @@ export function GavetaOrcamento() {
                             type="button"
                             onClick={() => remover(item.id)}
                             aria-label={`Remover ${item.nome}`}
-                            className="grid size-8 place-items-center text-marinho-200/40 transition-colors duration-400 hover:text-carmim-400"
+                            className="grid size-8 place-items-center text-marinho-700/75 transition-colors duration-400 hover:text-carmim-500"
                           >
                             <Trash2 size={14} strokeWidth={1.25} />
                           </button>
@@ -131,8 +131,8 @@ export function GavetaOrcamento() {
                   ))}
                 </ul>
 
-                <footer className="border-t border-marinho-200/10 px-7 py-7">
-                  <p className="text-[0.8125rem] font-light leading-relaxed legivel text-marinho-200/50">
+                <footer className="border-t border-marinho-500/12 px-7 py-7">
+                  <p className="text-[0.8125rem] font-light leading-relaxed legivel text-marinho-700/78">
                     A lista vira uma mensagem pronta no WhatsApp. Você confere
                     tudo antes de enviar.
                   </p>
@@ -150,7 +150,7 @@ export function GavetaOrcamento() {
                   <button
                     type="button"
                     onClick={limpar}
-                    className="mt-4 w-full font-sans text-[0.6875rem] uppercase tracking-[0.18em] text-marinho-200/35 transition-colors duration-400 hover:text-marinho-200/70"
+                    className="mt-4 w-full font-sans text-[0.6875rem] uppercase tracking-[0.18em] text-marinho-700/72 transition-colors duration-400 hover:text-marinho-700/85"
                   >
                     Esvaziar lista
                   </button>
@@ -178,7 +178,7 @@ function BotaoQuantidade({
       type="button"
       onClick={onClick}
       aria-label={rotulo}
-      className="grid size-8 place-items-center text-marfim/60 transition-colors duration-400 hover:bg-marinho-200/8 hover:text-marfim"
+      className="grid size-8 place-items-center text-marinho-800/75 transition-colors duration-400 hover:bg-marinho-500/8 hover:text-marinho-900"
     >
       {children}
     </button>
@@ -189,14 +189,14 @@ function ListaVazia({ aoFechar }: { aoFechar: () => void }) {
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-6 px-10 text-center">
       <AviaoDePapel className="h-9 w-9 opacity-40" />
-      <p className="text-[0.9375rem] font-light leading-relaxed legivel text-marinho-200/50">
-        Navegue pelo catálogo e toque no <span className="text-marfim">+</span>{" "}
+      <p className="text-[0.9375rem] font-light leading-relaxed legivel text-marinho-700/78">
+        Navegue pelo catálogo e toque no <span className="text-marinho-900">+</span>{" "}
         de cada peça para montar sua seleção.
       </p>
       <Link
         href="/catalogo"
         onClick={aoFechar}
-        className="inline-flex h-12 items-center border border-marinho-200/25 px-8 font-sans text-[0.75rem] uppercase tracking-[0.18em] text-marfim transition-colors duration-500 hover:border-marfim"
+        className="inline-flex h-12 items-center border border-marinho-500/28 px-8 font-sans text-[0.75rem] uppercase tracking-[0.18em] text-marinho-900 transition-colors duration-500 hover:border-marinho-900"
       >
         Ver catálogo
       </Link>

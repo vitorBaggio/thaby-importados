@@ -77,20 +77,20 @@ export default async function PaginaProduto({
 
       <div className="area pb-24 pt-28 md:pt-36">
         <nav aria-label="Trilha de navegação">
-          <ol className="flex flex-wrap items-center gap-2 font-sans text-[0.625rem] uppercase tracking-[0.18em] text-marinho-200/40">
+          <ol className="flex flex-wrap items-center gap-2 font-sans text-[0.625rem] uppercase tracking-[0.18em] text-marinho-700/75">
             {trilha.map((item, indice) => {
               const ultimo = indice === trilha.length - 1;
               return (
                 <li key={item.caminho} className="flex items-center gap-2">
                   {ultimo ? (
-                    <span className="line-clamp-1 max-w-[16rem] text-marinho-200/70">
+                    <span className="line-clamp-1 max-w-[16rem] text-marinho-700/85">
                       {item.nome}
                     </span>
                   ) : (
                     <>
                       <Link
                         href={item.caminho}
-                        className="transition-colors duration-400 hover:text-marfim"
+                        className="transition-colors duration-400 hover:text-marinho-900"
                       >
                         {item.nome}
                       </Link>
@@ -114,7 +114,7 @@ export default async function PaginaProduto({
             share="morph"
             default="none"
           >
-            <figure className="relative aspect-square overflow-hidden bg-marfim lg:sticky lg:top-28">
+            <figure className="relative aspect-square overflow-hidden border border-marinho-500/10 bg-ladrilho lg:sticky lg:top-28">
               {produto.imagem ? (
                 <Image
                   src={produto.imagem}
@@ -131,7 +131,7 @@ export default async function PaginaProduto({
                     <span className="font-display text-7xl font-light text-marinho-500/30">
                       {iniciais(produto.marca ?? produto.nome)}
                     </span>
-                    <span className="sobrescrita text-[0.5625rem] text-marinho-600/40">
+                    <span className="sobrescrita text-[0.5625rem] text-marinho-600/80">
                       Foto sob consulta
                     </span>
                   </span>
@@ -143,13 +143,13 @@ export default async function PaginaProduto({
           <div className="lg:py-4">
             <Revelar>
               <div className="flex items-center gap-3">
-                <span className="sobrescrita text-carmim-400/85">
+                <span className="sobrescrita text-carmim-600">
                   {produto.marca ?? categoria?.nome ?? "Importado"}
                 </span>
                 {produto.destaque && (
                   <>
-                    <span className="size-1 rotate-45 bg-marinho-300/50" />
-                    <span className="sobrescrita text-marinho-200/45">
+                    <span className="size-1 rotate-45 bg-marinho-500/40" />
+                    <span className="sobrescrita text-marinho-700/75">
                       Destaque
                     </span>
                   </>
@@ -158,23 +158,23 @@ export default async function PaginaProduto({
             </Revelar>
 
             <Revelar atraso={0.06}>
-              <h1 className="mt-6 text-fluid-xl font-light leading-[1.12] equilibrio text-marfim">
+              <h1 className="mt-6 text-fluid-xl font-light leading-[1.12] equilibrio text-marinho-900">
                 {produto.nome}
               </h1>
             </Revelar>
 
             <Revelar atraso={0.12}>
-              <p className="mt-7 max-w-lg text-fluid-base font-light leading-relaxed legivel text-marinho-100/60">
+              <p className="mt-7 max-w-lg text-fluid-base font-light leading-relaxed legivel text-marinho-800/70">
                 {produto.resumo}
               </p>
             </Revelar>
 
             <Revelar atraso={0.18}>
-              <div className="mt-10 border-y border-marinho-200/10 py-7">
-                <p className="font-display text-3xl font-light text-marfim">
+              <div className="mt-10 border-y border-marinho-500/12 py-7">
+                <p className="font-display text-3xl font-light text-marinho-900">
                   Sob consulta
                 </p>
-                <p className="mt-2.5 max-w-sm text-[0.8125rem] font-light leading-relaxed text-marinho-200/45">
+                <p className="mt-2.5 max-w-sm text-[0.8125rem] font-light leading-relaxed text-marinho-700/75">
                   O valor depende do câmbio e do lote em que a peça entra. A
                   Thaby fecha o preço com você antes de qualquer compra.
                 </p>
@@ -191,10 +191,10 @@ export default async function PaginaProduto({
               <dl className="mt-12 grid grid-cols-2 gap-x-8 gap-y-7">
                 {ficha.map((linha) => (
                   <div key={linha.rotulo}>
-                    <dt className="font-sans text-[0.5625rem] uppercase tracking-[0.22em] text-marinho-200/35">
+                    <dt className="font-sans text-[0.5625rem] uppercase tracking-[0.22em] text-marinho-700/72">
                       {linha.rotulo}
                     </dt>
-                    <dd className="mt-2 text-[0.9375rem] font-light text-marfim/80">
+                    <dd className="mt-2 text-[0.9375rem] font-light text-marinho-900/80">
                       {linha.valor}
                     </dd>
                   </div>
@@ -206,9 +206,9 @@ export default async function PaginaProduto({
       </div>
 
       {sugestoes.length > 0 && (
-        <section className="border-t border-marinho-200/8 py-20 md:py-28">
+        <section className="border-t border-marinho-500/10 py-20 md:py-28">
           <div className="area">
-            <h2 className="font-display text-2xl font-light text-marfim/85 md:text-3xl">
+            <h2 className="font-display text-2xl font-light text-marinho-900/85 md:text-3xl">
               Também no acervo
             </h2>
 

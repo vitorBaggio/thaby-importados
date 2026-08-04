@@ -44,13 +44,13 @@ export function VitrineCatalogo({ produtos }: { produtos: Produto[] }) {
 
   return (
     <div>
-      <div className="sticky top-[4.5rem] z-30 -mx-6 border-b border-marinho-200/8 bg-marinho-950/85 px-6 py-5 backdrop-blur-xl md:-mx-10 md:px-10 lg:top-[5rem]">
+      <div className="sticky top-[4.5rem] z-30 -mx-6 border-b border-marinho-500/10 bg-fundo/85 px-6 py-5 backdrop-blur-xl md:-mx-10 md:px-10 lg:top-[5rem]">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <label className="group relative flex w-full max-w-md items-center">
             <Search
               size={16}
               strokeWidth={1.4}
-              className="pointer-events-none absolute left-0 text-marinho-200/40 transition-colors duration-400 group-focus-within:text-carmim-400"
+              className="pointer-events-none absolute left-0 text-marinho-700/75 transition-colors duration-400 group-focus-within:text-carmim-500"
             />
             <input
               type="search"
@@ -58,14 +58,14 @@ export function VitrineCatalogo({ produtos }: { produtos: Produto[] }) {
               onChange={(evento) => setTermo(evento.target.value)}
               placeholder="Buscar por peça, marca ou origem"
               aria-label="Buscar no catálogo"
-              className="w-full border-0 border-b border-marinho-200/15 bg-transparent py-2.5 pl-7 pr-8 font-sans text-[0.875rem] font-light text-marfim placeholder:text-marinho-200/30 focus:border-marinho-200/45 focus:outline-none focus-visible:outline-none [&::-webkit-search-cancel-button]:hidden"
+              className="w-full border-0 border-b border-marinho-500/18 bg-transparent py-2.5 pl-7 pr-8 font-sans text-[0.875rem] font-light text-marinho-900 placeholder:text-marinho-700/70 focus:border-marinho-500/50 focus:outline-none focus-visible:outline-none [&::-webkit-search-cancel-button]:hidden"
             />
             {termo && (
               <button
                 type="button"
                 onClick={() => setTermo("")}
                 aria-label="Limpar busca"
-                className="absolute right-0 text-marinho-200/40 transition-colors duration-400 hover:text-marfim"
+                className="absolute right-0 text-marinho-700/75 transition-colors duration-400 hover:text-marinho-900"
               >
                 <X size={15} strokeWidth={1.5} />
               </button>
@@ -73,7 +73,7 @@ export function VitrineCatalogo({ produtos }: { produtos: Produto[] }) {
           </label>
 
           <div className="flex items-center gap-1">
-            <span className="mr-2 hidden font-sans text-[0.625rem] uppercase tracking-[0.18em] text-marinho-200/30 sm:inline">
+            <span className="mr-2 hidden font-sans text-[0.625rem] uppercase tracking-[0.18em] text-marinho-700/70 sm:inline">
               Ordenar
             </span>
             {ordenacoes.map((opcao) => (
@@ -85,8 +85,8 @@ export function VitrineCatalogo({ produtos }: { produtos: Produto[] }) {
                 className={cn(
                   "px-3 py-1.5 font-sans text-[0.6875rem] uppercase tracking-[0.14em] transition-colors duration-400",
                   ordenacao === opcao.valor
-                    ? "text-marfim"
-                    : "text-marinho-200/35 hover:text-marinho-200/70",
+                    ? "text-marinho-900"
+                    : "text-marinho-700/72 hover:text-marinho-700/85",
                 )}
               >
                 {opcao.rotulo}
@@ -116,7 +116,7 @@ export function VitrineCatalogo({ produtos }: { produtos: Produto[] }) {
       </div>
 
       <div className="mt-10 flex items-center justify-between gap-6">
-        <p className="font-sans text-[0.6875rem] uppercase tracking-[0.18em] text-marinho-200/40">
+        <p className="font-sans text-[0.6875rem] uppercase tracking-[0.18em] text-marinho-700/75">
           {resultado.length === 0
             ? "Nenhuma peça encontrada"
             : `${resultado.length} ${resultado.length === 1 ? "peça encontrada" : "peças encontradas"}`}
@@ -129,7 +129,7 @@ export function VitrineCatalogo({ produtos }: { produtos: Produto[] }) {
               setTermo("");
               setCategoriaAtiva(null);
             }}
-            className="font-sans text-[0.6875rem] uppercase tracking-[0.18em] text-carmim-400/80 transition-colors duration-400 hover:text-carmim-400"
+            className="font-sans text-[0.6875rem] uppercase tracking-[0.18em] text-carmim-600 transition-colors duration-400 hover:text-carmim-500"
           >
             Limpar filtros
           </button>
@@ -158,12 +158,12 @@ export function VitrineCatalogo({ produtos }: { produtos: Produto[] }) {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-16 flex flex-col items-center gap-7 border border-dashed border-marinho-200/15 px-8 py-20 text-center"
+          className="mt-16 flex flex-col items-center gap-7 border border-dashed border-marinho-500/18 px-8 py-20 text-center"
         >
-            <p className="max-w-md text-fluid-lg font-light leading-snug equilibrio text-marfim/80">
+            <p className="max-w-md text-fluid-lg font-light leading-snug equilibrio text-marinho-900/80">
             Nada por aqui com esse filtro.
           </p>
-          <p className="max-w-md text-[0.9375rem] font-light leading-relaxed legivel text-marinho-100/50">
+          <p className="max-w-md text-[0.9375rem] font-light leading-relaxed legivel text-marinho-800/75">
             O acervo publicado é só uma parte do que a Thaby tem. Se você já
             sabe o que procura, é mais rápido perguntar direto.
           </p>
@@ -201,8 +201,8 @@ function Chip({
       className={cn(
         "shrink-0 whitespace-nowrap border px-4 py-2 font-sans text-[0.6875rem] uppercase tracking-[0.14em] transition-colors duration-400",
         ativo
-          ? "border-marfim bg-marfim text-marinho-900"
-          : "border-marinho-200/15 text-marinho-100/55 hover:border-marinho-200/40 hover:text-marfim",
+          ? "border-marinho-900 bg-marinho-900 text-marfim-puro"
+          : "border-marinho-500/18 text-marinho-800/65 hover:border-marinho-500/45 hover:text-marinho-900",
       )}
     >
       {children}

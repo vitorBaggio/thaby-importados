@@ -4,12 +4,12 @@ import { AviaoDePapel, LacoTracejado } from "@/componentes/marca/RotaDeVoo";
 export default function NaoEncontrado() {
   return (
     <section className="grao relative flex min-h-[70svh] items-center overflow-hidden py-32">
-      <LacoTracejado className="pointer-events-none absolute left-1/2 top-1/2 h-[28rem] w-[28rem] -translate-x-1/2 -translate-y-1/2 text-marinho-400/8" />
+      <LacoTracejado className="pointer-events-none absolute left-1/2 top-1/2 h-[28rem] w-[28rem] -translate-x-1/2 -translate-y-1/2 text-marinho-500/12" />
 
       <div className="area relative flex flex-col items-center text-center">
         <AviaoDePapel className="h-8 w-8 opacity-70" />
 
-        <p className="mt-8 font-display text-6xl font-light leading-none text-marinho-300/40 md:text-7xl">
+        <p className="mt-8 font-display text-6xl font-light leading-none text-marinho-600/75 md:text-7xl">
           404
         </p>
 
@@ -17,7 +17,7 @@ export default function NaoEncontrado() {
           Essa encomenda não chegou.
         </h1>
 
-        <p className="mt-6 max-w-md text-[0.9375rem] font-light leading-relaxed legivel text-marinho-100/50">
+        <p className="mt-6 max-w-md text-[0.9375rem] font-light leading-relaxed legivel text-marinho-800/75">
           A página que você procurou não existe ou saiu do ar. O acervo
           continua inteiro — é só voltar por aqui.
         </p>

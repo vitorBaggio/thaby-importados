@@ -31,33 +31,36 @@ const etapas = [
 ];
 
 /**
- * Quebra de ritmo: única seção clara da página.
- * O contraste depois de tanto azul-escuro é o que faz a página respirar.
+ * Quebra de ritmo: única seção escura da página.
+ *
+ * Numa página clara do começo ao fim, o olho perde a noção de progresso. Este
+ * bloco em marinho profundo é a pausa que separa a vitrine da conversa — e
+ * carrega o azul da marca de volta ao centro da tela.
  */
 export function Processo() {
   return (
     <section
       id="processo"
-      className="grao relative overflow-hidden bg-marfim py-24 text-marinho-900 md:py-32 lg:py-40"
+      className="grao grao-inverso relative overflow-hidden bg-marinho-950 py-24 text-marfim md:py-32 lg:py-40"
     >
       <div className="area relative">
         <div className="max-w-2xl">
           <Revelar className="flex items-center gap-4">
-            <span className="font-sans text-micro tabular-nums text-carmim-500">
+            <span className="font-sans text-micro tabular-nums text-carmim-400">
               04
             </span>
-            <span className="h-px w-8 bg-marinho-500/30" />
-            <span className="sobrescrita text-marinho-600/70">
+            <span className="h-px w-8 bg-marinho-400/40" />
+            <span className="sobrescrita text-marinho-200/70">
               Encomenda personalizada
             </span>
           </Revelar>
 
-          <h2 className="mt-7 text-fluid-2xl font-light leading-[1.06] equilibrio text-marinho-900">
+          <h2 className="mt-7 text-fluid-2xl font-light leading-[1.06] equilibrio texto-metal-claro">
             <RevelarTexto texto="Não achou no catálogo? Então a gente busca." atraso={0.06} />
           </h2>
 
           <Revelar atraso={0.18}>
-            <p className="mt-6 max-w-xl text-fluid-base font-light leading-relaxed legivel text-marinho-800/65">
+            <p className="mt-6 max-w-xl text-fluid-base font-light leading-relaxed legivel text-marinho-100/60">
               Metade do que sai daqui nunca esteve numa vitrine — foi pedido por
               alguém. O processo é curto e você acompanha do começo ao fim.
             </p>
@@ -70,7 +73,7 @@ export function Processo() {
             aria-hidden
             className="absolute inset-x-0 top-[1.35rem] hidden lg:block"
           >
-            <div className="relative mx-[12.5%] h-px border-t border-dashed border-marinho-500/25">
+            <div className="relative mx-[12.5%] h-px border-t border-dashed border-marinho-400/35">
               <span className="absolute -top-[0.6rem] right-0 translate-x-1/2">
                 <AviaoDePapel className="h-5 w-5 animate-[flutuar_7s_ease-in-out_infinite]" />
               </span>
@@ -85,15 +88,15 @@ export function Processo() {
                 como="li"
                 className="relative"
               >
-                <span className="relative grid size-11 place-items-center rounded-full border border-marinho-500/25 bg-marfim font-sans text-[0.75rem] tabular-nums text-marinho-600">
+                <span className="relative grid size-11 place-items-center rounded-full border border-marinho-200/25 bg-marinho-950 font-sans text-[0.75rem] tabular-nums text-marinho-200">
                   {etapa.numero}
                 </span>
 
-                <h3 className="mt-6 font-display text-2xl font-normal leading-tight text-marinho-900">
+                <h3 className="mt-6 font-display text-2xl font-normal leading-tight text-marfim">
                   {etapa.titulo}
                 </h3>
 
-                <p className="mt-3 max-w-xs text-[0.9375rem] font-light leading-relaxed legivel text-marinho-800/60">
+                <p className="mt-3 max-w-xs text-[0.9375rem] font-light leading-relaxed legivel text-marinho-100/55">
                   {etapa.texto}
                 </p>
               </Revelar>
@@ -106,7 +109,7 @@ export function Processo() {
             href={linkWhatsApp(mensagensPadrao.encomenda)}
             porte="lg"
             externo
-            className="border-marinho-900 bg-marinho-900 text-marfim hover:border-marinho-800 hover:bg-marinho-800"
+            className="border-marfim bg-marfim text-marinho-900 hover:border-marfim-puro hover:bg-marfim-puro"
           >
             Pedir uma encomenda
           </BotaoLink>

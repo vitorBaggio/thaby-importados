@@ -76,8 +76,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#060b18",
-  colorScheme: "dark",
+  themeColor: "#fbf9f5",
+  colorScheme: "light",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -97,7 +97,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </noscript>
       </head>
 
-      <body className="flex min-h-full flex-col bg-marinho-950">
+      <body className="flex min-h-full flex-col bg-fundo">
         {/* Fora do ScrollSuave: a cortina não deve participar do scroll. */}
         <AberturaMarca />
 

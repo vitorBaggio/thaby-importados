@@ -10,7 +10,7 @@ export function CategoriasDestaque() {
   const grade = demais.slice(0, 3);
 
   return (
-    <Secao id="categorias" className="border-t border-marinho-200/8">
+    <Secao id="categorias" className="border-t border-marinho-500/10">
       <div className="area">
         <CabecalhoSecao
           numero="02"

@@ -42,12 +42,12 @@ export function CabecalhoSecao({
           )}
         >
           {numero && (
-            <span className="font-sans text-micro tabular-nums text-carmim-400">
+            <span className="font-sans text-micro tabular-nums text-carmim-500">
               {numero}
             </span>
           )}
-          <span className="h-px w-8 bg-marinho-400/40" />
-          <span className="sobrescrita text-marinho-200/70">{sobrescrita}</span>
+          <span className="h-px w-8 bg-marinho-500/40" />
+          <span className="sobrescrita text-marinho-700/85">{sobrescrita}</span>
         </Revelar>
 
         <h2 className="mt-7 text-fluid-2xl leading-[1.06] equilibrio texto-metal">
@@ -56,7 +56,7 @@ export function CabecalhoSecao({
 
         {apoio && (
           <Revelar atraso={0.18}>
-            <p className="mt-6 max-w-xl text-fluid-base font-light leading-relaxed legivel text-marinho-100/60">
+            <p className="mt-6 max-w-xl text-fluid-base font-light leading-relaxed legivel text-marinho-800/70">
               {apoio}
             </p>
           </Revelar>

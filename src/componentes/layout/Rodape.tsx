@@ -17,15 +17,15 @@ export function Rodape() {
   const ano = new Date().getFullYear();
 
   return (
-    <footer className="grao relative overflow-hidden border-t border-marinho-200/10 bg-marinho-950">
+    <footer className="grao grao-inverso relative overflow-hidden bg-marinho-950">
       <LacoTracejado className="pointer-events-none absolute -left-32 top-1/4 h-[30rem] w-[30rem] text-marinho-500/5" />
 
       <div className="area relative py-20 md:py-24">
         <div className="grid gap-14 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr] lg:gap-10">
           <div className="max-w-sm">
-            <Logo tamanho={72} />
+            <Logo variante="marfim" tamanho={72} />
 
-            <p className="mt-7 text-[0.9375rem] font-light leading-relaxed legivel text-marinho-100/55">
+            <p className="mt-7 text-[0.9375rem] font-light leading-relaxed legivel text-marinho-100/70">
               Importados selecionados peça a peça, de Sorriso para o Brasil
               inteiro. O que não está no catálogo, a gente busca.
             </p>
@@ -83,7 +83,7 @@ export function Rodape() {
                 href={linkWhatsApp(mensagensPadrao.geral)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex items-start gap-3 text-[0.875rem] font-light text-marinho-100/55 transition-colors duration-400 hover:text-marfim"
+                className="group flex items-start gap-3 text-[0.875rem] font-light text-marinho-100/70 transition-colors duration-400 hover:text-marfim"
               >
                 <MessageCircle
                   size={15}
@@ -97,7 +97,7 @@ export function Rodape() {
             <li>
               <a
                 href={`mailto:${empresa.email}`}
-                className="group flex items-start gap-3 break-all text-[0.875rem] font-light text-marinho-100/55 transition-colors duration-400 hover:text-marfim"
+                className="group flex items-start gap-3 break-all text-[0.875rem] font-light text-marinho-100/70 transition-colors duration-400 hover:text-marfim"
               >
                 <Mail
                   size={15}
@@ -108,7 +108,7 @@ export function Rodape() {
               </a>
             </li>
 
-            <li className="flex items-start gap-3 text-[0.875rem] font-light text-marinho-100/55">
+            <li className="flex items-start gap-3 text-[0.875rem] font-light text-marinho-100/70">
               <MapPin
                 size={15}
                 strokeWidth={1.4}
@@ -120,7 +120,7 @@ export function Rodape() {
           </ColunaRodape>
         </div>
 
-        <div className="mt-16 flex flex-col gap-4 border-t border-marinho-200/8 pt-8 font-sans text-[0.6875rem] uppercase tracking-[0.16em] text-marinho-200/35 md:flex-row md:items-center md:justify-between">
+        <div className="mt-16 flex flex-col gap-4 border-t border-marinho-200/8 pt-8 font-sans text-[0.6875rem] uppercase tracking-[0.16em] text-marinho-200/72 md:flex-row md:items-center md:justify-between">
           <p>
             © {ano} {empresa.nome} · CNPJ {empresa.cnpj}
           </p>
@@ -145,7 +145,7 @@ function ColunaRodape({
 }) {
   return (
     <div>
-      <h3 className="sobrescrita font-sans text-marinho-200/45">{titulo}</h3>
+      <h3 className="sobrescrita font-sans text-marinho-200/65">{titulo}</h3>
       <ul className="mt-6 flex flex-col gap-3.5">{children}</ul>
     </div>
   );
@@ -163,7 +163,7 @@ function LinkRodape({
   return (
     <Link
       href={href}
-      className={`text-[0.875rem] font-light text-marinho-100/55 transition-colors duration-400 hover:text-marfim ${className ?? ""}`}
+      className={`text-[0.875rem] font-light text-marinho-100/70 transition-colors duration-400 hover:text-marfim ${className ?? ""}`}
     >
       {children}
     </Link>

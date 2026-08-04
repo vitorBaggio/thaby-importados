@@ -33,7 +33,7 @@ export function BotaoFlutuante() {
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           className="group fixed bottom-6 right-6 z-40 grid size-14 place-items-center rounded-full bg-carmim-500 text-marfim-puro shadow-[0_10px_40px_-8px_rgba(187,60,69,0.55)] transition-colors duration-500 hover:bg-carmim-600 md:bottom-8 md:right-8"
         >
-          <span className="absolute inset-0 rounded-full border border-carmim-400/50 opacity-0 transition-all duration-700 group-hover:scale-125 group-hover:opacity-100" />
+          <span className="absolute inset-0 rounded-full border border-carmim-500/50 opacity-0 transition-all duration-700 group-hover:scale-125 group-hover:opacity-100" />
           <MessageCircle size={22} strokeWidth={1.5} />
         </motion.a>
       )}

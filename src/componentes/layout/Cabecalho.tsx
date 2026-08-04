@@ -57,7 +57,7 @@ export function Cabecalho() {
         className={cn(
           "fixed inset-x-0 top-0 z-50 transition-all duration-700 ease-[var(--ease-suave)]",
           rolou
-            ? "border-b border-marinho-200/10 bg-marinho-950/70 backdrop-blur-xl"
+            ? "border-b border-marinho-500/12 bg-fundo/80 backdrop-blur-xl"
             : "border-b border-transparent bg-transparent",
         )}
       >
@@ -86,7 +86,7 @@ export function Cabecalho() {
                   href={item.href}
                   className={cn(
                     "group relative py-2 font-sans text-[0.75rem] uppercase tracking-[0.2em] transition-colors duration-500",
-                    ativo ? "text-marfim" : "text-marfim/55 hover:text-marfim",
+                    ativo ? "text-marinho-900" : "text-marinho-800/70 hover:text-marinho-900",
                   )}
                 >
                   {item.rotulo}
@@ -108,7 +108,7 @@ export function Cabecalho() {
               href={linkWhatsApp(mensagensPadrao.geral)}
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden h-10 items-center border border-marinho-200/25 px-6 font-sans text-[0.75rem] uppercase tracking-[0.18em] text-marfim transition-colors duration-500 hover:border-carmim-500 hover:bg-carmim-500 md:inline-flex"
+              className="hidden h-10 items-center border border-marinho-500/28 px-6 font-sans text-[0.75rem] uppercase tracking-[0.18em] text-marinho-900 transition-colors duration-500 hover:border-carmim-500 hover:bg-carmim-500 md:inline-flex"
             >
               Falar agora
             </a>
@@ -117,7 +117,7 @@ export function Cabecalho() {
               type="button"
               onClick={() => setMenuAberto(true)}
               aria-label="Abrir menu"
-              className="grid size-10 place-items-center text-marfim transition-opacity duration-400 hover:opacity-70 lg:hidden"
+              className="grid size-10 place-items-center text-marinho-900 transition-opacity duration-400 hover:opacity-70 lg:hidden"
             >
               <Menu size={20} strokeWidth={1.25} />
             </button>
@@ -150,7 +150,7 @@ function BotaoOrcamento({
           ? ` (${quantidade} ${quantidade === 1 ? "item" : "itens"})`
           : ""
       }`}
-      className="group relative grid size-10 place-items-center text-marfim transition-opacity duration-400 hover:opacity-70"
+      className="group relative grid size-10 place-items-center text-marinho-900 transition-opacity duration-400 hover:opacity-70"
     >
       <ShoppingBag size={19} strokeWidth={1.25} />
       <AnimatePresence>
@@ -183,7 +183,7 @@ function MenuMobile({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.4 }}
-      className="fixed inset-0 z-[60] bg-marinho-950 lg:hidden"
+      className="fixed inset-0 z-[60] bg-fundo lg:hidden"
     >
       <div className="grao relative flex h-full flex-col">
         <div className="area flex items-center justify-between py-4">
@@ -192,7 +192,7 @@ function MenuMobile({
             type="button"
             onClick={aoFechar}
             aria-label="Fechar menu"
-            className="grid size-10 place-items-center text-marfim"
+            className="grid size-10 place-items-center text-marinho-900"
           >
             <X size={22} strokeWidth={1.25} />
           </button>
@@ -217,11 +217,11 @@ function MenuMobile({
                 <Link
                   href={item.href}
                   className={cn(
-                    "flex items-baseline gap-5 border-b border-marinho-200/8 py-5 font-display text-4xl font-light transition-colors duration-400",
-                    ativo ? "text-marfim" : "text-marfim/60",
+                    "flex items-baseline gap-5 border-b border-marinho-500/10 py-5 font-display text-4xl font-light transition-colors duration-400",
+                    ativo ? "text-marinho-900" : "text-marinho-800/75",
                   )}
                 >
-                  <span className="font-sans text-micro tabular-nums text-carmim-400">
+                  <span className="font-sans text-micro tabular-nums text-carmim-500">
                     0{indice + 1}
                   </span>
                   {item.rotulo}

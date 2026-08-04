@@ -10,7 +10,7 @@ export function Convite() {
     <Secao className="grao relative overflow-hidden">
       <div aria-hidden className="pointer-events-none absolute inset-0">
         <div className="absolute left-1/2 top-1/2 h-[36rem] w-[52rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,var(--color-marinho-700)_0%,transparent_65%)] opacity-35 blur-3xl" />
-        <LacoTracejado className="absolute left-1/2 top-1/2 h-[30rem] w-[30rem] -translate-x-1/2 -translate-y-1/2 text-marinho-400/8" />
+        <LacoTracejado className="absolute left-1/2 top-1/2 h-[30rem] w-[30rem] -translate-x-1/2 -translate-y-1/2 text-marinho-500/12" />
       </div>
 
       <div className="area relative flex flex-col items-center text-center">
@@ -23,7 +23,7 @@ export function Convite() {
         </h2>
 
         <Revelar atraso={0.16}>
-          <p className="mx-auto mt-7 max-w-xl text-fluid-base font-light leading-relaxed legivel text-marinho-100/55">
+          <p className="mx-auto mt-7 max-w-xl text-fluid-base font-light leading-relaxed legivel text-marinho-800/65">
             Chame no WhatsApp para receber o catálogo completo, conferir
             disponibilidade ou encomendar aquilo que você ainda não achou no
             Brasil.
@@ -56,7 +56,7 @@ export function Convite() {
               <IconeInstagram className="size-[1.05rem]" />
             </PerfilSocial>
 
-            <span className="h-8 w-px bg-marinho-200/15" />
+            <span className="h-8 w-px bg-marinho-500/20" />
 
             <PerfilSocial
               href={empresa.redes.tiktok.url}
@@ -90,15 +90,15 @@ function PerfilSocial({
       rel="noopener noreferrer"
       className="group flex items-center gap-3 text-left"
     >
-      <span className="text-marinho-200/50 transition-colors duration-500 group-hover:text-carmim-400">
+      <span className="text-marinho-700/78 transition-colors duration-500 group-hover:text-carmim-500">
         {children}
       </span>
 
       <span className="flex flex-col leading-tight">
-        <span className="font-sans text-[0.5625rem] uppercase tracking-[0.22em] text-marinho-200/35">
+        <span className="font-sans text-[0.5625rem] uppercase tracking-[0.22em] text-marinho-700/72">
           {rede}
         </span>
-        <span className="mt-1 text-[0.875rem] font-light text-marfim/75 transition-colors duration-500 group-hover:text-marfim">
+        <span className="mt-1 text-[0.875rem] font-light text-marinho-800/80 transition-colors duration-500 group-hover:text-marinho-900">
           {usuario}
         </span>
       </span>

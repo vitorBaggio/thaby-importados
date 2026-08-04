@@ -57,7 +57,7 @@ export function FormularioWhatsApp() {
       <div className="flex flex-col gap-2.5">
         <label
           htmlFor="procura"
-          className="font-sans text-[0.5625rem] uppercase tracking-[0.22em] text-marinho-200/40"
+          className="font-sans text-[0.5625rem] uppercase tracking-[0.22em] text-marinho-700/75"
         >
           O que você procura
         </label>
@@ -67,7 +67,7 @@ export function FormularioWhatsApp() {
           value={procura}
           onChange={(evento) => setProcura(evento.target.value)}
           placeholder="Nome da peça, marca, link ou só uma descrição — a gente decifra"
-          className="resize-none border-0 border-b border-marinho-200/15 bg-transparent py-3 font-sans text-[0.9375rem] font-light leading-relaxed text-marfim placeholder:text-marinho-200/25 focus:border-marinho-200/45 focus:outline-none"
+          className="resize-none border-0 border-b border-marinho-500/18 bg-transparent py-3 font-sans text-[0.9375rem] font-light leading-relaxed text-marinho-900 placeholder:text-marinho-700/68 focus:border-marinho-500/50 focus:outline-none"
         />
       </div>
 
@@ -82,7 +82,7 @@ export function FormularioWhatsApp() {
           Abrir no WhatsApp
         </a>
 
-        <p className="max-w-xs text-[0.75rem] font-light leading-relaxed text-marinho-200/40">
+        <p className="max-w-xs text-[0.75rem] font-light leading-relaxed text-marinho-700/75">
           Abre a conversa com o texto já escrito. Você revisa e envia.
         </p>
       </div>
@@ -109,7 +109,7 @@ function Campo({
     <div className="flex flex-col gap-2.5">
       <label
         htmlFor={id}
-        className="font-sans text-[0.5625rem] uppercase tracking-[0.22em] text-marinho-200/40"
+        className="font-sans text-[0.5625rem] uppercase tracking-[0.22em] text-marinho-700/75"
       >
         {rotulo}
       </label>
@@ -120,7 +120,7 @@ function Campo({
         autoComplete={autoComplete}
         onChange={(evento) => aoMudar(evento.target.value)}
         placeholder={placeholder}
-        className="border-0 border-b border-marinho-200/15 bg-transparent py-3 font-sans text-[0.9375rem] font-light text-marfim placeholder:text-marinho-200/25 focus:border-marinho-200/45 focus:outline-none"
+        className="border-0 border-b border-marinho-500/18 bg-transparent py-3 font-sans text-[0.9375rem] font-light text-marinho-900 placeholder:text-marinho-700/68 focus:border-marinho-500/50 focus:outline-none"
       />
     </div>
   );

@@ -38,8 +38,8 @@ export function AcoesProduto({ produto }: { produto: Produto }) {
         className={cn(
           "inline-flex h-14 items-center justify-center gap-2.5 border px-8 font-sans text-[0.8125rem] uppercase tracking-[0.16em] transition-colors duration-500",
           selecionado
-            ? "border-marfim/70 text-marfim"
-            : "border-marinho-200/25 text-marfim hover:border-marinho-200/60",
+            ? "border-marinho-900/70 text-marinho-900"
+            : "border-marinho-500/28 text-marinho-900 hover:border-marinho-600/60",
         )}
       >
         {selecionado ? (

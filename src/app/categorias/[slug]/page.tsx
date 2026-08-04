@@ -104,15 +104,15 @@ export default async function PaginaCategoria({
         )}
       </div>
 
-      <section className="border-t border-marinho-200/8 py-20 md:py-24">
+      <section className="border-t border-marinho-500/10 py-20 md:py-24">
         <div className="area">
           <div className="flex flex-wrap items-baseline justify-between gap-6">
-            <h2 className="font-display text-2xl font-light text-marfim/85 md:text-3xl">
+            <h2 className="font-display text-2xl font-light text-marinho-900/85 md:text-3xl">
               Continue explorando
             </h2>
             <Link
               href="/catalogo"
-              className="group inline-flex items-center gap-2 font-sans text-[0.75rem] uppercase tracking-[0.16em] text-marinho-200/50 transition-colors duration-400 hover:text-marfim"
+              className="group inline-flex items-center gap-2 font-sans text-[0.75rem] uppercase tracking-[0.16em] text-marinho-700/78 transition-colors duration-400 hover:text-marinho-900"
             >
               Catálogo completo
               <ArrowRight
@@ -128,7 +128,7 @@ export default async function PaginaCategoria({
               <li key={outra.id}>
                 <Link
                   href={`/categorias/${outra.slug}`}
-                  className="inline-flex border border-marinho-200/15 px-5 py-2.5 font-sans text-[0.6875rem] uppercase tracking-[0.14em] text-marinho-100/55 transition-colors duration-400 hover:border-marinho-200/45 hover:text-marfim"
+                  className="inline-flex border border-marinho-500/18 px-5 py-2.5 font-sans text-[0.6875rem] uppercase tracking-[0.14em] text-marinho-800/65 transition-colors duration-400 hover:border-marinho-500/50 hover:text-marinho-900"
                 >
                   {outra.nome}
                 </Link>
@@ -154,11 +154,11 @@ function AcervoSobConsulta({
 }) {
   return (
     <Revelar>
-      <div className="relative grid items-center gap-12 overflow-hidden border border-dashed border-marinho-200/15 p-8 md:p-14 lg:grid-cols-2 lg:gap-20">
-        <LacoTracejado className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 text-marinho-400/8" />
+      <div className="relative grid items-center gap-12 overflow-hidden border border-dashed border-marinho-500/18 p-8 md:p-14 lg:grid-cols-2 lg:gap-20">
+        <LacoTracejado className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 text-marinho-500/12" />
 
         {imagem && (
-          <div className="relative aspect-[4/5] overflow-hidden bg-marfim">
+          <div className="relative aspect-[4/5] overflow-hidden border border-marinho-500/10 bg-ladrilho">
             <RevelarImagem>
               <Image
                 src={imagem}
@@ -173,13 +173,13 @@ function AcervoSobConsulta({
         )}
 
         <div className="relative flex max-w-lg flex-col items-start gap-7">
-          <span className="sobrescrita text-carmim-400/80">{nome}</span>
+          <span className="sobrescrita text-carmim-600">{nome}</span>
 
-          <p className="text-fluid-xl font-light leading-tight equilibrio text-marfim/90">
+          <p className="text-fluid-xl font-light leading-tight equilibrio text-marinho-900/90">
             Esta linha é montada sob encomenda.
           </p>
 
-          <p className="text-fluid-sm font-light leading-relaxed legivel text-marinho-100/50">
+          <p className="text-fluid-sm font-light leading-relaxed legivel text-marinho-800/75">
             As peças de {nome.toLowerCase()} giram rápido demais para ficarem
             publicadas no site. Chame no WhatsApp e a Thaby manda as opções
             disponíveis no lote atual, com foto e valor.
