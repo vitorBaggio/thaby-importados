@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { categorias, produtos } from "@/dados/catalogo";
+import { categorias, subcategorias, produtos } from "@/dados/catalogo";
 import { url } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -13,13 +13,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: url("/contato"), changeFrequency: "yearly", priority: 0.6 },
   ];
 
+  // Super e subcategorias têm slug único no mesmo espaço.
+  const rotasCategoria = [...categorias, ...subcategorias].map((c) => ({
+    url: url(`/categorias/${c.slug}`),
+    changeFrequency: "weekly" as const,
+    priority: 0.7,
+  }));
+
   return [
     ...fixas,
-    ...categorias.map((categoria) => ({
-      url: url(`/categorias/${categoria.slug}`),
-      changeFrequency: "weekly" as const,
-      priority: 0.7,
-    })),
+    ...rotasCategoria,
     ...produtos.map((produto) => ({
       url: url(`/produtos/${produto.slug}`),
       changeFrequency: "weekly" as const,

@@ -1,5 +1,5 @@
 import { empresa } from "@/dados/empresa";
-import { categorias, type Produto } from "@/dados/catalogo";
+import { categorias, resumoProduto, type Produto } from "@/dados/catalogo";
 import { url, urlBase } from "@/lib/site";
 
 /**
@@ -72,29 +72,37 @@ export function DadosEstruturados() {
 }
 
 export function DadosProduto({ produto }: { produto: Produto }) {
+  const oferta = produto.preco
+    ? {
+        "@type": "Offer",
+        availability: "https://schema.org/InStock",
+        priceCurrency: "BRL",
+        price: (produto.preco / 100).toFixed(2),
+        seller: { "@id": `${urlBase}/#loja` },
+        url: url(`/produtos/${produto.slug}`),
+      }
+    : {
+        "@type": "Offer",
+        availability: "https://schema.org/InStock",
+        priceCurrency: "BRL",
+        priceSpecification: { "@type": "PriceSpecification", priceCurrency: "BRL" },
+        seller: { "@id": `${urlBase}/#loja` },
+        url: url(`/produtos/${produto.slug}`),
+      };
+
   return (
     <Script
       dados={{
         "@context": "https://schema.org",
         "@type": "Product",
         name: produto.nome,
-        description: produto.resumo,
+        description: resumoProduto(produto),
         ...(produto.marca ? { brand: { "@type": "Brand", name: produto.marca } } : {}),
-        ...(produto.imagem ? { image: url(produto.imagem) } : {}),
+        ...(produto.imagem ? { image: produto.imagem } : {}),
+        ...(produto.ean ? { gtin13: produto.ean } : {}),
+        ...(produto.codigo ? { sku: produto.codigo } : {}),
         url: url(`/produtos/${produto.slug}`),
-        countryOfOrigin: produto.origem,
-        offers: {
-          "@type": "Offer",
-          availability: "https://schema.org/InStock",
-          priceCurrency: "BRL",
-          // A loja não publica preço: negocia caso a caso pelo WhatsApp.
-          priceSpecification: {
-            "@type": "PriceSpecification",
-            priceCurrency: "BRL",
-          },
-          seller: { "@id": `${urlBase}/#loja` },
-          url: url(`/produtos/${produto.slug}`),
-        },
+        offers: oferta,
       }}
     />
   );

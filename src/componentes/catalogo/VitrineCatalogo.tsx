@@ -4,43 +4,88 @@ import { useDeferredValue, useMemo, useState } from "react";
 import { motion } from "motion/react";
 import { Search, X } from "lucide-react";
 import { cn } from "@/lib/cn";
-import { buscar, categorias, type Produto } from "@/dados/catalogo";
+import { slugify } from "@/lib/texto";
 import { CartaoProduto } from "./CartaoProduto";
 import { BotaoLink } from "@/componentes/ui/Botao";
 import { linkWhatsApp } from "@/dados/empresa";
+import type { ProdutoResumo, SuperResumo } from "@/dados/catalogo";
 
-type Ordenacao = "curadoria" | "az" | "za";
+type Ordenacao = "curadoria" | "az" | "za" | "preco-asc" | "preco-desc";
 
 const ordenacoes: { valor: Ordenacao; rotulo: string }[] = [
   { valor: "curadoria", rotulo: "Curadoria" },
-  { valor: "az", rotulo: "A – Z" },
-  { valor: "za", rotulo: "Z – A" },
+  { valor: "az", rotulo: "A–Z" },
+  { valor: "preco-asc", rotulo: "Menor preço" },
+  { valor: "preco-desc", rotulo: "Maior preço" },
 ];
 
-export function VitrineCatalogo({ produtos }: { produtos: Produto[] }) {
-  const [termo, setTermo] = useState("");
-  const [categoriaAtiva, setCategoriaAtiva] = useState<number | null>(null);
-  const [ordenacao, setOrdenacao] = useState<Ordenacao>("curadoria");
+const LOTE = 48;
 
-  // A busca roda a cada tecla; adiar mantém o campo fluido em listas grandes.
+export function VitrineCatalogo({
+  produtos,
+  supercategorias,
+  mapaSuper,
+}: {
+  produtos: ProdutoResumo[];
+  supercategorias: SuperResumo[];
+  /** subcategoriaId → supercategoriaId */
+  mapaSuper: Record<number, number>;
+}) {
+  const [termo, setTermo] = useState("");
+  const [superAtiva, setSuperAtiva] = useState<number | null>(null);
+  const [ordenacao, setOrdenacao] = useState<Ordenacao>("curadoria");
+  const [visiveis, setVisiveis] = useState(LOTE);
+
+  // Assinatura do filtro atual. Se mudar entre renders, a paginação volta ao
+  // início durante o próprio render — sem efeito, sem cascata (padrão React 19).
+  const [assinatura, setAssinatura] = useState("");
+
   const termoAdiado = useDeferredValue(termo);
+  const assinaturaAtual = `${superAtiva}|${termoAdiado}|${ordenacao}`;
+  if (assinaturaAtual !== assinatura) {
+    setAssinatura(assinaturaAtual);
+    setVisiveis(LOTE);
+  }
 
   const resultado = useMemo(() => {
-    const porCategoria = categoriaAtiva
-      ? produtos.filter((p) => p.categoriaId === categoriaAtiva)
-      : produtos;
+    let lista = produtos;
 
-    const encontrados = buscar(termoAdiado, porCategoria);
+    if (superAtiva !== null) {
+      lista = lista.filter((p) => mapaSuper[p.categoriaId] === superAtiva);
+    }
 
-    if (ordenacao === "curadoria") return encontrados;
+    const alvo = slugify(termoAdiado);
+    if (alvo) {
+      const partes = alvo.split("-").filter(Boolean);
+      lista = lista.filter((p) => {
+        const indice = slugify(`${p.nome} ${p.marca ?? ""}`);
+        return partes.every((parte) => indice.includes(parte));
+      });
+    }
 
-    const ordenados = [...encontrados].sort((a, b) =>
-      a.nome.localeCompare(b.nome, "pt-BR"),
-    );
-    return ordenacao === "az" ? ordenados : ordenados.reverse();
-  }, [produtos, categoriaAtiva, termoAdiado, ordenacao]);
+    if (ordenacao === "curadoria") return lista;
 
-  const comFiltro = Boolean(termo) || categoriaAtiva !== null;
+    const ordenada = [...lista];
+    switch (ordenacao) {
+      case "az":
+        ordenada.sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+        break;
+      case "za":
+        ordenada.sort((a, b) => b.nome.localeCompare(a.nome, "pt-BR"));
+        break;
+      case "preco-asc":
+        ordenada.sort((a, b) => (a.preco ?? Infinity) - (b.preco ?? Infinity));
+        break;
+      case "preco-desc":
+        ordenada.sort((a, b) => (b.preco ?? -1) - (a.preco ?? -1));
+        break;
+    }
+    return ordenada;
+  }, [produtos, superAtiva, termoAdiado, ordenacao, mapaSuper]);
+
+  const mostrados = resultado.slice(0, visiveis);
+  const restam = resultado.length - mostrados.length;
+  const comFiltro = Boolean(termo) || superAtiva !== null;
 
   return (
     <div>
@@ -55,10 +100,10 @@ export function VitrineCatalogo({ produtos }: { produtos: Produto[] }) {
             <input
               type="search"
               value={termo}
-              onChange={(evento) => setTermo(evento.target.value)}
-              placeholder="Buscar por peça, marca ou origem"
+              onChange={(e) => setTermo(e.target.value)}
+              placeholder="Buscar por peça ou marca"
               aria-label="Buscar no catálogo"
-              className="w-full border-0 border-b border-marinho-500/18 bg-transparent py-2.5 pl-7 pr-8 font-sans text-[0.875rem] font-light text-marinho-900 placeholder:text-marinho-700/70 focus:border-marinho-500/50 focus:outline-none focus-visible:outline-none [&::-webkit-search-cancel-button]:hidden"
+              className="w-full border-0 border-b border-marinho-500/18 bg-transparent py-2.5 pl-7 pr-8 font-sans text-[0.875rem] font-light text-marinho-900 placeholder:text-marinho-700/70 focus:border-marinho-500/50 focus:outline-none [&::-webkit-search-cancel-button]:hidden"
             />
             {termo && (
               <button
@@ -72,10 +117,7 @@ export function VitrineCatalogo({ produtos }: { produtos: Produto[] }) {
             )}
           </label>
 
-          <div className="flex items-center gap-1">
-            <span className="mr-2 hidden font-sans text-[0.625rem] uppercase tracking-[0.18em] text-marinho-700/70 sm:inline">
-              Ordenar
-            </span>
+          <div className="flex flex-wrap items-center gap-1">
             {ordenacoes.map((opcao) => (
               <button
                 key={opcao.valor}
@@ -83,10 +125,10 @@ export function VitrineCatalogo({ produtos }: { produtos: Produto[] }) {
                 onClick={() => setOrdenacao(opcao.valor)}
                 aria-pressed={ordenacao === opcao.valor}
                 className={cn(
-                  "px-3 py-1.5 font-sans text-[0.6875rem] uppercase tracking-[0.14em] transition-colors duration-400",
+                  "px-3 py-1.5 font-sans text-[0.6875rem] uppercase tracking-[0.12em] transition-colors duration-400",
                   ordenacao === opcao.valor
                     ? "text-marinho-900"
-                    : "text-marinho-700/72 hover:text-marinho-700/85",
+                    : "text-marinho-700/72 hover:text-marinho-700/90",
                 )}
               >
                 {opcao.rotulo}
@@ -96,20 +138,16 @@ export function VitrineCatalogo({ produtos }: { produtos: Produto[] }) {
         </div>
 
         <div className="-mx-6 mt-5 flex gap-2 overflow-x-auto px-6 pb-1 [scrollbar-width:none] md:-mx-10 md:px-10 [&::-webkit-scrollbar]:hidden">
-          <Chip
-            ativo={categoriaAtiva === null}
-            onClick={() => setCategoriaAtiva(null)}
-          >
+          <Chip ativo={superAtiva === null} onClick={() => setSuperAtiva(null)}>
             Tudo
           </Chip>
-
-          {categorias.map((categoria) => (
+          {supercategorias.map((s) => (
             <Chip
-              key={categoria.id}
-              ativo={categoriaAtiva === categoria.id}
-              onClick={() => setCategoriaAtiva(categoria.id)}
+              key={s.id}
+              ativo={superAtiva === s.id}
+              onClick={() => setSuperAtiva(s.id)}
             >
-              {categoria.nome}
+              {s.nome}
             </Chip>
           ))}
         </div>
@@ -119,7 +157,7 @@ export function VitrineCatalogo({ produtos }: { produtos: Produto[] }) {
         <p className="font-sans text-[0.6875rem] uppercase tracking-[0.18em] text-marinho-700/75">
           {resultado.length === 0
             ? "Nenhuma peça encontrada"
-            : `${resultado.length} ${resultado.length === 1 ? "peça encontrada" : "peças encontradas"}`}
+            : `${resultado.length.toLocaleString("pt-BR")} ${resultado.length === 1 ? "peça" : "peças"}`}
         </p>
 
         {comFiltro && (
@@ -127,7 +165,7 @@ export function VitrineCatalogo({ produtos }: { produtos: Produto[] }) {
             type="button"
             onClick={() => {
               setTermo("");
-              setCategoriaAtiva(null);
+              setSuperAtiva(null);
             }}
             className="font-sans text-[0.6875rem] uppercase tracking-[0.18em] text-carmim-600 transition-colors duration-400 hover:text-carmim-500"
           >
@@ -136,36 +174,48 @@ export function VitrineCatalogo({ produtos }: { produtos: Produto[] }) {
         )}
       </div>
 
-      {/*
-        Troca direta entre grade e estado vazio. Um AnimatePresence com
-        `mode="wait"` aqui trava: os cartões filhos não sinalizam fim de saída,
-        a grade nunca desmonta e o estado vazio não chega a aparecer.
-      */}
       {resultado.length > 0 ? (
-        <div className="mt-10 grid grid-cols-2 gap-x-6 gap-y-14 md:gap-x-8 lg:grid-cols-3 xl:grid-cols-4">
-          {resultado.map((produto, indice) => (
-            <CartaoProduto
-              key={produto.id}
-              produto={produto}
-              atraso={Math.min(indice, 7) * 0.05}
-              prioridade={indice < 4}
-            />
-          ))}
-        </div>
+        <>
+          <div className="mt-10 grid grid-cols-2 gap-x-6 gap-y-14 md:gap-x-8 lg:grid-cols-3 xl:grid-cols-4">
+            {mostrados.map((produto, indice) => (
+              <CartaoProduto
+                key={produto.id}
+                produto={produto}
+                atraso={(indice % 8) * 0.04}
+                prioridade={indice < 4}
+              />
+            ))}
+          </div>
+
+          {restam > 0 && (
+            <div className="mt-16 flex flex-col items-center gap-4">
+              <p className="font-sans text-[0.6875rem] uppercase tracking-[0.18em] text-marinho-700/70">
+                Mostrando {mostrados.length.toLocaleString("pt-BR")} de{" "}
+                {resultado.length.toLocaleString("pt-BR")}
+              </p>
+              <button
+                type="button"
+                onClick={() => setVisiveis((v) => v + LOTE * 2)}
+                className="inline-flex items-center border border-marinho-500/28 px-9 py-3.5 font-sans text-[0.8125rem] uppercase tracking-[0.16em] text-marinho-900 transition-colors duration-500 hover:border-marinho-900 hover:bg-marinho-900 hover:text-marfim-puro"
+              >
+                Ver mais
+              </button>
+            </div>
+          )}
+        </>
       ) : (
         <motion.div
-          key="vazio"
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           className="mt-16 flex flex-col items-center gap-7 border border-dashed border-marinho-500/18 px-8 py-20 text-center"
         >
-            <p className="max-w-md text-fluid-lg font-light leading-snug equilibrio text-marinho-900/80">
+          <p className="max-w-md text-fluid-lg font-light leading-snug equilibrio text-marinho-900/80">
             Nada por aqui com esse filtro.
           </p>
           <p className="max-w-md text-[0.9375rem] font-light leading-relaxed legivel text-marinho-800/75">
-            O acervo publicado é só uma parte do que a Thaby tem. Se você já
-            sabe o que procura, é mais rápido perguntar direto.
+            O acervo é grande e gira rápido. Se você já sabe o que procura, é
+            mais rápido perguntar direto.
           </p>
           <BotaoLink
             href={linkWhatsApp(
@@ -202,7 +252,7 @@ function Chip({
         "shrink-0 whitespace-nowrap border px-4 py-2 font-sans text-[0.6875rem] uppercase tracking-[0.14em] transition-colors duration-400",
         ativo
           ? "border-marinho-900 bg-marinho-900 text-marfim-puro"
-          : "border-marinho-500/18 text-marinho-800/65 hover:border-marinho-500/45 hover:text-marinho-900",
+          : "border-marinho-500/18 text-marinho-800/65 hover:border-marinho-500/40 hover:text-marinho-900",
       )}
     >
       {children}

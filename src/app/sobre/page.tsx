@@ -46,7 +46,7 @@ const valores = [
 const numeros = [
   { valor: String(empresa.fundacao), rotulo: "Primeira encomenda" },
   { valor: `${totais.marcas}+`, rotulo: "Marcas internacionais" },
-  { valor: String(totais.categorias), rotulo: "Frentes de curadoria" },
+  { valor: `${totais.produtos}+`, rotulo: "Peças no acervo" },
   { valor: "BR", rotulo: "Envio para todo o país" },
 ];
 
@@ -82,11 +82,12 @@ export default function PaginaSobre() {
                   trás — dá para trazer o original, inteiro, sem enrolação?
                 </p>
                 <p>
-                  Deu. E o que era favor virou método. Hoje o acervo cobre{" "}
-                  {totais.categorias} frentes, de skincare coreano a perfumaria
-                  fina, de bolsa de grife a brinquedo de licença oficial. O que
-                  não mudou foi o critério: cada peça passa pela mão de alguém
-                  antes de ser oferecida.
+                  Deu. E o que era favor virou método. Hoje o acervo passa de{" "}
+                  {totais.produtos.toLocaleString("pt-BR")} peças em{" "}
+                  {totais.supercategorias} frentes, de skincare coreano a
+                  perfumaria fina, de bolsa de grife a brinquedo de licença
+                  oficial. O que não mudou foi o critério: cada peça passa pela
+                  mão de alguém antes de ser oferecida.
                 </p>
                 <p>
                   Não temos loja física de shopping nem catálogo infinito.

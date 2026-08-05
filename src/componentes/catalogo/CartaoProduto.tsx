@@ -8,7 +8,7 @@ import { motion } from "motion/react";
 import { cn } from "@/lib/cn";
 import { iniciais } from "@/lib/texto";
 import { nomeTransicaoProduto } from "@/lib/transicoes";
-import { categoriaPorId, type Produto } from "@/dados/catalogo";
+import { categoriaPorId, precoFormatado, type ProdutoResumo } from "@/dados/catalogo";
 import { useOrcamento } from "@/componentes/orcamento/ContextoOrcamento";
 import { RevelarImagem } from "@/componentes/ui/RevelarImagem";
 import { LacoTracejado } from "@/componentes/marca/RotaDeVoo";
@@ -18,7 +18,7 @@ export function CartaoProduto({
   atraso = 0,
   prioridade = false,
 }: {
-  produto: Produto;
+  produto: ProdutoResumo;
   atraso?: number;
   prioridade?: boolean;
 }) {
@@ -94,14 +94,9 @@ export function CartaoProduto({
       </button>
 
       <div className="flex flex-1 flex-col pt-5">
-        <div className="flex items-baseline justify-between gap-4">
-          <span className="sobrescrita text-[0.5625rem] text-carmim-500">
-            {produto.marca ?? categoria?.nome ?? "Importado"}
-          </span>
-          <span className="font-sans text-[0.5625rem] uppercase tracking-[0.2em] text-marinho-600/78">
-            {produto.origem}
-          </span>
-        </div>
+        <span className="sobrescrita text-[0.5625rem] text-carmim-500">
+          {produto.marca ?? categoria?.nome ?? "Importado"}
+        </span>
 
         <h3 className="mt-2.5 text-[1.0625rem] font-normal leading-snug legivel">
           <Link
@@ -112,8 +107,12 @@ export function CartaoProduto({
           </Link>
         </h3>
 
-        <p className="mt-auto pt-4 font-sans text-[0.6875rem] uppercase tracking-[0.18em] text-marinho-700/75">
-          Sob consulta
+        <p className="mt-auto pt-4 font-sans text-[0.8125rem] tabular-nums text-marinho-900">
+          {precoFormatado(produto.preco) ?? (
+            <span className="text-[0.6875rem] uppercase tracking-[0.18em] text-marinho-700/75">
+              Sob consulta
+            </span>
+          )}
         </p>
       </div>
     </motion.article>
@@ -124,7 +123,7 @@ export function CartaoProduto({
  * Nem todo item do acervo tem foto liberada. Em vez de um cinza vazio,
  * o espaço vira uma peça de marca — mantém a vitrine coerente.
  */
-function PlaceholderProduto({ produto }: { produto: Produto }) {
+function PlaceholderProduto({ produto }: { produto: ProdutoResumo }) {
   const categoria = categoriaPorId(produto.categoriaId);
 
   return (

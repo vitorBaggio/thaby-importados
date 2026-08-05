@@ -3,13 +3,18 @@ import { CabecalhoPagina } from "@/componentes/layout/CabecalhoPagina";
 import { VitrineCatalogo } from "@/componentes/catalogo/VitrineCatalogo";
 import { Migalhas } from "@/componentes/seo/DadosEstruturados";
 import { BotaoLink } from "@/componentes/ui/Botao";
-import { vitrine, totais } from "@/dados/catalogo";
+import {
+  vitrineResumo,
+  categoriasResumo,
+  mapaSubParaSuper,
+  totais,
+} from "@/dados/catalogo";
 import { linkWhatsApp, mensagensPadrao } from "@/dados/empresa";
 
 export const metadata: Metadata = {
   title: "Catálogo",
   description:
-    "O acervo de importados da Thaby: beleza, perfumaria, moda, acessórios, alimentação e brinquedos. Busque por peça, marca ou origem e monte sua lista de orçamento.",
+    "O acervo completo de importados da Thaby: beleza, perfumaria, moda, acessórios, alimentação, infantil e mais. Busque por peça ou marca e monte sua lista de orçamento.",
   alternates: { canonical: "/catalogo" },
 };
 
@@ -25,9 +30,9 @@ export default function PaginaCatalogo() {
 
       <CabecalhoPagina
         trilha={trilha}
-        sobrescrita={`${totais.produtos} peças publicadas`}
+        sobrescrita={`${totais.produtos.toLocaleString("pt-BR")} peças · ${totais.marcas} marcas`}
         titulo="O acervo, peça por peça."
-        apoio="Esta é a seleção publicada do que a Thaby tem em mãos. O estoque gira rápido e boa parte do acervo é montada sob encomenda — se não achar, pergunte."
+        apoio="O catálogo inteiro da Thaby, direto da fonte. Filtre por frente, busque por marca e monte sua lista de orçamento — o estoque gira rápido, então confirme sempre no WhatsApp."
         extra={
           <BotaoLink
             href={linkWhatsApp(mensagensPadrao.catalogo)}
@@ -40,7 +45,11 @@ export default function PaginaCatalogo() {
       />
 
       <div className="area pb-28 pt-10 md:pb-36">
-        <VitrineCatalogo produtos={vitrine} />
+        <VitrineCatalogo
+          produtos={vitrineResumo}
+          supercategorias={categoriasResumo}
+          mapaSuper={mapaSubParaSuper}
+        />
       </div>
     </>
   );

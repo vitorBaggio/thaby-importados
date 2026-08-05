@@ -9,7 +9,6 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { Produto } from "@/dados/catalogo";
 import { empresa } from "@/dados/empresa";
 import {
   gravarItens,
@@ -27,11 +26,14 @@ import {
 
 export type { ItemOrcamento };
 
+/** O mínimo para entrar na lista — qualquer produto (completo ou resumo) serve. */
+type ProdutoSelecionavel = { id: number; nome: string; slug: string };
+
 type Contexto = {
   itens: ItemOrcamento[];
   quantidadeTotal: number;
   contem: (id: number) => boolean;
-  alternar: (produto: Produto) => void;
+  alternar: (produto: ProdutoSelecionavel) => void;
   definirQuantidade: (id: number, quantidade: number) => void;
   remover: (id: number) => void;
   limpar: () => void;
@@ -67,7 +69,7 @@ export function ProvedorOrcamento({ children }: { children: ReactNode }) {
   }, [aberto]);
 
   const alternar = useCallback(
-    (produto: Produto) => {
+    (produto: ProdutoSelecionavel) => {
       const existe = itens.some((i) => i.id === produto.id);
       gravarItens(
         existe

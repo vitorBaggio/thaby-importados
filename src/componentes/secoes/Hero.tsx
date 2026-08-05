@@ -12,7 +12,7 @@ import { totais } from "@/dados/catalogo";
 
 const indicadores = [
   { valor: `${totais.marcas}+`, rotulo: "marcas internacionais" },
-  { valor: String(totais.categorias), rotulo: "categorias no acervo" },
+  { valor: `${totais.produtos}+`, rotulo: "peças no acervo" },
   { valor: "BR", rotulo: "envio para todo o país" },
 ];
 

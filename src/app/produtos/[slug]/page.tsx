@@ -13,16 +13,24 @@ import { DadosProduto, Migalhas } from "@/componentes/seo/DadosEstruturados";
 import { LacoTracejado } from "@/componentes/marca/RotaDeVoo";
 import {
   categoriaPorId,
+  destaques,
+  precoFormatado,
   produtoPorSlug,
-  produtos,
   relacionados,
+  resumoProduto,
+  superDaSubcategoria,
 } from "@/dados/catalogo";
 
+/*
+  São 3.000+ produtos. Pré-renderizar todos inflaria o build sem ganho real —
+  a maioria das páginas quase nunca é acessada direto. Geramos no build só os
+  destaques; o resto é renderizado sob demanda na primeira visita e cacheado.
+*/
 export function generateStaticParams() {
-  return produtos.map((produto) => ({ slug: produto.slug }));
+  return destaques.slice(0, 60).map((produto) => ({ slug: produto.slug }));
 }
 
-export const dynamicParams = false;
+export const dynamicParams = true;
 
 export async function generateMetadata({
   params,
@@ -30,15 +38,16 @@ export async function generateMetadata({
   const { slug } = await params;
   const produto = produtoPorSlug(slug);
   if (!produto) return {};
+  const resumo = resumoProduto(produto);
 
   return {
     title: produto.nome,
-    description: produto.resumo,
+    description: resumo,
     alternates: { canonical: `/produtos/${produto.slug}` },
     openGraph: {
       type: "website",
       title: `${produto.nome} · Thaby Importados`,
-      description: produto.resumo,
+      description: resumo,
       images: produto.imagem ? [{ url: produto.imagem }] : undefined,
     },
   };
@@ -52,11 +61,16 @@ export default async function PaginaProduto({
   if (!produto) notFound();
 
   const categoria = categoriaPorId(produto.categoriaId);
+  const superCat = superDaSubcategoria(produto.categoriaId);
   const sugestoes = relacionados(produto);
+  const preco = precoFormatado(produto.preco);
 
   const trilha = [
     { nome: "Início", caminho: "/" },
     { nome: "Catálogo", caminho: "/catalogo" },
+    ...(superCat
+      ? [{ nome: superCat.nome, caminho: `/categorias/${superCat.slug}` }]
+      : []),
     ...(categoria
       ? [{ nome: categoria.nome, caminho: `/categorias/${categoria.slug}` }]
       : []),
@@ -66,7 +80,7 @@ export default async function PaginaProduto({
   const ficha = [
     { rotulo: "Categoria", valor: categoria?.nome ?? "—" },
     { rotulo: "Marca", valor: produto.marca ?? "Sem marca declarada" },
-    { rotulo: "Procedência", valor: produto.origem },
+    ...(produto.codigo ? [{ rotulo: "Código", valor: produto.codigo }] : []),
     { rotulo: "Referência", valor: `#${produto.id}` },
   ];
 
@@ -165,18 +179,19 @@ export default async function PaginaProduto({
 
             <Revelar atraso={0.12}>
               <p className="mt-7 max-w-lg text-fluid-base font-light leading-relaxed legivel text-marinho-800/70">
-                {produto.resumo}
+                {resumoProduto(produto)}
               </p>
             </Revelar>
 
             <Revelar atraso={0.18}>
               <div className="mt-10 border-y border-marinho-500/12 py-7">
-                <p className="font-display text-3xl font-light text-marinho-900">
-                  Sob consulta
+                <p className="font-display text-4xl font-light text-marinho-900">
+                  {preco ?? "Sob consulta"}
                 </p>
                 <p className="mt-2.5 max-w-sm text-[0.8125rem] font-light leading-relaxed text-marinho-700/75">
-                  O valor depende do câmbio e do lote em que a peça entra. A
-                  Thaby fecha o preço com você antes de qualquer compra.
+                  {preco
+                    ? "Valor de referência do acervo. Confirme disponibilidade e condições no WhatsApp antes de fechar."
+                    : "O valor depende do câmbio e do lote em que a peça entra. A Thaby fecha o preço com você antes de comprar."}
                 </p>
               </div>
             </Revelar>

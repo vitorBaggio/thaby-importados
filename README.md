@@ -85,8 +85,10 @@ moldura de `1px` eles sangrariam direto na página.
 avião de papel. Em `RotaDeVoo.tsx` esse traço atravessa a página, revelado por
 máscara conforme a seção entra, com o avião correndo o caminho pelo scroll.
 
-**Sem preço no site.** A loja negocia caso a caso (câmbio, lote, frete). Toda
-peça mostra "sob consulta" e leva ao WhatsApp — inventar preço seria mentira.
+**Preço real, com âncora no WhatsApp.** Cada peça mostra o valor de referência
+do acervo (vindo da API), mas todo CTA leva ao WhatsApp para confirmar
+disponibilidade e condições — o estoque gira rápido. Produto sem preço cadastrado
+cai para "sob consulta".
 
 **A foto do produto morfa entre as páginas.** `<ViewTransition>` do React 19.2
 pareia o ladrilho da grade com a foto do detalhe pelo mesmo `name` (ver
@@ -112,27 +114,41 @@ graça) e monta a mensagem final do WhatsApp.
 `<noscript>` no layout devolve a visibilidade — sem ele, o site sumiria para
 quem estiver sem script.
 
-## Catálogo: o que está aqui e o que falta
+## Catálogo: acervo completo, extraído da fonte
 
-O catálogo operacional da loja (`thabyimportados.catalogomobile.com.br`) expõe
-publicamente **apenas um recorte**: 34 produtos, 10 categorias e 9 fotos. O
-acervo completo fica atrás de sessão autenticada.
+O site carrega o **acervo real completo** da loja: **3.284 produtos ativos, 10
+supercategorias, 43 subcategorias e 122 marcas**, com preço, código, EAN e fotos.
+Os dados estão em `src/dados/catalogo-completo.json` (gerado; ~7 MB, fica no
+servidor) e são consumidos por `src/dados/catalogo.ts`.
 
-Então `src/dados/catalogo.ts` traz esse recorte real — IDs, nomes e fotos
-verdadeiros — com a estrutura pronta para receber o export integral: basta
-acrescentar itens ao array `produtosBase` no mesmo formato e rodar
-`npm run assets` se vierem imagens novas.
+**Como os dados foram obtidos.** O app de vendas do catalogomobile abre uma
+sessão pública automática (`/api/v2/auth/loginClient`) que destrava
+`/api/v1/products` e `/api/v1/categories`. Os scripts em `scratchpad` do processo
+paginaram os 5.165 registros, filtraram os ativos, montaram a hierarquia por
+`parent_id`, normalizaram marcas e limparam o HTML das descrições.
+
+**Para reprocessar** (quando o estoque mudar): rodar de novo a extração (precisa
+de um token de sessão válido — expira em ~1h) e o gerador, que reescreve o JSON.
+O procedimento está documentado nos scripts.
+
+**Arquitetura de escala:**
+
+- **Fotos** (2.232 no S3) via `next/image` + `remotePatterns` — otimizadas sob
+  demanda, nada baixado no build. O repositório fica leve.
+- **Páginas de produto**: `dynamicParams` renderiza sob demanda e cacheia; só os
+  60 destaques são pré-renderizados no build (senão seriam 3.000+ páginas).
+- **Vitrine**: o cliente recebe um índice enxuto (`vitrineResumo`, ~0.76 MB), não
+  os produtos completos. Filtra por frente, busca e pagina em lotes de 48.
 
 **Pendências para a loja revisar antes de publicar:**
 
-1. Textos de vitrine dos produtos são editoriais e precisam de aprovação.
-2. Três categorias (Bolsas femininas, Acessórios e moda, Bonés) não têm peça
-   publicada — hoje caem numa página "sob encomenda", que funciona, mas ficam
-   muito melhores com produtos reais.
-3. 25 dos 34 produtos não têm foto. Há um marcador de marca no lugar, mas
-   fotografia própria elevaria o site inteiro.
-4. Domínio: definir `NEXT_PUBLIC_SITE_URL` na hospedagem (hoje o fallback em
-   `src/lib/site.ts` é `https://thabyimportados.com.br`).
+1. Curadoria de destaques: hoje a home elege peças de marcas-âncora
+   (`MARCAS_ANCORA` em `catalogo.ts`) com foto e preço. Revisável.
+2. ~1.050 produtos ainda sem foto — caem no marcador de marca. Fotografia
+   própria elevaria o acervo.
+3. Preços vêm do cadastro do ERP; confirmar se são os de venda ao cliente final.
+4. Domínio: definir `NEXT_PUBLIC_SITE_URL` na hospedagem (fallback em
+   `src/lib/site.ts`).
 5. Crédito do rodapé: há um `TODO` em `componentes/layout/Rodape.tsx`.
 
 ## Deploy

@@ -5,18 +5,24 @@ import { cn } from "@/lib/cn";
 import { Revelar } from "@/componentes/ui/Revelar";
 import { RevelarImagem } from "@/componentes/ui/RevelarImagem";
 import { LacoTracejado } from "@/componentes/marca/RotaDeVoo";
-import { produtosDaCategoria, type Categoria } from "@/dados/catalogo";
+import {
+  resumoCategoria,
+  urlFoto,
+  type Categoria,
+  type Subcategoria,
+} from "@/dados/catalogo";
 
 export function CartaoCategoria({
   categoria,
   atraso = 0,
   destaque = false,
 }: {
-  categoria: Categoria;
+  categoria: Categoria | Subcategoria;
   atraso?: number;
   destaque?: boolean;
 }) {
-  const quantidade = produtosDaCategoria(categoria.id).length;
+  const quantidade = categoria.total;
+  const imagem = urlFoto(categoria.imagem);
 
   return (
     <Revelar atraso={atraso} deslocamento={28}>
@@ -30,10 +36,10 @@ export function CartaoCategoria({
             destaque ? "aspect-[4/3] md:aspect-[16/11]" : "aspect-[4/5]",
           )}
         >
-          {categoria.imagem ? (
+          {imagem ? (
             <RevelarImagem atraso={atraso}>
               <Image
-                src={categoria.imagem}
+                src={imagem}
                 alt={categoria.nome}
                 fill
                 sizes={destaque ? "(min-width: 1024px) 50vw, 92vw" : "(min-width: 1024px) 30vw, 45vw"}
@@ -69,7 +75,7 @@ export function CartaoCategoria({
         </div>
 
         <p className="mt-2.5 max-w-md text-[0.875rem] font-light leading-relaxed legivel text-marinho-800/70">
-          {categoria.resumo}
+          {resumoCategoria(categoria)}
         </p>
       </Link>
     </Revelar>
