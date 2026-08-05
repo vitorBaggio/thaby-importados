@@ -1,8 +1,14 @@
 # Thaby Importados — site institucional e catálogo
 
+**▶ Ver no ar: https://vitorbaggio.github.io/thaby-importados**
+
 Site de vitrine da **Thaby Importados** (Sorriso/MT). Não é loja com checkout:
 a venda acontece no WhatsApp, então o site existe para apresentar a marca,
 expor o acervo e entregar o cliente na conversa com a mensagem já escrita.
+
+> Publicado no GitHub Pages como exportação estática (build automático a cada
+> push via GitHub Actions). Deploy alternativo em servidor Node — Vercel, com
+> páginas sob demanda e fotos otimizadas — também suportado pelo mesmo código.
 
 ## Stack
 
