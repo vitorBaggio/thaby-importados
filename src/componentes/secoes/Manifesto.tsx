@@ -4,6 +4,7 @@ import { RevelarImagem } from "@/componentes/ui/RevelarImagem";
 import { CabecalhoSecao, Secao } from "@/componentes/ui/Secao";
 import { LinkSublinhado } from "@/componentes/ui/Botao";
 import { LacoTracejado } from "@/componentes/marca/RotaDeVoo";
+import { asset } from "@/lib/asset";
 
 const pilares = [
   {
@@ -71,7 +72,7 @@ export function Manifesto() {
                 <div className="relative aspect-[3/4] overflow-hidden border border-marinho-500/10 bg-ladrilho">
                   <RevelarImagem>
                     <Image
-                      src="/categorias/acessorios-e-moda.webp"
+                      src={asset("/categorias/acessorios-e-moda.webp")}
                       alt="Composição de acessórios e peças de moda importadas"
                       fill
                       sizes="(min-width: 1024px) 45vw, 90vw"

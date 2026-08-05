@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { cn } from "@/lib/cn";
+import { asset } from "@/lib/asset";
 import { empresa } from "@/dados/empresa";
 
 type Props = {
@@ -23,7 +24,7 @@ export function Logo({
 }: Props) {
   return (
     <Image
-      src={variante === "cor" ? "/marca/logo.png" : "/marca/logo-ivory.png"}
+      src={asset(variante === "cor" ? "/marca/logo.png" : "/marca/logo-ivory.png")}
       alt={empresa.nome}
       width={tamanho}
       height={tamanho}

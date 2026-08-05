@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { CabecalhoPagina } from "@/componentes/layout/CabecalhoPagina";
 import { Migalhas } from "@/componentes/seo/DadosEstruturados";
+import { asset } from "@/lib/asset";
 import { Revelar } from "@/componentes/ui/Revelar";
 import { RevelarImagem } from "@/componentes/ui/RevelarImagem";
 import { Convite } from "@/componentes/secoes/Convite";
@@ -114,7 +115,7 @@ export default function PaginaSobre() {
               <div className="relative aspect-[4/5] overflow-hidden border border-marinho-500/10 bg-ladrilho">
                 <RevelarImagem>
                   <Image
-                    src="/categorias/beleza.webp"
+                    src={asset("/categorias/beleza.webp")}
                     alt="Seleção de itens de beleza importados da Thaby"
                     fill
                     sizes="(min-width: 1024px) 40vw, 92vw"

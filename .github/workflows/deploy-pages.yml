@@ -34,6 +34,7 @@ jobs:
         run: npm run build
         env:
           GITHUB_PAGES: "true"
+          NEXT_PUBLIC_BASE_PATH: "/thaby-importados"
           NEXT_PUBLIC_SITE_URL: "https://vitorbaggio.github.io/thaby-importados"
 
       # Sem isso, o GitHub Pages roda Jekyll e ignora a pasta _next/ do Next.

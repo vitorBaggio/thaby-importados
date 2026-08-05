@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "motion/react";
 import { TRAJETO_LACO } from "./RotaDeVoo";
+import { asset } from "@/lib/asset";
 import { empresa } from "@/dados/empresa";
 
 /**
@@ -122,7 +123,7 @@ export function AberturaMarca() {
               transition={{ duration: 0.45, delay: 0.5, ease: curva }}
             >
               <Image
-                src="/marca/logo-ivory.png"
+                src={asset("/marca/logo-ivory.png")}
                 alt={empresa.nome}
                 width={260}
                 height={260}

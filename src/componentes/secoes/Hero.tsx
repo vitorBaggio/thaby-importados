@@ -8,6 +8,7 @@ import { BotaoLink } from "@/componentes/ui/Botao";
 import { RevelarImagem } from "@/componentes/ui/RevelarImagem";
 import { AviaoDePapel, LacoTracejado } from "@/componentes/marca/RotaDeVoo";
 import { empresa, linkWhatsApp, mensagensPadrao } from "@/dados/empresa";
+import { asset } from "@/lib/asset";
 import { totais } from "@/dados/catalogo";
 
 const indicadores = [
@@ -126,7 +127,7 @@ export function Hero() {
         <div className="relative lg:col-span-5 xl:col-span-6">
           <div className="relative mx-auto flex max-w-md justify-center lg:ml-auto lg:mr-0 lg:max-w-none">
             <Moldura
-              src="/categorias/bolsas-femininas.webp"
+              src={asset("/categorias/bolsas-femininas.webp")}
               alt="Bolsa de grife importada disponível no acervo da Thaby Importados"
               legenda="Bolsas femininas"
               atraso={0.35}
@@ -136,7 +137,7 @@ export function Hero() {
             />
 
             <Moldura
-              src="/categorias/beleza.webp"
+              src={asset("/categorias/beleza.webp")}
               alt="Seleção de itens de beleza importados"
               legenda="Beleza"
               atraso={0.5}
