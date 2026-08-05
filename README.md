@@ -13,10 +13,13 @@ expor o acervo e entregar o cliente na conversa com a mensagem já escrita.
 | Estilo    | Tailwind CSS v4 (`@theme` em `globals.css`) |
 | Movimento | Motion 12 + Lenis (scroll suave)            |
 | Ícones    | lucide-react (+ SVGs próprios para redes)   |
-| Imagens   | `next/image` sobre WebP gerado por Sharp    |
+| Imagens   | `next/image` (fotos remotas S3 + assets locais via Sharp) |
 
-Tudo é pré-renderizado: `next build` gera 56 páginas estáticas. Não há banco,
-API nem variável de ambiente obrigatória.
+O catálogo tem **3.284 produtos**. As páginas de marca, categoria e a home são
+pré-renderizadas no build; as páginas de produto renderizam sob demanda e ficam
+em cache (`dynamicParams`), então o build fica leve. Sem banco próprio: os dados
+vivem num JSON gerado a partir da API do catálogo (ver seção abaixo). Nenhuma
+variável de ambiente é obrigatória para rodar.
 
 ## Rodando
 
