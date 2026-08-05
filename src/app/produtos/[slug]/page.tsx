@@ -13,24 +13,25 @@ import { DadosProduto, Migalhas } from "@/componentes/seo/DadosEstruturados";
 import { LacoTracejado } from "@/componentes/marca/RotaDeVoo";
 import {
   categoriaPorId,
-  destaques,
   precoFormatado,
   produtoPorSlug,
+  produtos,
   relacionados,
   resumoProduto,
   superDaSubcategoria,
 } from "@/dados/catalogo";
 
 /*
-  São 3.000+ produtos. Pré-renderizar todos inflaria o build sem ganho real —
-  a maioria das páginas quase nunca é acessada direto. Geramos no build só os
-  destaques; o resto é renderizado sob demanda na primeira visita e cacheado.
+  Todos os produtos são pré-renderizados no build. É o que a exportação estática
+  do GitHub Pages exige (não há servidor para renderizar sob demanda), e no
+  servidor/Vercel isso só melhora — tudo vira HTML pronto, sem primeira-visita
+  lenta. `dynamicParams = false`: slug inexistente é 404 estático.
 */
 export function generateStaticParams() {
-  return destaques.slice(0, 60).map((produto) => ({ slug: produto.slug }));
+  return produtos.map((produto) => ({ slug: produto.slug }));
 }
 
-export const dynamicParams = true;
+export const dynamicParams = false;
 
 export async function generateMetadata({
   params,

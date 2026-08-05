@@ -2,6 +2,9 @@ import type { MetadataRoute } from "next";
 import { categorias, subcategorias, produtos } from "@/dados/catalogo";
 import { url } from "@/lib/site";
 
+// Exigido pela exportação estática (GitHub Pages).
+export const dynamic = "force-static";
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const agora = new Date();
 
