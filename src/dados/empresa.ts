@@ -8,7 +8,7 @@ export const empresa = {
   nomeCurto: "Thaby",
   descritor: "Importados selecionados",
   cnpj: "41.639.143/0001-25",
-  fundacao: 2021,
+  fundacao: 2018,
 
   cidade: "Sorriso",
   estado: "MT",

@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     template: `%s · ${empresa.nome}`,
   },
   description:
-    "Beleza, perfumaria, moda e acessórios importados, garimpados peça a peça. Curadoria própria, procedência conferida e atendimento direto no WhatsApp, de Sorriso/MT para todo o Brasil.",
+    "Beleza, perfumaria, moda e acessórios importados, garimpados peça a peça. Curadoria própria e atendimento direto no WhatsApp, de Sorriso/MT para todo o Brasil.",
   applicationName: empresa.nome,
   keywords: [
     "importados Sorriso MT",

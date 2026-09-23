@@ -26,9 +26,9 @@ const trilha = [
 const valores = [
   {
     numero: "01",
-    titulo: "Procedência antes de preço",
+    titulo: "Escolha antes de preço",
     texto:
-      "Toda peça vem de canal oficial ou de fornecedor com histórico. Se a origem não é clara, não entra — por mais tentadora que seja a margem.",
+      "Cada peça passa pelo nosso olhar antes de entrar no acervo. Se não tem a cara das nossas clientes, não entra, por mais tentadora que seja a margem.",
   },
   {
     numero: "02",
@@ -45,7 +45,7 @@ const valores = [
 ];
 
 const numeros = [
-  { valor: String(empresa.fundacao), rotulo: "Primeira encomenda" },
+  { valor: empresa.fundacao, rotulo: "O começo" },
   { valor: `${totais.marcas}+`, rotulo: "Marcas internacionais" },
   { valor: `${totais.produtos}+`, rotulo: "Peças no acervo" },
   { valor: "BR", rotulo: "Envio para todo o país" },
@@ -60,7 +60,7 @@ export default function PaginaSobre() {
         trilha={trilha}
         sobrescrita={`${empresa.cidade} · ${empresa.estado}`}
         titulo="Uma vitrine internacional no meio do Mato Grosso."
-        apoio="A Thaby Importados existe porque alguém em Sorriso cansou de esperar. O que era um favor para amigas virou uma operação de curadoria com nome, CNPJ e uma régua própria de qualidade."
+        apoio="A casa da curadoria, dos achados e das coisas que fazem você se apaixonar."
       />
 
       <section className="py-24 md:py-32">
