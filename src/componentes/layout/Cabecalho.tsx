@@ -14,7 +14,7 @@ import { empresa, linkWhatsApp, mensagensPadrao } from "@/dados/empresa";
 const navegacao = [
   // As páginas de produto pertencem ao catálogo, então acendem o mesmo item.
   { rotulo: "Catálogo", href: "/catalogo", prefixos: ["/catalogo", "/produtos"] },
-  { rotulo: "Categorias", href: "/categorias", prefixos: ["/categorias"] },
+  { rotulo: "Curadoria", href: "/categorias", prefixos: ["/categorias"] },
   { rotulo: "A casa", href: "/sobre", prefixos: ["/sobre"] },
   { rotulo: "Contato", href: "/contato", prefixos: ["/contato"] },
 ] as const;

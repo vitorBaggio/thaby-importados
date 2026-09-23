@@ -32,7 +32,7 @@ export default function PaginaCatalogo() {
         trilha={trilha}
         sobrescrita={`${totais.produtos.toLocaleString("pt-BR")} peças · ${totais.marcas} marcas`}
         titulo="O acervo, peça por peça."
-        apoio="O catálogo inteiro da Thaby, direto da fonte. Filtre por frente, busque por marca e monte sua lista de orçamento — o estoque gira rápido, então confirme sempre no WhatsApp."
+        apoio="Tudo o que temos disponível para você escolher e se apaixonar. Nosso estoque gira rápido, então confirme sempre pelo WhatsApp."
         extra={
           <BotaoLink
             href={linkWhatsApp(mensagensPadrao.catalogo)}

@@ -2,7 +2,7 @@ import { Faixa } from "@/componentes/ui/Faixa";
 import { marcas } from "@/dados/catalogo";
 
 /**
- * Prova de procedência. São as marcas que realmente aparecem no acervo —
+ * São as marcas que realmente aparecem no acervo,
  * nada de logotipo genérico de banco de imagem.
  */
 export function FaixaMarcas() {

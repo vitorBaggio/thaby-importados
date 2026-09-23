@@ -82,7 +82,7 @@ export function Hero() {
             className="mt-9 max-w-lg text-fluid-base font-light leading-relaxed legivel text-marinho-800/70"
           >
             Beleza, perfumaria, moda e acessórios garimpados peça a peça lá fora.
-            Procedência conferida, quantidade contada e um atendimento que
+            Quantidade contada e um atendimento que
             continua depois da venda.
           </motion.p>
 

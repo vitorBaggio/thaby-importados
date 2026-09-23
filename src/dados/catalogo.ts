@@ -209,7 +209,7 @@ export function categoriaPorSlug(
  */
 const RESUMO_SUPER: Record<string, string> = {
   "acessorios-e-moda":
-    "Bolsas, carteiras, óculos e relógios de grife. O detalhe que assina o visual, com procedência conferida.",
+    "Bolsas, carteiras, óculos e relógios de grife. O detalhe que assina o visual.",
   beleza:
     "Skincare coreano, maquiagem de cult e perfumaria fina. As linhas que ditam o padrão internacional de beleza.",
   alimentacao:

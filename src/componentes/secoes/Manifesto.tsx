@@ -5,12 +5,13 @@ import { CabecalhoSecao, Secao } from "@/componentes/ui/Secao";
 import { LinkSublinhado } from "@/componentes/ui/Botao";
 import { LacoTracejado } from "@/componentes/marca/RotaDeVoo";
 import { asset } from "@/lib/asset";
+import { empresa } from "@/dados/empresa";
 
 const pilares = [
   {
     titulo: "Curadoria, não estoque",
     texto:
-      "Nada entra no acervo por acaso. Cada peça é escolhida por procedência, acabamento e por fazer sentido para quem já compra aqui.",
+      "Nada entra no acervo por acaso. Cada peça é escolhida pelo acabamento e por fazer sentido para quem já compra aqui.",
   },
   {
     titulo: "Quantidade contada",
@@ -83,10 +84,10 @@ export function Manifesto() {
 
                 <div className="absolute -bottom-6 -left-6 hidden max-w-[15rem] border border-marinho-500/14 bg-fundo/95 p-6 backdrop-blur-sm md:block">
                   <p className="font-display text-4xl font-light leading-none text-marinho-900">
-                    2021
+                    {empresa.fundacao}
                   </p>
                   <p className="mt-3 font-sans text-[0.625rem] uppercase leading-relaxed tracking-[0.18em] text-marinho-700/75">
-                    Ano em que a primeira encomenda saiu de Sorriso
+                    Ano em que tudo começou, em Sorriso
                   </p>
                 </div>
               </figure>

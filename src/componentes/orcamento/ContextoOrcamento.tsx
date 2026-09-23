@@ -111,15 +111,13 @@ export function ProvedorOrcamento({ children }: { children: ReactNode }) {
 
     const linhas = itens.map(
       (item, indice) =>
-        `${indice + 1}. ${item.nome}${item.quantidade > 1 ? ` — ${item.quantidade} un.` : ""}`,
+        `${indice + 1}. ${item.nome}${item.quantidade > 1 ? `, ${item.quantidade} un.` : ""}`,
     );
 
     return [
-      `Olá! Vim pelo site da ${empresa.nome} e gostaria de um orçamento para:`,
+      `Olá! Vim pelo catálogo da ${empresa.nomeCurto} e gostaria de verificar a disponibilidade desses produtos:`,
       "",
       ...linhas,
-      "",
-      "Pode me passar disponibilidade e valores?",
     ].join("\n");
   }, [itens]);
 
