@@ -250,9 +250,9 @@ const MOLDES_RESUMO = [
   (marca: string, cat: string) =>
     `${marca} na seleção de ${cat} da Thaby Importados. Valor e disponibilidade pelo WhatsApp.`,
   (marca: string, cat: string) =>
-    `Da curadoria da Thaby para a seleção de ${cat}: ${marca}, direto do exterior.`,
-  (marca: string, cat: string) =>
-    `Categoria: ${cat}. Importado de ${marca}, com valor e disponibilidade confirmados no WhatsApp.`,
+    `Conheça a seleção de ${cat} da Thaby Importados, com peças da marca ${marca}.`,
+  (marca: string) =>
+    `${marca} na curadoria da Thaby Importados. Consulte valor e disponibilidade pelo WhatsApp.`,
 ];
 
 export function resumoProduto(p: Produto): string {
