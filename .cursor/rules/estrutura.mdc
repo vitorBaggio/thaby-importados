@@ -1,0 +1,78 @@
+---
+alwaysApply: true
+---
+
+# Thaby Importados
+
+## Antes de comecar
+
+Leia a nota deste projeto no vault do Obsidian pelo MCP `obsidian`, vault id
+`organizacao-ai`, caminho `03 - Projetos/Thaby Importados.md`. Ela e a fonte oficial de
+estrategia, estado e decisoes. O repositorio e a fonte do codigo. O Linear e a
+fonte do trabalho em andamento (PROJ-83..88).
+
+Sessao Hermes: `p_59d3d24a`. Orca repo: `042919e2-9e66-482e-8820-2ec14c39388a`.
+
+## Divisao de agentes
+
+| Tarefa | Agente |
+|---|---|
+| Implementacao complexa, arquitetura, feature inteira | Claude Code (Opus) |
+| Revisao, testes, seguranca, regressao | Codex |
+| Edicao cirurgica, rename, typo, ajuste de copy, varredura de repo | Cursor |
+
+Se a tarefa que voce recebeu como Cursor passar de ~50 linhas de diff ou tocar
+mais de 3 arquivos, pare e diga que ela e grande demais. Ela pertence ao Claude
+Code.
+
+## Camadas de verdade
+
+| Camada | Onde | Guarda |
+|---|---|---|
+| O que | Linear, time Projetos (PROJ) | trabalho a fazer, ticket nasce e fecha aqui |
+| O feito | GitHub | codigo, PR e merge |
+| O aprendido | Obsidian, vault `organizacao-ai` | conhecimento que sobrevive ao projeto |
+| Producao | GitHub Pages (push na master publica) | push na master so com autorizacao explicita do Vitor |
+
+Fronteira: vale so para este projeto vai para `docs/` do repo; vale para o
+proximo projeto vira nota atomica em `02 - Conhecimento`; trabalho a fazer vai
+para o Linear, nunca para o vault.
+
+## Loop de verificacao
+
+Executor entrega, Hermes verifica lendo o estado real (nao o relatorio do agente),
+e o Vitor aprova. Nenhuma issue vai para Done por alegacao de agente.
+
+Verificacao minima de qualquer mudanca:
+
+```
+npx tsc --noEmit && npx eslint . && npm run build
+```
+
+## Regras deste projeto
+
+1. Next.js 16 tem breaking changes: ler `node_modules/next/dist/docs/` antes de codar.
+2. Push na master PUBLICA (GitHub Actions faz deploy no Pages). Trabalhe em worktree/branch.
+3. Imagens locais passam por `src/lib/asset.ts` (basePath no export estatico). Fotos do S3 nao.
+4. Build de export local no Git Bash: prefixar `MSYS_NO_PATHCONV=1 MSYS2_ARG_CONV_EXCL='*'`.
+5. Codigo e copy em PT-BR. Contraste minimo 4,5:1 (ja medido; nao quebrar).
+6. Nada vai para a cliente, dominio ou conta nova sem ok do Vitor.
+
+## Regras gerais
+
+1. Nunca trabalhar direto na branch principal. Uma worktree do Orca por tarefa.
+2. Nunca registrar senha, token ou chave de API em Markdown ou no Git.
+3. Sem travessao em copy e texto entregue ao usuario.
+
+## Honestidade (inegociavel)
+
+1. Nunca afirme ter feito algo que nao fez ou nao verificou.
+2. Toda alegacao de sucesso vem com evidencia real: output do comando, link, teste.
+3. Se travou, diga qual etapa e por que. Comente no ticket do Linear.
+4. Distinga "verifiquei" de "presumo". Relatorio de outro agente e alegacao, nao fato.
+
+## Ao terminar
+
+Escreva o resultado do ciclo na nota do vault: o que mudou, o que foi verificado,
+o que ficou pendente. Substitua o estado antigo, nao empilhe. Depois informe:
+o que mudou, arquivos alterados, testes rodados, riscos e proximo passo.
