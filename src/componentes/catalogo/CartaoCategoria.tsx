@@ -70,7 +70,7 @@ export function CartaoCategoria({
           </h3>
 
           <span className="shrink-0 font-sans text-[0.625rem] uppercase tabular-nums tracking-[0.18em] text-marinho-700/75">
-            {quantidade > 0 ? `${quantidade} ${quantidade === 1 ? "peça" : "peças"}` : "Sob consulta"}
+            {quantidade > 0 ? `${quantidade.toLocaleString("pt-BR")} ${quantidade === 1 ? "peça" : "peças"}` : "Sob consulta"}
           </span>
         </div>
 

@@ -187,12 +187,29 @@ function limparNome(nome: string, marca: string | null): string {
   return saida.replace(/\s{2,}/g, " ").replace(/\s+([.,])/g, "$1").trim();
 }
 
+/**
+ * Tira travessões (– e —) da descrição do cadastro: faixa entre dígitos vira
+ * hífen ("10–15" → "10-15"); o resto, com os espaços em volta, vira vírgula.
+ */
+function limparTravessoes(texto: string): string {
+  // Marcador provisório: a limpeza de pontuação só age onde havia travessão.
+  const M = "";
+  return texto
+    .replace(/(\d)[–—](?=\d)/g, "$1-")
+    .replace(/(?:[ \t]*[–—][ \t]*)+/g, M)
+    .replace(new RegExp(`^${M}|${M}$`, "gm"), "")
+    .replace(new RegExp(`([.,;:!?])${M}`, "g"), "$1 ")
+    .replace(new RegExp(`${M}(?=[.,;:!?])`, "g"), "")
+    .replaceAll(M, ", ");
+}
+
 const produtosBase: Produto[] = (dados.produtos as ProdutoBruto[]).map((p) => {
   const marca = normalizarMarca(p.marca);
   return {
     ...p,
     // A limpeza do nome continua recebendo a marca crua do cadastro.
     nome: limparNome(p.nome, p.marca),
+    descricao: p.descricao && limparTravessoes(p.descricao),
     marca,
     imagem: urlFoto(p.fotos[0]),
     destaque:
