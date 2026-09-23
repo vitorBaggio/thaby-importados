@@ -79,7 +79,7 @@ export default async function PaginaProduto({
   ];
 
   const ficha = [
-    { rotulo: "Categoria", valor: categoria?.nome ?? "—" },
+    ...(categoria ? [{ rotulo: "Categoria", valor: categoria.nome }] : []),
     { rotulo: "Marca", valor: produto.marca ?? "Sem marca declarada" },
     ...(produto.codigo ? [{ rotulo: "Código", valor: produto.codigo }] : []),
     { rotulo: "Referência", valor: `#${produto.id}` },

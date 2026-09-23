@@ -35,7 +35,8 @@ export function GradeProdutos({
       {restam > 0 && (
         <div className="mt-16 flex flex-col items-center gap-4">
           <p className="font-sans text-[0.6875rem] uppercase tracking-[0.18em] text-marinho-700/70">
-            Mostrando {mostrados.length} de {produtos.length}
+            Mostrando {mostrados.length.toLocaleString("pt-BR")} de{" "}
+            {produtos.length.toLocaleString("pt-BR")}
           </p>
           <button
             type="button"

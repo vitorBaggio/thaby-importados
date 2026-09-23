@@ -47,7 +47,7 @@ const valores = [
 const numeros = [
   { valor: empresa.fundacao, rotulo: "O começo" },
   { valor: `${totais.marcas}+`, rotulo: "Marcas internacionais" },
-  { valor: `${totais.produtos}+`, rotulo: "Peças no acervo" },
+  { valor: `${totais.produtos.toLocaleString("pt-BR")}+`, rotulo: "Peças no acervo" },
   { valor: "BR", rotulo: "Envio para todo o país" },
 ];
 

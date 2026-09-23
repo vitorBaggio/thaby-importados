@@ -66,7 +66,7 @@ export function FormularioWhatsApp() {
           rows={4}
           value={procura}
           onChange={(evento) => setProcura(evento.target.value)}
-          placeholder="Nome da peça, marca, link ou só uma descrição — a gente decifra"
+          placeholder="Nome da peça, marca, link ou só uma descrição, a gente decifra"
           className="resize-none border-0 border-b border-marinho-500/18 bg-transparent py-3 font-sans text-[0.9375rem] font-light leading-relaxed text-marinho-900 placeholder:text-marinho-700/68 focus:border-marinho-500/50 focus:outline-none"
         />
       </div>

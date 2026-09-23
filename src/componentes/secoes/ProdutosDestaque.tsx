@@ -17,7 +17,7 @@ export function ProdutosDestaque() {
           numero="03"
           sobrescrita="Selecionados"
           titulo="O que está saindo agora."
-          apoio="Peças em destaque no acervo desta temporada. Disponibilidade e valores por WhatsApp — o estoque muda toda semana."
+          apoio="Peças em destaque no acervo desta temporada. Disponibilidade e valores por WhatsApp. O estoque muda toda semana."
           acao={
             <BotaoLink href="/catalogo" variante="contorno">
               Catálogo completo

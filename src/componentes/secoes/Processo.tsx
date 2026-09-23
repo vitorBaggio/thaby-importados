@@ -61,7 +61,7 @@ export function Processo() {
 
           <Revelar atraso={0.18}>
             <p className="mt-6 max-w-xl text-fluid-base font-light leading-relaxed legivel text-marinho-100/60">
-              Metade do que sai daqui nunca esteve numa vitrine — foi pedido por
+              Metade do que sai daqui nunca esteve numa vitrine: foi pedido por
               alguém. O processo é curto e você acompanha do começo ao fim.
             </p>
           </Revelar>

@@ -82,7 +82,7 @@ function PaginaSuper({ categoria }: { categoria: Categoria }) {
 
       <CabecalhoPagina
         trilha={trilha}
-        sobrescrita={`${categoria.subcategorias.length} frentes · ${categoria.total} peças`}
+        sobrescrita={`${categoria.subcategorias.length} frentes · ${categoria.total.toLocaleString("pt-BR")} peças`}
         titulo={categoria.nome}
         apoio={resumoCategoria(categoria)}
         extra={
@@ -135,7 +135,7 @@ function PaginaSub({ subcategoria }: { subcategoria: Subcategoria }) {
 
       <CabecalhoPagina
         trilha={trilha}
-        sobrescrita={`${produtos.length} ${produtos.length === 1 ? "peça" : "peças"}`}
+        sobrescrita={`${produtos.length.toLocaleString("pt-BR")} ${produtos.length === 1 ? "peça" : "peças"}`}
         titulo={subcategoria.nome}
         apoio={resumoCategoria(subcategoria)}
         extra={

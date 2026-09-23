@@ -64,7 +64,7 @@ export function Cabecalho() {
         <div className="area flex items-center justify-between gap-8 py-4">
           <Link
             href="/"
-            aria-label={`${empresa.nome} — página inicial`}
+            aria-label={`${empresa.nome}, página inicial`}
             className="relative -my-2 flex items-center transition-opacity duration-500 hover:opacity-75"
           >
             <Logo

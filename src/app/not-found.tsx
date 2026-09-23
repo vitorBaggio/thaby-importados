@@ -19,7 +19,7 @@ export default function NaoEncontrado() {
 
         <p className="mt-6 max-w-md text-[0.9375rem] font-light leading-relaxed legivel text-marinho-800/75">
           A página que você procurou não existe ou saiu do ar. O acervo
-          continua inteiro — é só voltar por aqui.
+          continua inteiro, é só voltar por aqui.
         </p>
 
         <div className="mt-10 flex flex-wrap justify-center gap-4">

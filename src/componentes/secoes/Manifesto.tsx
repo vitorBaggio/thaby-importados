@@ -16,7 +16,7 @@ const pilares = [
   {
     titulo: "Quantidade contada",
     texto:
-      "Trabalhamos com lotes pequenos. É o que garante exclusividade — e é também por isso que o que sai raramente volta.",
+      "Trabalhamos com lotes pequenos. É o que garante exclusividade, e é também por isso que o que sai raramente volta.",
   },
   {
     titulo: "Atendimento com nome",
@@ -41,7 +41,7 @@ export function Manifesto() {
                 <>
                   A Thaby nasceu em Sorriso, no meio do Mato Grosso, de uma
                   inconformidade simples: por que o que há de melhor lá fora
-                  demora tanto para chegar aqui — e quando chega, chega
+                  demora tanto para chegar aqui, e quando chega, chega
                   descaracterizado?
                 </>
               }

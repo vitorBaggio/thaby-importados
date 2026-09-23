@@ -86,7 +86,37 @@ export const subcategorias: Subcategoria[] = categorias.flatMap(
   (c) => c.subcategorias,
 );
 
-export const marcas = dados.marcas as string[];
+/**
+ * Grafias diferentes da mesma marca no cadastro (apóstrofo reto/curvo/ausente,
+ * acento, typo, singular/plural). Tudo converge para a grafia oficial. O JSON
+ * fica intocado; a normalização acontece aqui, no carregamento.
+ */
+const APELIDOS_MARCA: Record<string, string> = {
+  "Victorias Secret": "Victoria's Secret",
+  "Victoria’s Secret": "Victoria's Secret",
+  Lancome: "Lancôme",
+  Hermes: "Hermès",
+  "Round Labs": "Round Lab",
+  "Dr Althea": "Dr. Althea",
+  "Kernel Seasons": "Kernel Season's",
+  "Kernel Season’s": "Kernel Season's",
+  "Seasons Kernel": "Kernel Season's",
+  "Bath Andd Body Works": "Bath & Body Works",
+  "Mchael Kors": "Michael Kors",
+  Kiko: "Kiko Milano",
+  "Caudalie Paris": "Caudalie",
+  Vt: "VT Cosmetics",
+  "Vt Cosmetics": "VT Cosmetics",
+  "Pink Stuff": "The Pink Stuff",
+  Castebel: "Castelbel",
+  "By Mario": "Makeup By Mario",
+};
+
+const normalizarMarca = (marca: string | null): string | null =>
+  marca ? (APELIDOS_MARCA[marca] ?? marca) : null;
+
+/** Corte de presença real no acervo: o mesmo da lista original do JSON. */
+const MIN_PECAS_MARCA = 3;
 
 /**
  * Destaques da home. Sem flag de destaque na origem, elegemos peças que
@@ -157,15 +187,76 @@ function limparNome(nome: string, marca: string | null): string {
   return saida.replace(/\s{2,}/g, " ").replace(/\s+([.,])/g, "$1").trim();
 }
 
-const produtosBase: Produto[] = (dados.produtos as ProdutoBruto[]).map((p) => ({
-  ...p,
-  nome: limparNome(p.nome, p.marca),
-  imagem: urlFoto(p.fotos[0]),
-  destaque:
-    p.fotos.length > 0 && p.preco != null && !!p.marca && MARCAS_ANCORA.has(p.marca),
-}));
+const produtosBase: Produto[] = (dados.produtos as ProdutoBruto[]).map((p) => {
+  const marca = normalizarMarca(p.marca);
+  return {
+    ...p,
+    // A limpeza do nome continua recebendo a marca crua do cadastro.
+    nome: limparNome(p.nome, p.marca),
+    marca,
+    imagem: urlFoto(p.fotos[0]),
+    destaque:
+      p.fotos.length > 0 && p.preco != null && !!marca && MARCAS_ANCORA.has(marca),
+  };
+});
 
 export const produtos = produtosBase;
+
+const pecasPorMarca = new Map<string, number>();
+for (const p of produtos) {
+  if (p.marca) pecasPorMarca.set(p.marca, (pecasPorMarca.get(p.marca) ?? 0) + 1);
+}
+
+/** Marcas já normalizadas, da mais para a menos representada. */
+export const marcas: string[] = [...pecasPorMarca]
+  .filter(([, total]) => total >= MIN_PECAS_MARCA)
+  .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "pt-BR"))
+  .map(([marca]) => marca);
+
+/**
+ * Faixa de marcas da home: só grifes e beleza de desejo, da maior assinatura
+ * para a mais acessível. Toda marca daqui precisa ter peça no acervo; a que
+ * não tiver cai fora sozinha, sem deixar nome vazio na faixa.
+ */
+const MARCAS_VITRINE = [
+  "Chanel",
+  "Dior",
+  "Gucci",
+  "Yves Saint Laurent",
+  "Burberry",
+  "Versace",
+  "Dolce & Gabbana",
+  "Lalique",
+  "Montblanc",
+  "Carolina Herrera",
+  "Kenzo",
+  "Mugler",
+  "Marc Jacobs",
+  "Michael Kors",
+  "Coach",
+  "Kate Spade",
+  "Lancôme",
+  "Shiseido",
+  "Charlotte Tilbury",
+  "Natasha Denona",
+  "Huda Beauty",
+  "Laura Mercier",
+  "Fenty Beauty",
+  "Too Faced",
+  "Tarte",
+  "Victoria's Secret",
+  "Bath & Body Works",
+  "Sephora",
+  "Laneige",
+  "Glow Recipe",
+  "Medicube",
+  "Stanley",
+  "Disney",
+];
+
+export const marcasVitrine: string[] = MARCAS_VITRINE.filter((m) =>
+  pecasPorMarca.has(m),
+);
 
 /* ------------------------------------------------------------------ */
 /* Índices                                                            */
@@ -177,8 +268,15 @@ const subPorId = new Map(subcategorias.map((s) => [s.id, s]));
 const subPorSlug = new Map(subcategorias.map((s) => [s.slug, s]));
 const superDeSub = new Map(subcategorias.map((s) => [s.id, superPorId.get(s.superId)!]));
 const produtoPorSlugMap = new Map(produtos.map((p) => [p.slug, p]));
+/**
+ * Com foto antes de sem foto, mantendo a ordem do cadastro dentro de cada
+ * grupo (o sort do JS é estável). As listagens de categoria saem daqui.
+ */
+const fotoPrimeiro = (lista: Produto[]) =>
+  [...lista].sort((a, b) => Number(!!b.imagem) - Number(!!a.imagem));
+
 const produtosPorSub = new Map<number, Produto[]>();
-for (const p of produtos) {
+for (const p of fotoPrimeiro(produtos)) {
   const lista = produtosPorSub.get(p.categoriaId);
   if (lista) lista.push(p);
   else produtosPorSub.set(p.categoriaId, [p]);
@@ -221,7 +319,7 @@ const RESUMO_SUPER: Record<string, string> = {
   "mamae-e-bebe":
     "O enxoval e o cuidado da maternidade, no padrão de acabamento importado.",
   papelaria:
-    "Canetas, adesivos e papelaria de coleção — utilidade tratada como item de desejo.",
+    "Canetas, adesivos e papelaria de coleção: utilidade tratada como item de desejo.",
   tecnologia: "Acessórios e gadgets que ainda não chegaram por aqui.",
   vestuario: "Peças de vestuário adulto e infantil, selecionadas por acabamento.",
   "outros-importados": "Achados que fogem das prateleiras comuns.",
@@ -231,13 +329,14 @@ export function resumoCategoria(c: Categoria | Subcategoria): string {
   if ("super" in c) {
     return (
       RESUMO_SUPER[c.slug] ??
-      `${c.subcategorias.length} frentes, ${c.total} peças no acervo.`
+      `${c.subcategorias.length} frentes, ${c.total.toLocaleString("pt-BR")} peças no acervo.`
     );
   }
   const sup = superDeSub.get(c.id);
+  const pecas = `${c.total.toLocaleString("pt-BR")} ${c.total === 1 ? "peça" : "peças"}`;
   return sup
-    ? `Parte da curadoria de ${sup.nome}. ${c.total} ${c.total === 1 ? "peça" : "peças"} no acervo.`
-    : `${c.total} ${c.total === 1 ? "peça" : "peças"} no acervo.`;
+    ? `Parte da curadoria de ${sup.nome}. ${pecas} no acervo.`
+    : `${pecas} no acervo.`;
 }
 
 /**
@@ -377,10 +476,12 @@ export function buscar(termo: string, lista: Produto[] = vitrine): Produto[] {
   });
 }
 
-export const totais = dados.totais as {
+const totaisJson = dados.totais as {
   produtos: number;
   comFoto: number;
   supercategorias: number;
   subcategorias: number;
   marcas: number;
 };
+
+export const totais = { ...totaisJson, marcas: marcas.length };

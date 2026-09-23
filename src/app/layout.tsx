@@ -32,7 +32,7 @@ const sans = Jost({
 export const metadata: Metadata = {
   metadataBase: new URL(urlBase),
   title: {
-    default: `${empresa.nome} — Importados selecionados em ${empresa.cidade}/${empresa.estado}`,
+    default: `${empresa.nome} · Importados selecionados em ${empresa.cidade}/${empresa.estado}`,
     template: `%s · ${empresa.nome}`,
   },
   description:
@@ -57,13 +57,13 @@ export const metadata: Metadata = {
     locale: "pt_BR",
     url: urlBase,
     siteName: empresa.nome,
-    title: `${empresa.nome} — Importados selecionados`,
+    title: `${empresa.nome} · Importados selecionados em ${empresa.cidade}/${empresa.estado}`,
     description:
       "Curadoria de importados de beleza, perfumaria, moda e acessórios. De Sorriso/MT para todo o Brasil.",
   },
   twitter: {
     card: "summary_large_image",
-    title: `${empresa.nome} — Importados selecionados`,
+    title: `${empresa.nome} · Importados selecionados em ${empresa.cidade}/${empresa.estado}`,
     description:
       "Curadoria de importados de beleza, perfumaria, moda e acessórios.",
   },
