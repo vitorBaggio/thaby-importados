@@ -106,8 +106,60 @@ const MARCAS_ANCORA = new Set([
   "Stanley",
 ]);
 
+/**
+ * Limpa o ruído de ERP que vem nos nomes: siglas de marca soltas ("Ct", "Bbw")
+ * quando a marca já aparece em separado, typos conhecidos e acrônimos de skincare
+ * que deveriam ser caixa-alta. Conservador de propósito: só mexe no que é seguro.
+ *
+ * A sigla só sai quando o produto tem a marca correspondente no cadastro; sem
+ * marca, ela é a única indicação de origem no cartão e fica.
+ */
+const ABREVIACOES: Record<string, RegExp> = {
+  "Charlotte Tilbury": /\bct\b/gi,
+  "Bath & Body Works": /\bbbw\b/gi,
+  // "Fenty Beauty" sai inteiro (ou "Fenty" solto), nunca deixando "Beauty" órfão.
+  "Fenty Beauty": /\bfenty(?:\s+beauty)?\b/gi,
+};
+
+/** Sem a sigla, o nome precisa continuar com pelo menos isso de palavras. */
+const MIN_PALAVRAS = 2;
+
+const TYPOS: Array<[RegExp, string]> = [
+  [/\bselting\b/gi, "Setting"],
+  [/\bwaterproof\b/gi, "Waterproof"],
+];
+
+const ACRONIMOS = ["pdrn", "spf", "edt", "edp", "edc", "led", "uv"];
+
+const contarPalavras = (texto: string) =>
+  texto.split(/\s+/).filter((palavra) => /[\p{L}\p{N}]/u.test(palavra)).length;
+
+function limparNome(nome: string, marca: string | null): string {
+  let saida = nome;
+
+  // Remove a sigla correspondente à própria marca do produto, desde que o
+  // nome que sobra ainda diga o que é a peça ("Blush Fenty" não vira "Blush").
+  if (marca && ABREVIACOES[marca]) {
+    const semSigla = saida.replace(ABREVIACOES[marca], " ");
+    if (contarPalavras(semSigla) >= MIN_PALAVRAS) saida = semSigla;
+  }
+
+  for (const [de, para] of TYPOS) saida = saida.replace(de, para);
+
+  saida = saida
+    .split(/\s+/)
+    .map((palavra) => {
+      const limpo = palavra.replace(/[^a-zA-Z]/g, "").toLowerCase();
+      return ACRONIMOS.includes(limpo) ? palavra.toUpperCase() : palavra;
+    })
+    .join(" ");
+
+  return saida.replace(/\s{2,}/g, " ").replace(/\s+([.,])/g, "$1").trim();
+}
+
 const produtosBase: Produto[] = (dados.produtos as ProdutoBruto[]).map((p) => ({
   ...p,
+  nome: limparNome(p.nome, p.marca),
   imagem: urlFoto(p.fotos[0]),
   destaque:
     p.fotos.length > 0 && p.preco != null && !!p.marca && MARCAS_ANCORA.has(p.marca),
@@ -188,14 +240,35 @@ export function resumoCategoria(c: Categoria | Subcategoria): string {
     : `${c.total} ${c.total === 1 ? "peça" : "peças"} no acervo.`;
 }
 
-/** Descrição de vitrine de um produto: usa a real quando existe. */
+/**
+ * Descrição de vitrine: usa a real quando existe. Sem descrição própria, varia
+ * o texto entre alguns moldes (escolhidos pelo id) para não repetir a mesma
+ * frase em prateleiras inteiras. A categoria entra como rótulo, sem artigo,
+ * para não depender do gênero ("Maquiagem", "Brinquedos").
+ */
+const MOLDES_RESUMO = [
+  (marca: string, cat: string) =>
+    `${marca} na seleção de ${cat} da Thaby Importados. Valor e disponibilidade pelo WhatsApp.`,
+  (marca: string, cat: string) =>
+    `Da curadoria da Thaby para a seleção de ${cat}: ${marca}, direto do exterior.`,
+  (marca: string, cat: string) =>
+    `Categoria: ${cat}. Importado de ${marca}, com valor e disponibilidade confirmados no WhatsApp.`,
+];
+
 export function resumoProduto(p: Produto): string {
   if (p.descricao && p.descricao.length > 4) return p.descricao;
+
   const sub = subPorId.get(p.categoriaId);
-  const partes = [p.marca, sub?.nome].filter(Boolean);
-  return partes.length
-    ? `${partes.join(" · ")}. Importado, disponível sob consulta.`
-    : "Importado selecionado, disponível sob consulta.";
+  const marca = p.marca;
+  const cat = sub?.nome;
+
+  if (marca && cat) {
+    return MOLDES_RESUMO[p.id % MOLDES_RESUMO.length](marca, cat);
+  }
+  if (cat) {
+    return `Seleção de ${cat} da curadoria Thaby Importados. Valor e disponibilidade no WhatsApp.`;
+  }
+  return "Peça importada da curadoria Thaby Importados. Consulte disponibilidade e valor no WhatsApp.";
 }
 export const subcategoriaPorId = (id: number) => subPorId.get(id);
 export const superDaSubcategoria = (subId: number) => superDeSub.get(subId);

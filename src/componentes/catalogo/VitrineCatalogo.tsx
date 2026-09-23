@@ -2,7 +2,7 @@
 
 import { useDeferredValue, useMemo, useState } from "react";
 import { motion } from "motion/react";
-import { Search, X } from "lucide-react";
+import { Search, SlidersHorizontal, X } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { slugify } from "@/lib/texto";
 import { CartaoProduto } from "./CartaoProduto";
@@ -35,6 +35,9 @@ export function VitrineCatalogo({
   const [superAtiva, setSuperAtiva] = useState<number | null>(null);
   const [ordenacao, setOrdenacao] = useState<Ordenacao>("curadoria");
   const [visiveis, setVisiveis] = useState(LOTE);
+  // No mobile a barra fixa ficava alta demais; ordenação + categorias colapsam
+  // atrás de "Filtrar". No desktop tudo aparece sempre (lg:flex).
+  const [painelAberto, setPainelAberto] = useState(false);
 
   // Assinatura do filtro atual. Se mudar entre renders, a paginação volta ao
   // início durante o próprio render — sem efeito, sem cascata (padrão React 19).
@@ -91,33 +94,54 @@ export function VitrineCatalogo({
     <div>
       <div className="sticky top-[4.5rem] z-30 -mx-6 border-b border-marinho-500/10 bg-fundo/85 px-6 py-5 backdrop-blur-xl md:-mx-10 md:px-10 lg:top-[5rem]">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-          <label className="group relative flex w-full max-w-md items-center">
-            <Search
-              size={16}
-              strokeWidth={1.4}
-              className="pointer-events-none absolute left-0 text-marinho-700/75 transition-colors duration-400 group-focus-within:text-carmim-500"
-            />
-            <input
-              type="search"
-              value={termo}
-              onChange={(e) => setTermo(e.target.value)}
-              placeholder="Buscar por peça ou marca"
-              aria-label="Buscar no catálogo"
-              className="w-full border-0 border-b border-marinho-500/18 bg-transparent py-2.5 pl-7 pr-8 font-sans text-[0.875rem] font-light text-marinho-900 placeholder:text-marinho-700/70 focus:border-marinho-500/50 focus:outline-none [&::-webkit-search-cancel-button]:hidden"
-            />
-            {termo && (
-              <button
-                type="button"
-                onClick={() => setTermo("")}
-                aria-label="Limpar busca"
-                className="absolute right-0 text-marinho-700/75 transition-colors duration-400 hover:text-marinho-900"
-              >
-                <X size={15} strokeWidth={1.5} />
-              </button>
-            )}
-          </label>
+          <div className="flex w-full items-center gap-3 lg:max-w-md">
+            <label className="group relative flex flex-1 items-center">
+              <Search
+                size={16}
+                strokeWidth={1.4}
+                className="pointer-events-none absolute left-0 text-marinho-700/75 transition-colors duration-400 group-focus-within:text-carmim-500"
+              />
+              <input
+                type="search"
+                value={termo}
+                onChange={(e) => setTermo(e.target.value)}
+                placeholder="Buscar por peça ou marca"
+                aria-label="Buscar no catálogo"
+                className="w-full border-0 border-b border-marinho-500/18 bg-transparent py-2.5 pl-7 pr-8 font-sans text-[0.875rem] font-light text-marinho-900 placeholder:text-marinho-700/70 focus:border-marinho-500/50 focus:outline-none [&::-webkit-search-cancel-button]:hidden"
+              />
+              {termo && (
+                <button
+                  type="button"
+                  onClick={() => setTermo("")}
+                  aria-label="Limpar busca"
+                  className="absolute right-0 text-marinho-700/75 transition-colors duration-400 hover:text-marinho-900"
+                >
+                  <X size={15} strokeWidth={1.5} />
+                </button>
+              )}
+            </label>
 
-          <div className="flex flex-wrap items-center gap-1">
+            {/* Abre ordenação + categorias no mobile. Some no desktop. */}
+            <button
+              type="button"
+              onClick={() => setPainelAberto((v) => !v)}
+              aria-expanded={painelAberto}
+              className={cn(
+                "flex shrink-0 items-center gap-2 border px-4 py-2 font-sans text-[0.6875rem] uppercase tracking-[0.14em] transition-colors duration-400 lg:hidden",
+                painelAberto || comFiltro
+                  ? "border-marinho-900 text-marinho-900"
+                  : "border-marinho-500/25 text-marinho-700/80",
+              )}
+            >
+              <SlidersHorizontal size={13} strokeWidth={1.5} />
+              Filtrar
+              {superAtiva !== null && (
+                <span className="size-1.5 rounded-full bg-carmim-500" />
+              )}
+            </button>
+          </div>
+
+          <div className={cn("flex-wrap items-center gap-1", painelAberto ? "flex" : "hidden", "lg:flex")}>
             {ordenacoes.map((opcao) => (
               <button
                 key={opcao.valor}
@@ -137,7 +161,13 @@ export function VitrineCatalogo({
           </div>
         </div>
 
-        <div className="-mx-6 mt-5 flex gap-2 overflow-x-auto px-6 pb-1 [scrollbar-width:none] md:-mx-10 md:px-10 [&::-webkit-scrollbar]:hidden">
+        <div
+          className={cn(
+            "-mx-6 mt-5 gap-2 overflow-x-auto px-6 pb-1 [scrollbar-width:none] md:-mx-10 md:px-10 [&::-webkit-scrollbar]:hidden",
+            painelAberto ? "flex" : "hidden",
+            "lg:flex",
+          )}
+        >
           <Chip ativo={superAtiva === null} onClick={() => setSuperAtiva(null)}>
             Tudo
           </Chip>
