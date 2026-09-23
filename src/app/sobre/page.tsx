@@ -68,33 +68,47 @@ export default function PaginaSobre() {
           <div className="lg:col-span-7">
             <Revelar>
               <p className="text-fluid-lg font-light leading-relaxed legivel text-marinho-900/85">
-                Sorriso fica a mais de dois mil quilômetros do litoral. Aqui, o
-                que é lançamento no exterior costuma levar temporadas para
-                aparecer — e quando aparece, chega com outro nome, outra
-                formulação, outro preço.
+                A Thaby nasceu de um desejo simples: ter acesso ao que ainda não
+                encontrávamos por aqui.
               </p>
             </Revelar>
 
             <Revelar atraso={0.1}>
               <div className="mt-9 flex flex-col gap-6 text-fluid-base font-light leading-relaxed legivel text-marinho-800/65">
                 <p>
-                  A Thaby começou resolvendo isso para um círculo pequeno: uma
-                  encomenda aqui, um pedido ali, sempre com a mesma pergunta por
-                  trás — dá para trazer o original, inteiro, sem enrolação?
+                  Tudo começou a partir de um grupo de mães, em Sorriso, no
+                  interior do Mato Grosso, que buscavam produtos diferentes,
+                  especiais e de qualidade, coisas que muitas vezes não estavam
+                  disponíveis em nossa cidade.
                 </p>
                 <p>
-                  Deu. E o que era favor virou método. Hoje o acervo passa de{" "}
-                  {totais.produtos.toLocaleString("pt-BR")} peças em{" "}
-                  {totais.supercategorias} frentes, de skincare coreano a
-                  perfumaria fina, de bolsa de grife a brinquedo de licença
-                  oficial. O que não mudou foi o critério: cada peça passa pela
-                  mão de alguém antes de ser oferecida.
+                  O que começou despretensiosamente, com produtos para bebês,
+                  foi ganhando novos caminhos. Vieram a beleza, os cuidados
+                  pessoais, os acessórios, a moda, a casa e tantos outros achados
+                  que passaram a fazer parte da nossa curadoria.
                 </p>
                 <p>
-                  Não temos loja física de shopping nem catálogo infinito.
-                  Temos curadoria, quantidade contada e um WhatsApp que
-                  responde.
+                  E o que talvez tenha começado sem grandes pretensões se
+                  transformou em 8 anos de história, descobertas e,
+                  principalmente, de confiança.
                 </p>
+                <p>
+                  Hoje, a Thaby é feita de escolhas. De olhar atento, de viagens,
+                  de pesquisas e daquela vontade de encontrar algo especial e
+                  pensar: “isso tem a cara das nossas clientes.”
+                </p>
+                <p>
+                  Mais do que trazer produtos de outros lugares, queremos trazer
+                  experiências, novidades e aquela sensação gostosa de encontrar
+                  algo que você nem sabia que estava procurando.
+                </p>
+                <p>
+                  Essa é a nossa casa.
+                  <br />
+                  A casa da curadoria, dos achados e das coisas que fazem você se
+                  apaixonar.
+                </p>
+                <p>Seja bem-vinda à Thaby.</p>
               </div>
             </Revelar>
 

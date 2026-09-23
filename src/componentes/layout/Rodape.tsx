@@ -8,7 +8,7 @@ import { empresa, linkWhatsApp, mensagensPadrao } from "@/dados/empresa";
 
 const navegacao = [
   { rotulo: "Catálogo completo", href: "/catalogo" },
-  { rotulo: "Categorias", href: "/categorias" },
+  { rotulo: "Curadoria", href: "/categorias" },
   { rotulo: "A casa", href: "/sobre" },
   { rotulo: "Contato", href: "/contato" },
 ];
@@ -62,7 +62,7 @@ export function Rodape() {
             ))}
           </ColunaRodape>
 
-          <ColunaRodape titulo="Categorias">
+          <ColunaRodape titulo="Curadoria">
             {categorias.slice(0, 6).map((categoria) => (
               <li key={categoria.id}>
                 <LinkRodape href={`/categorias/${categoria.slug}`}>

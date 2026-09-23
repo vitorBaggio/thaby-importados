@@ -6,7 +6,7 @@ import { RotaDeVoo } from "@/componentes/marca/RotaDeVoo";
 import { categorias, totais } from "@/dados/catalogo";
 
 export const metadata: Metadata = {
-  title: "Categorias",
+  title: "Curadoria",
   description:
     "As frentes de curadoria da Thaby Importados: beleza, moda, acessórios, alimentação, infantil, papelaria, tecnologia e mais.",
   alternates: { canonical: "/categorias" },
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 const trilha = [
   { nome: "Início", caminho: "/" },
-  { nome: "Categorias", caminho: "/categorias" },
+  { nome: "Curadoria", caminho: "/categorias" },
 ];
 
 export default function PaginaCategorias() {
@@ -25,8 +25,8 @@ export default function PaginaCategorias() {
       <CabecalhoPagina
         trilha={trilha}
         sobrescrita={`${totais.supercategorias} frentes · ${totais.subcategorias} categorias`}
-        titulo="Por onde começar."
-        apoio="Cada frente tem seu próprio critério de escolha, mas todas seguem a mesma régua: procedência conferida e quantidade contada."
+        titulo="Curadoria."
+        apoio="Encontre seus produtos favoritos por categoria: acessórios e moda, beleza, bem estar e estilo de vida, infantil e muito mais."
       />
 
       <div className="area pb-28 pt-20 md:pb-36 md:pt-24">

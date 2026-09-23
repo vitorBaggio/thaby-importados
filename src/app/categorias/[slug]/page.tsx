@@ -72,7 +72,7 @@ export default async function PaginaCategoria({
 function PaginaSuper({ categoria }: { categoria: Categoria }) {
   const trilha = [
     { nome: "Início", caminho: "/" },
-    { nome: "Categorias", caminho: "/categorias" },
+    { nome: "Curadoria", caminho: "/categorias" },
     { nome: categoria.nome, caminho: `/categorias/${categoria.slug}` },
   ];
 
@@ -124,7 +124,7 @@ function PaginaSub({ subcategoria }: { subcategoria: Subcategoria }) {
 
   const trilha = [
     { nome: "Início", caminho: "/" },
-    { nome: "Categorias", caminho: "/categorias" },
+    { nome: "Curadoria", caminho: "/categorias" },
     ...(sup ? [{ nome: sup.nome, caminho: `/categorias/${sup.slug}` }] : []),
     { nome: subcategoria.nome, caminho: `/categorias/${subcategoria.slug}` },
   ];

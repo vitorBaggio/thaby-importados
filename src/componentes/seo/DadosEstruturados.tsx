@@ -57,7 +57,7 @@ export function DadosEstruturados() {
           },
           {
             "@type": "ItemList",
-            name: "Categorias do acervo",
+            name: "Curadoria do acervo",
             itemListElement: categorias.map((categoria, indice) => ({
               "@type": "ListItem",
               position: indice + 1,
