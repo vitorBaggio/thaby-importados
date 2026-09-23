@@ -6,7 +6,7 @@ import { Revelar } from "@/componentes/ui/Revelar";
 import { FormularioWhatsApp } from "@/componentes/contato/FormularioWhatsApp";
 import { IconeInstagram, IconeTikTok } from "@/componentes/marca/IconesSociais";
 import { LacoTracejado } from "@/componentes/marca/RotaDeVoo";
-import { empresa, linkWhatsApp, mensagensPadrao } from "@/dados/empresa";
+import { empresa, equipe, linkWhatsAppPara } from "@/dados/empresa";
 
 export const metadata: Metadata = {
   title: "Contato",
@@ -19,14 +19,9 @@ const trilha = [
   { nome: "Contato", caminho: "/contato" },
 ];
 
+const gruposEquipe = [...new Set(equipe.map((pessoa) => pessoa.grupo))];
+
 const canais = [
-  {
-    rotulo: "WhatsApp",
-    valor: empresa.whatsapp.exibicao,
-    detalhe: "O canal principal. É por aqui que tudo acontece.",
-    href: linkWhatsApp(mensagensPadrao.geral),
-    icone: <MessageCircle size={17} strokeWidth={1.4} />,
-  },
   {
     rotulo: "E-mail",
     valor: empresa.email,
@@ -59,8 +54,47 @@ export default function PaginaContato() {
         trilha={trilha}
         sobrescrita="Atendimento direto"
         titulo="Fale com quem escolhe as peças."
-        apoio="Sem central, sem robô, sem fila. Do outro lado tem uma pessoa que conhece o acervo e sabe o que dá para trazer."
+        apoio="Fale com a gente, tire suas dúvidas e conte com nosso atendimento personalizado. Sem central, sem robô, sem fila. Do outro lado tem uma pessoa que conhece o acervo."
       />
+
+      <section aria-label="Equipe de atendimento" className="pt-24 md:pt-32">
+        <div className="area grid gap-12 lg:grid-cols-2 lg:gap-20">
+          {gruposEquipe.map((grupo) => (
+            <div key={grupo}>
+              <h2 className="font-display text-3xl font-light leading-tight text-marinho-900 md:text-4xl">
+                {grupo}
+              </h2>
+              <ul className="mt-8 flex flex-col divide-y divide-marinho-500/12 border-y border-marinho-500/12">
+                {equipe.filter((pessoa) => pessoa.grupo === grupo).map((pessoa) => (
+                  <li key={pessoa.numero} className="flex flex-col gap-5 py-6 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="min-w-0">
+                      <h3 className="font-sans text-[1.0625rem] font-light text-marinho-900">
+                        {pessoa.nome}
+                      </h3>
+                      <p className="mt-1.5 text-[0.8125rem] font-light leading-relaxed text-marinho-700">
+                        {pessoa.papel}
+                      </p>
+                      <p className="mt-1.5 text-[1.0625rem] font-light text-marinho-900">
+                        {pessoa.exibicao}
+                      </p>
+                    </div>
+                    <a
+                      href={linkWhatsAppPara(pessoa.numero, `Olá, ${pessoa.nome}! Vim pelo site da Thaby e gostaria de atendimento.`)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`Chamar no WhatsApp: ${pessoa.nome}`}
+                      className="inline-flex min-h-11 items-center justify-center gap-3 border border-marinho-500/18 px-4 py-3 text-[0.8125rem] text-marinho-800 transition-colors duration-500 hover:border-carmim-600 hover:bg-carmim-600 hover:text-marfim-puro focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-marinho-800"
+                    >
+                      <MessageCircle aria-hidden="true" size={17} strokeWidth={1.4} className="shrink-0" />
+                      Chamar no WhatsApp
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </section>
 
       <section className="py-24 md:py-32">
         <div className="area grid gap-16 lg:grid-cols-12 lg:gap-20">

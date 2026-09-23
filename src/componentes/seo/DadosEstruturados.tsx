@@ -1,4 +1,4 @@
-import { empresa } from "@/dados/empresa";
+import { empresa, equipe } from "@/dados/empresa";
 import { categorias, resumoProduto, type Produto } from "@/dados/catalogo";
 import { url, urlBase } from "@/lib/site";
 
@@ -25,6 +25,14 @@ const negocio = {
     "Importados selecionados de beleza, perfumaria, moda e acessórios, com curadoria própria e atendimento por WhatsApp.",
   url: urlBase,
   telephone: `+${empresa.whatsapp.numero}`,
+  contactPoint: equipe.map((pessoa) => ({
+    "@type": "ContactPoint",
+    name: pessoa.nome,
+    telephone: `+${pessoa.numero}`,
+    contactType: "customer service",
+    areaServed: "BR",
+    availableLanguage: "Portuguese",
+  })),
   email: empresa.email,
   image: url("/marca/logo.png"),
   logo: url("/marca/logo.png"),
