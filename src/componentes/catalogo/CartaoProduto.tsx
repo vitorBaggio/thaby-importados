@@ -110,7 +110,14 @@ export function CartaoProduto({
           </Link>
         </h3>
 
-        <p className="mt-auto pt-4 font-sans text-[0.8125rem] tabular-nums text-marinho-900">
+        <p className="mt-auto flex flex-wrap items-baseline gap-x-2.5 pt-4 font-sans text-[0.8125rem] tabular-nums text-marinho-900">
+          {produto.precoAnterior != null && (
+            <s className="text-[0.75rem] text-marinho-700/60">
+              <span className="sr-only">De </span>
+              {precoFormatado(produto.precoAnterior)}
+            </s>
+          )}
+          {produto.precoAnterior != null && <span className="sr-only">por </span>}
           {precoFormatado(produto.preco) ?? (
             <span className="text-[0.6875rem] uppercase tracking-[0.18em] text-marinho-700/75">
               Sob consulta

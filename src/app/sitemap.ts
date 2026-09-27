@@ -11,6 +11,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const fixas: MetadataRoute.Sitemap = [
     { url: url("/"), changeFrequency: "weekly", priority: 1 },
     { url: url("/novidades"), changeFrequency: "weekly", priority: 0.9 },
+    { url: url("/sale"), changeFrequency: "weekly", priority: 0.8 },
     { url: url("/catalogo"), changeFrequency: "weekly", priority: 0.9 },
     { url: url("/categorias"), changeFrequency: "monthly", priority: 0.8 },
     { url: url("/sobre"), changeFrequency: "yearly", priority: 0.5 },

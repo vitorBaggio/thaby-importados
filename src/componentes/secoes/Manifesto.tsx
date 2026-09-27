@@ -39,8 +39,7 @@ export function Manifesto() {
               titulo="Importar é escolher. E escolher bem leva tempo."
               apoio={
                 <>
-                  A Thaby nasceu em Sorriso, no meio do Mato Grosso, de uma
-                  inconformidade simples: por que o que há de melhor lá fora
+                  A Thaby nasceu de uma inconformidade simples: por que o que há de melhor lá fora
                   demora tanto para chegar aqui, e quando chega, chega
                   descaracterizado?
                 </>
@@ -87,7 +86,7 @@ export function Manifesto() {
                     {empresa.fundacao}
                   </p>
                   <p className="mt-3 font-sans text-[0.625rem] uppercase leading-relaxed tracking-[0.18em] text-marinho-700/75">
-                    Ano em que tudo começou, em Sorriso
+                    Ano em que tudo começou
                   </p>
                 </div>
               </figure>

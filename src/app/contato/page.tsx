@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Mail, MapPin, MessageCircle } from "lucide-react";
+import { Mail, MessageCircle, Truck } from "lucide-react";
 import { CabecalhoPagina } from "@/componentes/layout/CabecalhoPagina";
 import { Migalhas } from "@/componentes/seo/DadosEstruturados";
 import { Revelar } from "@/componentes/ui/Revelar";
@@ -10,7 +10,7 @@ import { empresa, equipe, linkWhatsAppPara } from "@/dados/empresa";
 
 export const metadata: Metadata = {
   title: "Contato",
-  description: `Fale com a Thaby Importados: WhatsApp ${empresa.whatsapp.exibicao}, e-mail e redes. Atendimento direto, de ${empresa.cidade}/${empresa.estado} para todo o Brasil.`,
+  description: `Fale com a Thaby Importados: WhatsApp ${empresa.whatsapp.exibicao}, e-mail e redes. Atendimento direto para todo o Brasil.`,
   alternates: { canonical: "/contato" },
 };
 
@@ -150,21 +150,21 @@ export default function PaginaContato() {
                 <LacoTracejado className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 text-marinho-500/12" />
 
                 <div className="relative flex items-start gap-4">
-                  <MapPin
+                  <Truck
                     size={17}
                     strokeWidth={1.4}
                     className="mt-1 shrink-0 text-carmim-600/85"
                   />
                   <div>
                     <p className="font-sans text-[0.5625rem] uppercase tracking-[0.22em] text-marinho-700/72">
-                      Base
+                      Entrega
                     </p>
                     <p className="mt-2 text-[1.0625rem] font-light text-marinho-900/85">
-                      {empresa.regiao}
+                      Todo o Brasil
                     </p>
                     <p className="mt-2.5 text-[0.8125rem] font-light leading-relaxed text-marinho-700/75">
-                      Retirada combinada na cidade. Envio com rastreio para
-                      qualquer endereço do Brasil.
+                      Retirada combinada ou envio com rastreio para qualquer
+                      endereço do Brasil.
                     </p>
                   </div>
                 </div>

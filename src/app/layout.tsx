@@ -32,20 +32,18 @@ const sans = Jost({
 export const metadata: Metadata = {
   metadataBase: new URL(urlBase),
   title: {
-    default: `${empresa.nome} · Importados selecionados em ${empresa.cidade}/${empresa.estado}`,
+    default: `${empresa.nome} · Importados selecionados`,
     template: `%s · ${empresa.nome}`,
   },
   description:
-    "Beleza, perfumaria, moda e acessórios importados, garimpados peça a peça. Curadoria própria e atendimento direto no WhatsApp, de Sorriso/MT para todo o Brasil.",
+    "Beleza, perfumaria, moda e acessórios importados, selecionados peça a peça. Curadoria própria e atendimento direto no WhatsApp, para todo o Brasil.",
   applicationName: empresa.nome,
   keywords: [
-    "importados Sorriso MT",
     "produtos importados",
     "skincare coreano",
     "perfume importado",
     "Bath and Body Works Brasil",
     "Medicube",
-    "importados Mato Grosso",
     empresa.nome,
   ],
   authors: [{ name: empresa.nome }],
@@ -57,13 +55,13 @@ export const metadata: Metadata = {
     locale: "pt_BR",
     url: urlBase,
     siteName: empresa.nome,
-    title: `${empresa.nome} · Importados selecionados em ${empresa.cidade}/${empresa.estado}`,
+    title: `${empresa.nome} · Importados selecionados`,
     description:
-      "Curadoria de importados de beleza, perfumaria, moda e acessórios. De Sorriso/MT para todo o Brasil.",
+      "Curadoria de importados de beleza, perfumaria, moda e acessórios. Para todo o Brasil.",
   },
   twitter: {
     card: "summary_large_image",
-    title: `${empresa.nome} · Importados selecionados em ${empresa.cidade}/${empresa.estado}`,
+    title: `${empresa.nome} · Importados selecionados`,
     description:
       "Curadoria de importados de beleza, perfumaria, moda e acessórios.",
   },

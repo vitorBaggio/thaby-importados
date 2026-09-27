@@ -26,7 +26,7 @@ const etapas = [
     numero: "04",
     titulo: "Chega até você",
     texto:
-      "Retirada em Sorriso ou envio com rastreio para qualquer endereço do Brasil.",
+      "Retirada combinada ou envio com rastreio para qualquer endereço do Brasil.",
   },
 ];
 

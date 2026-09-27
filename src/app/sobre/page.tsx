@@ -14,7 +14,7 @@ import { totais } from "@/dados/catalogo";
 export const metadata: Metadata = {
   title: "A casa",
   description:
-    "A história da Thaby Importados: uma operação de curadoria nascida em Sorriso, no Mato Grosso, que traz para o Brasil o que ainda não chegou aqui.",
+    "A história da Thaby Importados: uma operação de curadoria que traz para o Brasil o que ainda não chegou aqui.",
   alternates: { canonical: "/sobre" },
 };
 
@@ -58,8 +58,8 @@ export default function PaginaSobre() {
 
       <CabecalhoPagina
         trilha={trilha}
-        sobrescrita={`${empresa.cidade} · ${empresa.estado}`}
-        titulo="Uma vitrine internacional no meio do Mato Grosso."
+        sobrescrita={`Desde ${empresa.fundacao}`}
+        titulo="Uma vitrine internacional."
         apoio="A casa da curadoria, dos achados e das coisas que fazem você se apaixonar."
       />
 
@@ -76,10 +76,9 @@ export default function PaginaSobre() {
             <Revelar atraso={0.1}>
               <div className="mt-9 flex flex-col gap-6 text-fluid-base font-light leading-relaxed legivel text-marinho-800/65">
                 <p>
-                  Tudo começou a partir de um grupo de mães, em Sorriso, no
-                  interior do Mato Grosso, que buscavam produtos diferentes,
-                  especiais e de qualidade, coisas que muitas vezes não estavam
-                  disponíveis em nossa cidade.
+                  Tudo começou a partir de um grupo de mães que buscavam
+                  produtos diferentes, especiais e de qualidade, coisas que
+                  muitas vezes não estavam disponíveis em nossa cidade.
                 </p>
                 <p>
                   O que começou despretensiosamente, com produtos para bebês,
@@ -188,7 +187,7 @@ export default function PaginaSobre() {
         <div className="area flex flex-col items-center gap-8 text-center">
           <Logo variante="cor" tamanho={96} className="rounded-full bg-marfim-puro p-3" />
           <p className="max-w-xl text-[0.9375rem] font-light leading-relaxed legivel text-marinho-800/75">
-            {empresa.nome} · CNPJ {empresa.cnpj} · {empresa.regiao}
+            {empresa.nome} · CNPJ {empresa.cnpj}
           </p>
         </div>
       </section>
