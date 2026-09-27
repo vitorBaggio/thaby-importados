@@ -51,7 +51,7 @@ export function Hero() {
           >
             <AviaoDePapel className="h-3.5 w-3.5" />
             <span className="sobrescrita">
-              {empresa.cidade} · {empresa.estado} · desde {empresa.fundacao}
+              Desde {empresa.fundacao}
             </span>
           </motion.p>
 
@@ -81,7 +81,7 @@ export function Hero() {
             transition={{ duration: 1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
             className="mt-9 max-w-lg text-fluid-base font-light leading-relaxed legivel text-marinho-800/70"
           >
-            Beleza, perfumaria, moda e acessórios garimpados peça a peça lá fora.
+            Beleza, perfumaria, moda e acessórios selecionados peça a peça lá fora.
             Quantidade contada e um atendimento que
             continua depois da venda.
           </motion.p>

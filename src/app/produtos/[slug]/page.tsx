@@ -186,7 +186,17 @@ export default async function PaginaProduto({
 
             <Revelar atraso={0.18}>
               <div className="mt-10 border-y border-marinho-500/12 py-7">
+                {produto.precoAnterior != null && (
+                  <p className="mb-2 flex items-center gap-3 font-sans text-[0.8125rem] tabular-nums text-marinho-700/70">
+                    <span className="sobrescrita text-[0.5625rem] text-carmim-600">Sale</span>
+                    <s>
+                      <span className="sr-only">De </span>
+                      {precoFormatado(produto.precoAnterior)}
+                    </s>
+                  </p>
+                )}
                 <p className="font-display text-4xl font-light text-marinho-900">
+                  {produto.precoAnterior != null && <span className="sr-only">Por </span>}
                   {preco ?? "Sob consulta"}
                 </p>
                 <p className="mt-2.5 max-w-sm text-[0.8125rem] font-light leading-relaxed text-marinho-700/75">

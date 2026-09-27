@@ -11,6 +11,7 @@
  */
 
 import dados from "./catalogo-completo.json";
+import { itensSale, type ItemSale } from "./sale";
 import { slugify } from "@/lib/texto";
 
 const PREFIXO_FOTO = "https://catalogo-mobile.s3.sa-east-1.amazonaws.com/";
@@ -73,6 +74,8 @@ export type Produto = ProdutoBruto & {
   /** URL absoluta da primeira foto, ou null. */
   imagem: string | null;
   destaque: boolean;
+  /** Preço do cadastro em centavos quando a peça está no Sale com desconto; `preco` já é o promocional. */
+  precoAnterior: number | null;
 };
 
 /* ------------------------------------------------------------------ */
@@ -214,10 +217,61 @@ const produtosBase: Produto[] = (dados.produtos as ProdutoBruto[]).map((p) => {
     imagem: urlFoto(p.fotos[0]),
     destaque:
       p.fotos.length > 0 && p.preco != null && !!marca && MARCAS_ANCORA.has(marca),
+    precoAnterior: null,
   };
 });
 
-export const produtos = produtosBase;
+/* ------------------------------------------------------------------ */
+/* Sale                                                               */
+/* ------------------------------------------------------------------ */
+
+/** Só aplica promoção inteira, positiva e menor que o preço do cadastro. */
+const comPrecoSale = (p: Produto, promocional?: number): Produto =>
+  promocional != null &&
+  Number.isInteger(promocional) &&
+  promocional > 0 &&
+  p.preco != null &&
+  promocional < p.preco
+    ? { ...p, preco: promocional, precoAnterior: p.preco }
+    : p;
+
+/**
+ * Resolve os itens do Sale (código → produto), já com o preço promocional.
+ * Código inexistente fica de fora com aviso no build. Há códigos repetidos no
+ * cadastro: nesse caso todas as peças com o código entram, uma vez cada.
+ */
+export function resolverSale(
+  itens: readonly ItemSale[],
+  lista: Produto[] = produtosBase,
+): Produto[] {
+  const porCodigo = new Map<string, Produto[]>();
+  for (const p of lista) {
+    if (!p.codigo) continue;
+    const grupo = porCodigo.get(p.codigo);
+    if (grupo) grupo.push(p);
+    else porCodigo.set(p.codigo, [p]);
+  }
+
+  const vistos = new Set<number>();
+  return itens.flatMap((item) => {
+    const achados = porCodigo.get(item.codigo.trim());
+    if (!achados) {
+      if (typeof window === "undefined") {
+        console.warn(`[sale] Código "${item.codigo}" não existe no catálogo; item ignorado.`);
+      }
+      return [];
+    }
+    return achados
+      .filter((p) => !vistos.has(p.id) && !!vistos.add(p.id))
+      .map((p) => comPrecoSale(p, item.precoPromocional));
+  });
+}
+
+const emSale = resolverSale(itensSale);
+const salePorId = new Map(emSale.map((p) => [p.id, p]));
+
+/** Acervo com o preço do Sale aplicado: cartão, página e lista usam o mesmo valor. */
+export const produtos: Produto[] = produtosBase.map((p) => salePorId.get(p.id) ?? p);
 
 const pecasPorMarca = new Map<string, number>();
 for (const p of produtos) {
@@ -434,7 +488,16 @@ export const destaques = produtos.filter((p) => p.destaque);
  */
 export type ProdutoResumo = Pick<
   Produto,
-  "id" | "nome" | "slug" | "marca" | "preco" | "codigo" | "categoriaId" | "imagem" | "destaque"
+  | "id"
+  | "nome"
+  | "slug"
+  | "marca"
+  | "preco"
+  | "precoAnterior"
+  | "codigo"
+  | "categoriaId"
+  | "imagem"
+  | "destaque"
 >;
 
 const resumir = (p: Produto): ProdutoResumo => ({
@@ -443,6 +506,7 @@ const resumir = (p: Produto): ProdutoResumo => ({
   slug: p.slug,
   marca: p.marca,
   preco: p.preco,
+  precoAnterior: p.precoAnterior,
   codigo: p.codigo,
   categoriaId: p.categoriaId,
   imagem: p.imagem,
@@ -464,6 +528,9 @@ export const novidades: Produto[] = fotoPrimeiro(
 );
 
 export const novidadesResumo: ProdutoResumo[] = novidades.map(resumir);
+
+/** Peças da aba Sale, na ordem de `sale.ts`. */
+export const saleResumo: ProdutoResumo[] = emSale.map(resumir);
 
 /** Categorias em forma leve para o filtro do cliente (sem imagens/subs aninhadas pesadas). */
 export type SuperResumo = { id: number; nome: string; slug: string; total: number };

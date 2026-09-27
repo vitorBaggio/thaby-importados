@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Mail, MapPin, MessageCircle } from "lucide-react";
+import { Mail, MessageCircle } from "lucide-react";
 import { IconeInstagram, IconeTikTok } from "@/componentes/marca/IconesSociais";
 import { Logo } from "@/componentes/marca/Logo";
 import { LacoTracejado } from "@/componentes/marca/RotaDeVoo";
@@ -8,6 +8,7 @@ import { empresa, linkWhatsApp, mensagensPadrao } from "@/dados/empresa";
 
 const navegacao = [
   { rotulo: "Novidades", href: "/novidades" },
+  { rotulo: "Sale", href: "/sale" },
   { rotulo: "Catálogo completo", href: "/catalogo" },
   { rotulo: "Curadoria", href: "/categorias" },
   { rotulo: "A casa", href: "/sobre" },
@@ -27,8 +28,8 @@ export function Rodape() {
             <Logo variante="marfim" tamanho={72} />
 
             <p className="mt-7 text-[0.9375rem] font-light leading-relaxed legivel text-marinho-100/70">
-              Importados selecionados peça a peça, de Sorriso para o Brasil
-              inteiro. O que não está no catálogo, a gente busca.
+              Importados selecionados peça a peça, para todo o Brasil. O que
+              não está no catálogo, a gente busca.
             </p>
 
             <div className="mt-8 flex items-center gap-3">
@@ -107,16 +108,6 @@ export function Rodape() {
                 />
                 {empresa.email}
               </a>
-            </li>
-
-            <li className="flex items-start gap-3 text-[0.875rem] font-light text-marinho-100/70">
-              <MapPin
-                size={15}
-                strokeWidth={1.4}
-                className="mt-0.5 shrink-0 text-carmim-400/70"
-              />
-              {empresa.regiao}
-              <br />
             </li>
           </ColunaRodape>
         </div>

@@ -8,7 +8,7 @@ import { QTD_NOVIDADES, novidadesResumo } from "@/dados/catalogo";
 export const metadata: Metadata = {
   title: "Novidades",
   description:
-    "Os lançamentos que acabaram de chegar à Thaby Importados: beleza, perfumaria, moda e achados garimpados pelo mundo. Monte sua lista e confirme pelo WhatsApp.",
+    "Os lançamentos que acabaram de chegar à Thaby Importados: beleza, perfumaria, moda e achados selecionados pelo mundo. Monte sua lista e confirme pelo WhatsApp.",
   alternates: { canonical: "/novidades" },
 };
 
