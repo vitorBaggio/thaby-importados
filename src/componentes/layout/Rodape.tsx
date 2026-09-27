@@ -7,6 +7,7 @@ import { categorias } from "@/dados/catalogo";
 import { empresa, linkWhatsApp, mensagensPadrao } from "@/dados/empresa";
 
 const navegacao = [
+  { rotulo: "Novidades", href: "/novidades" },
   { rotulo: "Catálogo completo", href: "/catalogo" },
   { rotulo: "Curadoria", href: "/categorias" },
   { rotulo: "A casa", href: "/sobre" },

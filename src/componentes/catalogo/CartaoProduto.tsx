@@ -6,12 +6,11 @@ import Link from "next/link";
 import { Check, Plus } from "lucide-react";
 import { motion } from "motion/react";
 import { cn } from "@/lib/cn";
-import { iniciais } from "@/lib/texto";
 import { nomeTransicaoProduto } from "@/lib/transicoes";
 import { categoriaPorId, precoFormatado, type ProdutoResumo } from "@/dados/catalogo";
 import { useOrcamento } from "@/componentes/orcamento/ContextoOrcamento";
 import { RevelarImagem } from "@/componentes/ui/RevelarImagem";
-import { LacoTracejado } from "@/componentes/marca/RotaDeVoo";
+import { PlaceholderProduto } from "./PlaceholderProduto";
 
 export function CartaoProduto({
   produto,
@@ -62,7 +61,11 @@ export function CartaoProduto({
                 />
               </RevelarImagem>
             ) : (
-              <PlaceholderProduto produto={produto} />
+              <PlaceholderProduto
+                nome={produto.nome}
+                marca={produto.marca}
+                categoria={categoria?.nome}
+              />
             )}
 
             {/* Véu que escurece de leve no hover, para o botão ganhar contraste */}
@@ -116,32 +119,5 @@ export function CartaoProduto({
         </p>
       </div>
     </motion.article>
-  );
-}
-
-/**
- * Nem todo item do acervo tem foto liberada. Em vez de um cinza vazio,
- * o espaço vira uma peça de marca — mantém a vitrine coerente.
- */
-function PlaceholderProduto({ produto }: { produto: ProdutoResumo }) {
-  const categoria = categoriaPorId(produto.categoriaId);
-
-  return (
-    <span className="absolute inset-0 grid place-items-center overflow-hidden bg-gradient-to-br from-marfim to-areia">
-      <LacoTracejado className="absolute -right-16 -top-16 h-64 w-64 text-marinho-500/10" />
-
-      <span className="relative flex flex-col items-center gap-4 px-6 text-center">
-        <span className="font-display text-5xl font-light leading-none text-marinho-500/70">
-          {iniciais(produto.marca ?? produto.nome)}
-        </span>
-        <span className="sobrescrita text-[0.5rem] text-marinho-600/80">
-          {categoria?.nome ?? "Acervo"}
-        </span>
-      </span>
-
-      <span className="absolute bottom-4 left-1/2 -translate-x-1/2 font-sans text-[0.5625rem] uppercase tracking-[0.22em] text-marinho-600/75">
-        Foto sob consulta
-      </span>
-    </span>
   );
 }

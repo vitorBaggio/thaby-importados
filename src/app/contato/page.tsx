@@ -58,15 +58,16 @@ export default function PaginaContato() {
       />
 
       <section aria-label="Equipe de atendimento" className="pt-24 md:pt-32">
-        <div className="area grid gap-12 lg:grid-cols-2 lg:gap-20">
+        <div className="area flex flex-col gap-16">
           {gruposEquipe.map((grupo) => (
             <div key={grupo}>
               <h2 className="font-display text-3xl font-light leading-tight text-marinho-900 md:text-4xl">
                 {grupo}
               </h2>
-              <ul className="mt-8 flex flex-col divide-y divide-marinho-500/12 border-y border-marinho-500/12">
+              {/* Lista no celular; grade 2x2 no desktop, cada linha com seu filete. */}
+              <ul className="mt-8 grid border-t border-marinho-500/12 lg:grid-cols-2 lg:gap-x-20">
                 {equipe.filter((pessoa) => pessoa.grupo === grupo).map((pessoa) => (
-                  <li key={pessoa.numero} className="flex flex-col gap-5 py-6 sm:flex-row sm:items-center sm:justify-between">
+                  <li key={pessoa.numero} className="flex flex-col gap-5 border-b border-marinho-500/12 py-6 sm:flex-row sm:items-center sm:justify-between">
                     <div className="min-w-0">
                       <h3 className="font-sans text-[1.0625rem] font-light text-marinho-900">
                         {pessoa.nome}

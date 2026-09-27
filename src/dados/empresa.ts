@@ -55,7 +55,7 @@ export function linkWhatsApp(mensagem?: string) {
 
 /** Os grupos aparecem na ordem dos contatos, sem cadastro adicional na página. */
 export const equipe = [
-  { nome: "Thaby", papel: "Atendimento principal", numero: empresa.whatsapp.numero, exibicao: empresa.whatsapp.exibicao, grupo: "Contato principal" },
+  { nome: "Thaby", papel: "Consultora", numero: empresa.whatsapp.numero, exibicao: empresa.whatsapp.exibicao, grupo: "Consultoras" },
   { nome: "Laura", papel: "Consultora", numero: "5566999396797", exibicao: "(66) 99939-6797", grupo: "Consultoras" },
   { nome: "Raylde", papel: "Consultora", numero: "5566996350334", exibicao: "(66) 99635-0334", grupo: "Consultoras" },
   { nome: "Adriana", papel: "Consultora", numero: "5566992352711", exibicao: "(66) 99235-2711", grupo: "Consultoras" },

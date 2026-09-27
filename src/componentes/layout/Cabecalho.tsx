@@ -12,6 +12,7 @@ import { useOrcamento } from "@/componentes/orcamento/ContextoOrcamento";
 import { empresa, linkWhatsApp, mensagensPadrao } from "@/dados/empresa";
 
 const navegacao = [
+  { rotulo: "Novidades", href: "/novidades", prefixos: ["/novidades"] },
   // As páginas de produto pertencem ao catálogo, então acendem o mesmo item.
   { rotulo: "Catálogo", href: "/catalogo", prefixos: ["/catalogo", "/produtos"] },
   { rotulo: "Curadoria", href: "/categorias", prefixos: ["/categorias"] },
@@ -145,7 +146,7 @@ function BotaoOrcamento({
     <button
       type="button"
       onClick={aoClicar}
-      aria-label={`Abrir lista de orçamento${
+      aria-label={`Abrir seu pedido${
         quantidade > 0
           ? ` (${quantidade} ${quantidade === 1 ? "item" : "itens"})`
           : ""

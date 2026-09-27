@@ -16,7 +16,18 @@ export type ItemOrcamento = {
   nome: string;
   slug: string;
   quantidade: number;
+  /** Centavos, como vem do cadastro. Nulo quando o preço é sob consulta. */
+  preco: number | null;
+  codigo: string | null;
+  /** URL absoluta da foto, ou null. */
+  imagem: string | null;
 };
+
+/**
+ * Itens gravados antes de o pedido ter soma não têm preço, código nem foto.
+ * Eles continuam valendo: o provedor completa esses campos pelo id.
+ */
+export const itemLegado = (item: ItemOrcamento): boolean => !("preco" in item);
 
 const CHAVE = "thaby:orcamento";
 
@@ -50,7 +61,7 @@ function assinar(ouvinte: () => void) {
   };
 }
 
-function lerNoCliente(): ItemOrcamento[] {
+export function lerNoCliente(): ItemOrcamento[] {
   let bruto: string | null;
   try {
     bruto = window.localStorage.getItem(CHAVE);

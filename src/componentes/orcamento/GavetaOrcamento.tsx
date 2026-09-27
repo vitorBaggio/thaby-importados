@@ -2,29 +2,25 @@
 
 import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
-import { Minus, Plus, Trash2, X } from "lucide-react";
+import { X } from "lucide-react";
 import { useOrcamento } from "./ContextoOrcamento";
+import { ControleQuantidade } from "./ControleQuantidade";
+import {
+  NOTA_SOB_CONSULTA,
+  NOTA_TOTAL,
+  formatarBRL,
+  subtotal,
+  temPreco,
+} from "./pedido";
 import { AviaoDePapel, LacoTracejado } from "@/componentes/marca/RotaDeVoo";
-import { empresa } from "@/dados/empresa";
 
 /**
- * Gaveta lateral com a seleção do cliente.
- * O botão final não envia formulário: abre o WhatsApp com a lista já escrita,
- * que é como a loja realmente atende.
+ * Gaveta lateral com a seleção do cliente e a soma ao vivo.
+ * Finalizar leva ao /checkout, onde a pessoa escolhe quem vai atender.
  */
 export function GavetaOrcamento() {
-  const {
-    itens,
-    aberto,
-    fechar,
-    remover,
-    limpar,
-    definirQuantidade,
-    mensagem,
-    quantidadeTotal,
-  } = useOrcamento();
-
-  const href = `https://wa.me/${empresa.whatsapp.numero}?text=${encodeURIComponent(mensagem)}`;
+  const { itens, aberto, fechar, limpar, quantidadeTotal, totalEstimado, sobConsulta } =
+    useOrcamento();
 
   return (
     <AnimatePresence>
@@ -42,7 +38,7 @@ export function GavetaOrcamento() {
           <motion.aside
             role="dialog"
             aria-modal="true"
-            aria-label="Lista de orçamento"
+            aria-label="Seu pedido"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
@@ -57,7 +53,7 @@ export function GavetaOrcamento() {
               <div>
                 <p className="sobrescrita text-marinho-700/80">Sua seleção</p>
                 <h2 className="mt-3 font-display text-3xl font-light text-marinho-900">
-                  Lista de orçamento
+                  Seu pedido
                 </h2>
                 <p className="mt-2 font-sans text-[0.8125rem] font-light text-marinho-700/78">
                   {quantidadeTotal === 0
@@ -69,7 +65,7 @@ export function GavetaOrcamento() {
               <button
                 type="button"
                 onClick={fechar}
-                aria-label="Fechar lista"
+                aria-label="Fechar pedido"
                 className="-mr-2 -mt-1 grid size-10 shrink-0 place-items-center text-marinho-800/75 transition-colors duration-400 hover:text-marinho-900"
               >
                 <X size={20} strokeWidth={1.25} />
@@ -82,70 +78,59 @@ export function GavetaOrcamento() {
               <>
                 <ul className="flex-1 divide-y divide-marinho-500/10 overflow-y-auto px-7">
                   {itens.map((item) => (
-                    <li key={item.id} className="flex items-start gap-4 py-5">
-                      <div className="min-w-0 flex-1">
-                        <Link
-                          href={`/produtos/${item.slug}`}
-                          onClick={fechar}
-                          className="block text-[0.9375rem] font-light leading-snug text-marinho-900/85 transition-colors duration-400 hover:text-marinho-900"
-                        >
-                          {item.nome}
-                        </Link>
+                    <li key={item.id} className="py-5">
+                      <Link
+                        href={`/produtos/${item.slug}`}
+                        onClick={fechar}
+                        className="block text-[0.9375rem] font-light leading-snug text-marinho-900/85 transition-colors duration-400 hover:text-marinho-900"
+                      >
+                        {item.nome}
+                      </Link>
 
-                        <div className="mt-3 flex items-center gap-3">
-                          <div className="flex items-center border border-marinho-500/18">
-                            <BotaoQuantidade
-                              rotulo="Diminuir quantidade"
-                              onClick={() =>
-                                definirQuantidade(item.id, item.quantidade - 1)
-                              }
-                            >
-                              <Minus size={12} strokeWidth={1.75} />
-                            </BotaoQuantidade>
+                      <p className="mt-1.5 font-sans text-[0.75rem] tabular-nums text-marinho-700">
+                        {temPreco(item)
+                          ? `${formatarBRL(item.preco)} cada`
+                          : "Valor sob consulta"}
+                      </p>
 
-                            <span className="w-8 text-center font-sans text-[0.75rem] tabular-nums text-marinho-900">
-                              {item.quantidade}
-                            </span>
+                      <div className="mt-3 flex items-center justify-between gap-3">
+                        <ControleQuantidade item={item} />
 
-                            <BotaoQuantidade
-                              rotulo="Aumentar quantidade"
-                              onClick={() =>
-                                definirQuantidade(item.id, item.quantidade + 1)
-                              }
-                            >
-                              <Plus size={12} strokeWidth={1.75} />
-                            </BotaoQuantidade>
-                          </div>
-
-                          <button
-                            type="button"
-                            onClick={() => remover(item.id)}
-                            aria-label={`Remover ${item.nome}`}
-                            className="grid size-8 place-items-center text-marinho-700/75 transition-colors duration-400 hover:text-carmim-500"
-                          >
-                            <Trash2 size={14} strokeWidth={1.25} />
-                          </button>
-                        </div>
+                        {temPreco(item) && (
+                          <p className="font-sans text-[0.875rem] tabular-nums text-marinho-900">
+                            <span className="sr-only">Subtotal: </span>
+                            {formatarBRL(subtotal(item))}
+                          </p>
+                        )}
                       </div>
                     </li>
                   ))}
                 </ul>
 
                 <footer className="border-t border-marinho-500/12 px-7 py-7">
-                  <p className="text-[0.8125rem] font-light leading-relaxed legivel text-marinho-700/78">
-                    A lista vira uma mensagem pronta no WhatsApp. Você confere
-                    tudo antes de enviar.
+                  <div className="flex items-baseline justify-between gap-4">
+                    <p className="sobrescrita text-marinho-700">Total estimado</p>
+                    <p
+                      aria-live="polite"
+                      className="font-display text-3xl font-light tabular-nums text-marinho-900"
+                    >
+                      {formatarBRL(totalEstimado)}
+                    </p>
+                  </div>
+
+                  <p className="mt-3 text-[0.8125rem] font-light leading-relaxed legivel text-marinho-700">
+                    {NOTA_TOTAL}
+                    {sobConsulta && ` ${NOTA_SOB_CONSULTA}`}
                   </p>
 
-                  <a
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <Link
+                    href="/checkout"
+                    onClick={fechar}
                     className="mt-5 flex h-14 w-full items-center justify-center gap-3 bg-carmim-500 font-sans text-[0.8125rem] uppercase tracking-[0.18em] text-marfim-puro transition-colors duration-500 hover:bg-carmim-600"
                   >
                     <AviaoDePapel className="h-4 w-4 [&_path]:fill-current" />
-                    Enviar para a Thaby
-                  </a>
+                    Finalizar pedido
+                  </Link>
 
                   <button
                     type="button"
@@ -161,27 +146,6 @@ export function GavetaOrcamento() {
         </>
       )}
     </AnimatePresence>
-  );
-}
-
-function BotaoQuantidade({
-  children,
-  onClick,
-  rotulo,
-}: {
-  children: React.ReactNode;
-  onClick: () => void;
-  rotulo: string;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-label={rotulo}
-      className="grid size-8 place-items-center text-marinho-800/75 transition-colors duration-400 hover:bg-marinho-500/8 hover:text-marinho-900"
-    >
-      {children}
-    </button>
   );
 }
 

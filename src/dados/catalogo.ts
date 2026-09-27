@@ -434,7 +434,7 @@ export const destaques = produtos.filter((p) => p.destaque);
  */
 export type ProdutoResumo = Pick<
   Produto,
-  "id" | "nome" | "slug" | "marca" | "preco" | "categoriaId" | "imagem" | "destaque"
+  "id" | "nome" | "slug" | "marca" | "preco" | "codigo" | "categoriaId" | "imagem" | "destaque"
 >;
 
 const resumir = (p: Produto): ProdutoResumo => ({
@@ -443,12 +443,27 @@ const resumir = (p: Produto): ProdutoResumo => ({
   slug: p.slug,
   marca: p.marca,
   preco: p.preco,
+  codigo: p.codigo,
   categoriaId: p.categoriaId,
   imagem: p.imagem,
   destaque: p.destaque,
 });
 
 export const vitrineResumo: ProdutoResumo[] = vitrine.map(resumir);
+
+/** Quantas peças a aba Novidades mostra. */
+export const QTD_NOVIDADES = 60;
+
+/**
+ * O cadastro não tem data de entrada, mas os ids do catálogo operacional são
+ * crescentes: as novidades são os maiores ids. Depois do corte, foto primeiro
+ * (sort estável, então cada grupo segue do mais novo para o mais antigo).
+ */
+export const novidades: Produto[] = fotoPrimeiro(
+  [...produtos].sort((a, b) => b.id - a.id).slice(0, QTD_NOVIDADES),
+);
+
+export const novidadesResumo: ProdutoResumo[] = novidades.map(resumir);
 
 /** Categorias em forma leve para o filtro do cliente (sem imagens/subs aninhadas pesadas). */
 export type SuperResumo = { id: number; nome: string; slug: string; total: number };
