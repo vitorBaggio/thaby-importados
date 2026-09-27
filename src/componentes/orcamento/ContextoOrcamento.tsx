@@ -41,6 +41,11 @@ type Contexto = {
   totalEstimado: number;
   /** Há item sem preço (fica fora do total). */
   sobConsulta: boolean;
+  /** Há item antigo sem preço e o catálogo ainda está sendo baixado. */
+  recuperandoPrecos: boolean;
+  /** O download do catálogo para completar os preços falhou. */
+  erroRecuperacao: boolean;
+  tentarRecuperarDeNovo: () => void;
   contem: (id: number) => boolean;
   alternar: (produto: ProdutoSelecionavel) => void;
   definirQuantidade: (id: number, quantidade: number) => void;
@@ -77,31 +82,43 @@ export function ProvedorOrcamento({ children }: { children: ReactNode }) {
   }, [aberto]);
 
   // Itens salvos antes da soma existir: completa preço, código e foto pelo id.
-  // O catálogo só é baixado quando há o que completar.
+  // O catálogo só é baixado quando há o que completar. Enquanto isso o total
+  // estaria incompleto, então o envio fica bloqueado.
   const temLegado = itens.some(itemLegado);
+  const [erroRecuperacao, setErroRecuperacao] = useState(false);
+  const [tentativa, setTentativa] = useState(0);
   useEffect(() => {
     if (!temLegado) return;
     let cancelado = false;
-    import("@/dados/catalogo").then(({ produtos }) => {
-      if (cancelado) return;
-      const porId = new Map(produtos.map((p) => [p.id, p]));
-      gravarItens(
-        lerNoCliente().map((item) => {
-          if (!itemLegado(item)) return item;
-          const produto = porId.get(item.id);
-          return {
-            ...item,
-            preco: produto?.preco ?? null,
-            codigo: produto?.codigo ?? null,
-            imagem: produto?.imagem ?? null,
-          };
-        }),
-      );
-    });
+    import("@/dados/catalogo")
+      .then(({ produtos }) => {
+        if (cancelado) return;
+        const porId = new Map(produtos.map((p) => [p.id, p]));
+        gravarItens(
+          lerNoCliente().map((item) => {
+            if (!itemLegado(item)) return item;
+            const produto = porId.get(item.id);
+            return {
+              ...item,
+              preco: produto?.preco ?? null,
+              codigo: produto?.codigo ?? null,
+              imagem: produto?.imagem ?? null,
+            };
+          }),
+        );
+      })
+      .catch(() => {
+        if (!cancelado) setErroRecuperacao(true);
+      });
     return () => {
       cancelado = true;
     };
-  }, [temLegado]);
+  }, [temLegado, tentativa]);
+
+  const tentarRecuperarDeNovo = useCallback(() => {
+    setErroRecuperacao(false);
+    setTentativa((n) => n + 1);
+  }, []);
 
   const alternar = useCallback(
     (produto: ProdutoSelecionavel) => {
@@ -150,6 +167,9 @@ export function ProvedorOrcamento({ children }: { children: ReactNode }) {
       quantidadeTotal: itens.reduce((total, i) => total + i.quantidade, 0),
       totalEstimado: totalPedido(itens),
       sobConsulta: algumSobConsulta(itens),
+      recuperandoPrecos: temLegado && !erroRecuperacao,
+      erroRecuperacao: temLegado && erroRecuperacao,
+      tentarRecuperarDeNovo,
       contem: (id) => itens.some((i) => i.id === id),
       alternar,
       definirQuantidade,
@@ -159,7 +179,17 @@ export function ProvedorOrcamento({ children }: { children: ReactNode }) {
       abrir: () => setAberto(true),
       fechar: () => setAberto(false),
     }),
-    [itens, alternar, definirQuantidade, remover, limpar, aberto],
+    [
+      itens,
+      temLegado,
+      erroRecuperacao,
+      tentarRecuperarDeNovo,
+      alternar,
+      definirQuantidade,
+      remover,
+      limpar,
+      aberto,
+    ],
   );
 
   return (

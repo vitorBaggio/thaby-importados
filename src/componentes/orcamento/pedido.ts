@@ -41,6 +41,27 @@ export const NOTA_TOTAL =
 
 export const NOTA_SOB_CONSULTA ="Itens sob consulta não entram no total.";
 
+/**
+ * Acima disso o link com `?text=` falha em parte dos aparelhos e navegadores.
+ * Pedido maior vai em 2 passos: copiar a mensagem e abrir a conversa vazia.
+ */
+export const LIMITE_URL_WHATSAPP = 2000;
+
+export type PlanoEnvio =
+  | { passos: 1; href: string }
+  | { passos: 2; href: string; mensagem: string };
+
+/** `link` monta o wa.me da consultora: com mensagem no `?text=`, ou sem nada. */
+export function planejarEnvio(
+  mensagem: string,
+  link: (mensagem?: string) => string,
+): PlanoEnvio {
+  const href = link(mensagem);
+  return href.length > LIMITE_URL_WHATSAPP
+    ? { passos: 2, href: link(), mensagem }
+    : { passos: 1, href };
+}
+
 /** Mensagem pronta para o WhatsApp da consultora escolhida. */
 export function montarMensagemPedido({
   consultora,

@@ -1,6 +1,6 @@
 import { empresa, equipe } from "@/dados/empresa";
 import { categorias, resumoProduto, type Produto } from "@/dados/catalogo";
-import { url, urlBase } from "@/lib/site";
+import { url } from "@/lib/site";
 
 /**
  * JSON-LD. Para negócio local, é o que faz o Google mostrar telefone,
@@ -19,11 +19,11 @@ function Script({ dados }: { dados: object }) {
 
 const negocio = {
   "@type": "Store",
-  "@id": `${urlBase}/#loja`,
+  "@id": url("/#loja"),
   name: empresa.nome,
   description:
     "Importados selecionados de beleza, perfumaria, moda e acessórios, com curadoria própria e atendimento por WhatsApp.",
-  url: urlBase,
+  url: url("/"),
   telephone: `+${empresa.whatsapp.numero}`,
   contactPoint: equipe.map((pessoa) => ({
     "@type": "ContactPoint",
@@ -57,11 +57,11 @@ export function DadosEstruturados() {
           negocio,
           {
             "@type": "WebSite",
-            "@id": `${urlBase}/#site`,
-            url: urlBase,
+            "@id": url("/#site"),
+            url: url("/"),
             name: empresa.nome,
             inLanguage: "pt-BR",
-            publisher: { "@id": `${urlBase}/#loja` },
+            publisher: { "@id": url("/#loja") },
           },
           {
             "@type": "ItemList",
@@ -86,7 +86,7 @@ export function DadosProduto({ produto }: { produto: Produto }) {
         availability: "https://schema.org/InStock",
         priceCurrency: "BRL",
         price: (produto.preco / 100).toFixed(2),
-        seller: { "@id": `${urlBase}/#loja` },
+        seller: { "@id": url("/#loja") },
         url: url(`/produtos/${produto.slug}`),
       }
     : {
@@ -94,7 +94,7 @@ export function DadosProduto({ produto }: { produto: Produto }) {
         availability: "https://schema.org/InStock",
         priceCurrency: "BRL",
         priceSpecification: { "@type": "PriceSpecification", priceCurrency: "BRL" },
-        seller: { "@id": `${urlBase}/#loja` },
+        seller: { "@id": url("/#loja") },
         url: url(`/produtos/${produto.slug}`),
       };
 

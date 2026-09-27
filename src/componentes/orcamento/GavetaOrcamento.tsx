@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { X } from "lucide-react";
 import { useOrcamento } from "./ContextoOrcamento";
 import { ControleQuantidade } from "./ControleQuantidade";
+import { ValorTotal } from "./ValorTotal";
 import {
   NOTA_SOB_CONSULTA,
   NOTA_TOTAL,
@@ -19,8 +20,7 @@ import { AviaoDePapel, LacoTracejado } from "@/componentes/marca/RotaDeVoo";
  * Finalizar leva ao /checkout, onde a pessoa escolhe quem vai atender.
  */
 export function GavetaOrcamento() {
-  const { itens, aberto, fechar, limpar, quantidadeTotal, totalEstimado, sobConsulta } =
-    useOrcamento();
+  const { itens, aberto, fechar, limpar, quantidadeTotal, sobConsulta } = useOrcamento();
 
   return (
     <AnimatePresence>
@@ -110,12 +110,7 @@ export function GavetaOrcamento() {
                 <footer className="border-t border-marinho-500/12 px-7 py-7">
                   <div className="flex items-baseline justify-between gap-4">
                     <p className="sobrescrita text-marinho-700">Total estimado</p>
-                    <p
-                      aria-live="polite"
-                      className="font-display text-3xl font-light tabular-nums text-marinho-900"
-                    >
-                      {formatarBRL(totalEstimado)}
-                    </p>
+                    <ValorTotal className="font-display text-3xl font-light tabular-nums text-marinho-900" />
                   </div>
 
                   <p className="mt-3 text-[0.8125rem] font-light leading-relaxed legivel text-marinho-700">
