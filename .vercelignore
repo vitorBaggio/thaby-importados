@@ -1,0 +1,10 @@
+.next
+out
+node_modules
+dados-fonte
+scripts
+docs
+entrada-cliente
+.ref-preview
+*.log
+tsconfig.tsbuildinfo
