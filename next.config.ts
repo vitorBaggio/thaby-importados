@@ -13,12 +13,14 @@ import type { NextConfig } from "next";
   usuario.github.io/<repo>, não na raiz do domínio.
 */
 const paraGitHubPages = process.env.GITHUB_PAGES === "true";
+// Cloudflare (dominio proprio) tambem usa o export estatico, mas serve na raiz.
+const paraCloudflare = process.env.CLOUDFLARE === "true";
 const REPO = "thaby-importados";
 
-const nextConfig: NextConfig = paraGitHubPages
+const nextConfig: NextConfig = paraGitHubPages || paraCloudflare
   ? {
       output: "export",
-      basePath: `/${REPO}`,
+      ...(paraGitHubPages ? { basePath: `/${REPO}` } : {}),
       trailingSlash: true,
       images: { unoptimized: true },
       experimental: { optimizePackageImports: ["lucide-react", "motion"] },
