@@ -40,10 +40,11 @@ async function teste(nome, fn) {
 /* ------------------------------------------------------------------ */
 
 /**
- * `inclusoes`: id -> AAAA-MM-DD de inclusao no Bling (listagem com dataInclusaoInicial).
- * `expoeData`: a lista devolve `dataInclusao` (a especificacao nao documenta o campo).
+ * `inclusoes`: id -> AAAA-MM-DD de inclusao no Bling (listagem com dataInclusaoInicial/Final).
+ * `ignoraFiltroData`: a listagem por data de inclusao devolve todos os ativos.
+ * `recusaHora`: data com hora no filtro de inclusao responde 400.
  */
-function blingFalso({ extras = [], detalhesExtras = {}, falharEm, paginaVazia, inclusoes = {}, expoeData = false } = {}) {
+function blingFalso({ extras = [], detalhesExtras = {}, falharEm, paginaVazia, inclusoes = {}, ignoraFiltroData = false, recusaHora = false } = {}) {
   const categorias = fixture("categorias.json");
   const lista = [...fixture("produtos-lista.json"), ...extras];
   const detalhes = { ...fixture("produtos-detalhe.json"), ...detalhesExtras };
@@ -59,9 +60,11 @@ function blingFalso({ extras = [], detalhesExtras = {}, falharEm, paginaVazia, i
     if (paginaVazia?.(caminho, params)) return { data: [] };
     if (caminho === "/categorias/produtos") return { data: pagina(categorias, params) };
     if (caminho === "/produtos" && params.dataInclusaoInicial != null) {
-      const itens = lista
-        .filter((p) => p.situacao === "A" && inclusoes[p.id] && inclusoes[p.id] >= params.dataInclusaoInicial)
-        .map((p) => (expoeData ? { ...p, dataInclusao: `${inclusoes[p.id]} 10:00:00` } : p));
+      if (recusaHora && / /.test(params.dataInclusaoInicial)) throw new Error(`Bling GET ${caminho} falhou (400): data invalida`);
+      const dia = (s) => String(s).slice(0, 10);
+      const naJanela = (d) =>
+        d && d >= dia(params.dataInclusaoInicial) && (params.dataInclusaoFinal == null || d <= dia(params.dataInclusaoFinal));
+      const itens = lista.filter((p) => p.situacao === "A" && (ignoraFiltroData || naJanela(inclusoes[p.id])));
       return { data: pagina(itens, params) };
     }
     if (caminho === "/produtos") {
@@ -918,31 +921,70 @@ await teste("ritmo: 429 aumenta o intervalo em 25% (teto 2 s); 50 respostas 200 
 /* Novidades                                                          */
 /* ------------------------------------------------------------------ */
 
-const blingNovidades = blingFalso({ ...montarExtras([produtoExtra(990, "Novo Recente")]), inclusoes: { 101: "2026-09-20", 107: "2026-09-10", 990: "2026-09-29", 105: "2026-09-25" } });
+const blingNovidades = blingFalso({ ...montarExtras([produtoExtra(990, "Novo Recente")]), inclusoes: { 101: "2026-09-27", 107: "2026-09-10", 990: "2026-09-29", 105: "2026-09-25" } });
 const simNovidades = await sincronizar({ blingGet: blingNovidades.blingGet, baixarImagem: baixadorFalso().baixarImagem, raiz: novaRaiz(), hoje: "2026-09-30" });
-const blingComData = blingFalso({ inclusoes: { 101: "2026-09-20" }, expoeData: true });
-const simComData = await sincronizar({ blingGet: blingComData.blingGet, baixarImagem: baixadorFalso().baixarImagem, raiz: novaRaiz(), hoje: "2026-09-30" });
+const chamadasInclusao = (b) => b.chamadas.filter((x) => x.caminho === "/produtos" && x.params.dataInclusaoInicial != null);
 
-await teste("novidades: UMA listagem /produtos criterio=2 com dataInclusaoInicial = hoje - 15 dias", () => {
-  const c = blingNovidades.chamadas.filter((x) => x.caminho === "/produtos" && x.params.dataInclusaoInicial != null);
-  assert.equal(c.length, 1);
-  assert.equal(c[0].params.criterio, 2);
-  assert.equal(c[0].params.dataInclusaoInicial, "2026-09-15");
-  assert.equal(c[0].params.pagina, 1);
+await teste("novidades: uma listagem /produtos criterio=2 por dia, de hoje ate hoje - 15, cobrindo so aquele dia", () => {
+  const c = chamadasInclusao(blingNovidades);
+  assert.equal(c.length, 16);
+  assert.ok(c.every((x) => x.params.criterio === 2 && x.params.pagina === 1));
+  assert.deepEqual(c[0].params, { criterio: 2, dataInclusaoInicial: "2026-09-30 00:00:00", dataInclusaoFinal: "2026-09-30 23:59:59", pagina: 1, limite: 100 });
+  assert.equal(c[15].params.dataInclusaoInicial, "2026-09-15 00:00:00");
+  assert.equal(c[15].params.dataInclusaoFinal, "2026-09-15 23:59:59");
 });
 
-await teste("novidades: publicados incluidos recentemente ganham novidadeAte; sem data na lista usa hoje + 15", () => {
-  assert.equal(porCodigo(simNovidades, "SKU-101").novidadeAte, "2026-10-15");
-  assert.equal(simNovidades.catalogo.produtos.find((p) => p.id === 990).novidadeAte, "2026-10-15");
+await teste("novidades: incluido ha 3 dias -> novidadeAte = inclusao + 15 (nao hoje + 15)", () => {
+  assert.equal(porCodigo(simNovidades, "SKU-101").novidadeAte, "2026-10-12");
+  assert.equal(simNovidades.catalogo.produtos.find((p) => p.id === 990).novidadeAte, "2026-10-14");
   assert.equal(porCodigo(simNovidades, "SKU-109").novidadeAte, undefined);
-  assert.equal(porCodigo(simNovidades, "SKU-NOVO-107").novidadeAte, undefined, "incluido antes da janela nao entra");
   assert.match(simNovidades.relatorio, /Entraram em Novidades: 2/);
-  assert.match(simNovidades.relatorio, /nao traz a data de inclusao.*hoje \+ 15/);
+  assert.match(simNovidades.relatorio, /incluidos em 2026-09-29 \(novidade ate 2026-10-14\): 1/);
+  assert.match(simNovidades.relatorio, /incluidos em 2026-09-27 \(novidade ate 2026-10-12\): 1/);
+  assert.match(simNovidades.relatorio, /formato aceito pelo Bling: AAAA-MM-DD HH:MM:SS/);
+  assert.doesNotMatch(simNovidades.relatorio, /hoje \+ 15|ATENCAO: filtro/);
 });
 
-await teste("novidades: com data de inclusao na lista, novidadeAte = inclusao + 15", () => {
-  assert.equal(porCodigo(simComData, "SKU-101").novidadeAte, "2026-10-05");
-  assert.match(simComData.relatorio, /Entraram em Novidades: 1/);
+await teste("novidades: incluido ha 20 dias nao e novidade e nenhuma janela cobre o dia dele", () => {
+  assert.equal(porCodigo(simNovidades, "SKU-NOVO-107").novidadeAte, undefined);
+  const c = chamadasInclusao(blingNovidades);
+  assert.ok(c.every((x) => x.params.dataInclusaoFinal != null), "toda janela tem inicio e fim");
+  assert.ok(!c.some((x) => x.params.dataInclusaoInicial.slice(0, 10) <= "2026-09-10" && x.params.dataInclusaoFinal.slice(0, 10) >= "2026-09-10"));
+});
+
+const raizReroda = novaRaiz();
+const blingReroda = () => blingFalso({ inclusoes: { 101: "2026-09-27" } }).blingGet;
+await sincronizar({ blingGet: blingReroda(), baixarImagem: baixadorFalso().baixarImagem, raiz: raizReroda, aplicar: true, hoje: "2026-09-30" });
+const catReroda1 = JSON.parse(ler(raizReroda, "src/dados/catalogo-completo.json"));
+await sincronizar({ blingGet: blingReroda(), baixarImagem: baixadorFalso().baixarImagem, raiz: raizReroda, aplicar: true, hoje: "2026-10-07" });
+const catReroda2 = JSON.parse(ler(raizReroda, "src/dados/catalogo-completo.json"));
+
+await teste("novidades: rodar de novo 7 dias depois NAO empurra novidadeAte", () => {
+  const ate = (cat) => cat.produtos.find((p) => p.codigo === "SKU-101").novidadeAte;
+  assert.equal(ate(catReroda1), "2026-10-12");
+  assert.equal(ate(catReroda2), "2026-10-12");
+});
+
+const blingIgnora = blingFalso({ inclusoes: { 101: "2026-09-27" }, ignoraFiltroData: true });
+const simIgnora = await sincronizar({ blingGet: blingIgnora.blingGet, baixarImagem: baixadorFalso().baixarImagem, raiz: novaRaiz(), hoje: "2026-09-30" });
+
+await teste("novidades: filtro de data ignorado pelo Bling -> ninguem vira novidade e o relatorio avisa", () => {
+  assert.equal(simIgnora.catalogo.produtos.filter((p) => p.novidadeAte).length, 0);
+  assert.match(simIgnora.relatorio, /ATENCAO: filtro de data de inclusao ignorado pelo Bling; Novidades mantida pelo criterio antigo/);
+  assert.match(simIgnora.relatorio, /Entraram em Novidades: 0/);
+});
+
+const blingSemHora = blingFalso({ inclusoes: { 101: "2026-09-27" }, recusaHora: true });
+const simSemHora = await sincronizar({ blingGet: blingSemHora.blingGet, baixarImagem: baixadorFalso().baixarImagem, raiz: novaRaiz(), hoje: "2026-09-30" });
+
+await teste("novidades: Bling recusa data com hora (400) -> tenta AAAA-MM-DD uma vez e registra o formato", () => {
+  const c = chamadasInclusao(blingSemHora);
+  assert.equal(c[0].params.dataInclusaoInicial, "2026-09-30 00:00:00");
+  assert.equal(c[1].params.dataInclusaoInicial, "2026-09-30");
+  assert.equal(c[1].params.dataInclusaoFinal, "2026-09-30");
+  assert.equal(c.filter((x) => / /.test(x.params.dataInclusaoInicial)).length, 1);
+  assert.equal(porCodigo(simSemHora, "SKU-101").novidadeAte, "2026-10-12");
+  assert.match(simSemHora.relatorio, /formato aceito pelo Bling: AAAA-MM-DD\./);
 });
 
 await teste("novidades (site): DIAS_NOVIDADE = 15 num lugar so, compartilhado com a sincronizacao", () => {

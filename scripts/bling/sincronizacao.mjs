@@ -285,28 +285,51 @@ async function listarProdutos(get, deposito) {
   return porId;
 }
 
+/** Formatos de data aceitos no filtro de inclusao: o da especificacao e, se o Bling recusar (400), so a data. */
+const FORMATOS_DATA_INCLUSAO = {
+  "AAAA-MM-DD HH:MM:SS": (dia) => [`${dia} 00:00:00`, `${dia} 23:59:59`],
+  "AAAA-MM-DD": (dia) => [dia, dia],
+};
+
 /**
- * Ativos incluidos no Bling desde `desde` (uma listagem, paginada). Devolve
- * id -> data de inclusao (AAAA-MM-DD) ou null quando a lista nao traz a data
- * (a especificacao nao documenta o campo). Variacao conta para o pai. Data
- * anterior a janela e ignorada (o Bling nao aplicou o filtro).
+ * Data de inclusao exata dos ativos incluidos nos ultimos DIAS_NOVIDADE dias:
+ * uma listagem por dia (hoje ate hoje - DIAS_NOVIDADE, fuso da loja), com
+ * dataInclusaoInicial e dataInclusaoFinal cobrindo so aquele dia. O dia da
+ * janela em que o produto aparece e a data de inclusao. Variacao conta para o
+ * pai (a inclusao mais recente). Janela com mais da metade dos ativos = filtro
+ * ignorado pelo Bling: para e ninguem recebe data.
  */
-async function listarIncluidos(get, desde) {
-  const lista = await paginar(get, "/produtos", { criterio: 2, dataInclusaoInicial: desde });
+async function listarIncluidos(get, hoje, ativos, log) {
+  let formato = "AAAA-MM-DD HH:MM:SS";
   const porId = new Map();
-  let foraDaJanela = 0;
-  for (const p of lista) {
-    if (!idValido(p?.id)) throw new Error(`Produto com id invalido na lista de inclusao recente: ${JSON.stringify(p?.id)}. Abortado, nada foi gravado.`);
-    const data = /^\d{4}-\d{2}-\d{2}/.exec(String(p.dataInclusao ?? ""))?.[0] ?? null;
-    if (data && data < desde) {
-      foraDaJanela++;
-      continue;
+  let listados = 0;
+  for (let i = 0; i <= DIAS_NOVIDADE; i++) {
+    const dia = somarDias(hoje, -i);
+    const pedir = () => {
+      const [dataInclusaoInicial, dataInclusaoFinal] = FORMATOS_DATA_INCLUSAO[formato](dia);
+      return paginar(get, "/produtos", { criterio: 2, dataInclusaoInicial, dataInclusaoFinal });
+    };
+    let lista;
+    try {
+      lista = await pedir();
+    } catch (e) {
+      // Uma unica troca de formato, e so na primeira janela.
+      if (i > 0 || !/\(400\)/.test(e.message)) throw e;
+      formato = "AAAA-MM-DD";
+      log(`Bling recusou a data com hora (400); tentando ${formato}.`);
+      lista = await pedir();
     }
-    const id = idValido(p.idProdutoPai) ? p.idProdutoPai : p.id;
-    const antes = porId.get(id);
-    porId.set(id, antes === undefined ? data : antes && data && data > antes ? data : (antes ?? data));
+    listados += lista.length;
+    if (ativos > 0 && lista.length > ativos / 2) {
+      return { porId: new Map(), listados, janelas: i + 1, formato, filtroIgnorado: dia };
+    }
+    for (const p of lista) {
+      if (!idValido(p?.id)) throw new Error(`Produto com id invalido na lista de inclusao recente: ${JSON.stringify(p?.id)}. Abortado, nada foi gravado.`);
+      const id = idValido(p.idProdutoPai) ? p.idProdutoPai : p.id;
+      if (!porId.has(id)) porId.set(id, dia);
+    }
   }
-  return { porId, listados: lista.length, foraDaJanela };
+  return { porId, listados, janelas: DIAS_NOVIDADE + 1, formato, filtroIgnorado: null };
 }
 
 /** Completa `saldos` para os ids sem saldo conhecido, em lotes de 100. Ausente na resposta = 0. */
@@ -699,8 +722,8 @@ export async function sincronizar({
   const simples = ativosP.filter((p) => p.formato !== "V");
 
   const desdeNovidade = somarDias(hoje, -DIAS_NOVIDADE);
-  log(`Lendo produtos incluidos desde ${desdeNovidade}...`);
-  const incluidos = await listarIncluidos(get, desdeNovidade);
+  log(`Lendo produtos incluidos desde ${desdeNovidade}, dia a dia...`);
+  const incluidos = await listarIncluidos(get, hoje, topo.filter((p) => p.situacao === "A").length, log);
 
   // Com deposito definido, o saldo da lista (soma de todos) nao serve.
   const saldoDaLista = (p) => (deposito == null ? numero(p?.estoque?.saldoVirtualTotal) : null);
@@ -913,14 +936,14 @@ export async function sincronizar({
     // Marca: a do Bling; sem ela, a que o site ja tem.
     const marcaBling = normalizarMarca(d.marca);
     const [marca, origemMarca] = marcaBling ? [marcaBling, "bling"] : temTexto(c?.site.marca) ? [c.site.marca, "site"] : [null, "nenhuma"];
-    // Novidade: incluido na janela; sem data de inclusao na lista, conta de hoje (conservador).
+    // Novidade: so com data de inclusao descoberta; novidadeAte = inclusao + DIAS_NOVIDADE.
     const inclusao = incluidos.porId.get(p.id);
-    const novidadeAte = inclusao === undefined ? null : somarDias(inclusao ?? hoje, DIAS_NOVIDADE);
+    const novidadeAte = inclusao ? somarDias(inclusao, DIAS_NOVIDADE) : null;
     origens.set(p.id, {
       descricao: origemDescricao,
       marca: origemMarca,
       imagemDesconhecida: a.imagens.some((img) => img.tipo === "desconhecida"),
-      semDataInclusao: inclusao === null,
+      inclusao,
     });
 
     return {
@@ -1045,11 +1068,13 @@ export async function sincronizar({
     novidades: {
       desde: desdeNovidade,
       listados: incluidos.listados,
-      foraDaJanela: incluidos.foraDaJanela,
-      ativos: topo.filter((p) => p.situacao === "A").length,
+      janelas: incluidos.janelas,
+      formato: incluidos.formato,
+      filtroIgnorado: incluidos.filtroIgnorado,
       publicados: produtos.filter((p) => p.novidadeAte).length,
-      semData: produtos.filter((p) => p.novidadeAte && origens.get(p.id).semDataInclusao).length,
-      ateSemData: somarDias(hoje, DIAS_NOVIDADE),
+      porDia: produtos
+        .filter((p) => p.novidadeAte)
+        .reduce((t, p) => ((t[origens.get(p.id).inclusao] = (t[origens.get(p.id).inclusao] ?? 0) + 1), t), {}),
     },
     origemDescricao: contar("descricao"),
     origemMarca: contar("marca"),
@@ -1269,15 +1294,18 @@ function montarRelatorio(r) {
     "## Novidades",
     "",
     `- Regra: incluidos no Bling nos ultimos ${DIAS_NOVIDADE} dias (desde ${n.desde}). Ficam em /novidades ate a data novidadeAte e continuam na categoria.`,
-    `- Incluidos (listagem do Bling): ${n.listados}`,
+    `- Data de inclusao: ${n.janelas} listagem(ns) diaria(s) com dataInclusaoInicial/dataInclusaoFinal; formato aceito pelo Bling: ${n.formato}.`,
+    `- Incluidos (listagens do Bling): ${n.listados}`,
+    ...(n.filtroIgnorado
+      ? [
+          `- ATENCAO: filtro de data de inclusao ignorado pelo Bling; Novidades mantida pelo criterio antigo (a janela de ${n.filtroIgnorado} trouxe mais da metade dos ativos).`,
+        ]
+      : []),
     `- Entraram em Novidades: ${n.publicados}`,
-    ...(n.semData
-      ? [`- A lista do Bling nao traz a data de inclusao: novidadeAte = hoje + ${DIAS_NOVIDADE} (${n.ateSemData}) para ${n.semData} produto(s), conservador.`]
-      : []),
-    ...(n.foraDaJanela ? [`- Ignorados por data de inclusao anterior a ${n.desde}: ${n.foraDaJanela} (o Bling nao aplicou o filtro de data?)`] : []),
-    ...(n.ativos && n.listados > n.ativos / 2
-      ? [`- ATENCAO: a listagem de inclusao recente trouxe ${n.listados} de ${n.ativos} ativos. Confira se o Bling aplicou o filtro dataInclusaoInicial.`]
-      : []),
+    ...Object.keys(n.porDia)
+      .sort()
+      .reverse()
+      .map((dia) => `  - incluidos em ${dia} (novidade ate ${somarDias(dia, DIAS_NOVIDADE)}): ${n.porDia[dia]}`),
     "",
     "## Descricao e marca",
     "",
