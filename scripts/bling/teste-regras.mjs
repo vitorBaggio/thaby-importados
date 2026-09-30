@@ -1131,8 +1131,27 @@ const erro403 = await erroDe(() => sincronizar({ blingGet: blingProibido.blingGe
 await teste("--da-previa: link expirado (403) aborta pedindo nova simulacao, nada gravado", () => {
   assert.ok(erro403, "deveria abortar");
   assert.match(erro403.message, /403/);
-  assert.match(erro403.message, /rode a simulacao de novo/);
+  assert.match(erro403.message, /rode a simulacao de novo/i);
   assert.deepEqual(estadoDe(raizVelha), antesVelha);
+});
+
+const dezPrevia = Array.from({ length: 10 }, (_, i) => produtoExtra(960 + i, `Previa Dez ${i}`, { imagens: interna(960 + i, `${960 + i}.png`) }));
+const raizDez = novaRaiz();
+await sincronizar({ blingGet: blingFalso(montarExtras(dezPrevia)).blingGet, baixarImagem: baixadorFalso().baixarImagem, raiz: raizDez, hoje: "2026-09-30", agora: () => T0 });
+const previaDez = JSON.parse(ler(raizDez, "scripts/bling/saida/previa.json"));
+const antesDez = estadoDe(raizDez);
+const baixadorDez = baixadorFalso({ "965.png": recusaTamanho });
+const erroDez = await erroDe(() => sincronizar({ blingGet: blingProibido.blingGet, baixarImagem: baixadorDez.baixarImagem, raiz: raizDez, aplicar: true, daPrevia: true, agora: () => T0 + HORA }));
+
+await teste("--da-previa: 1 de 10 fotos acima do teto recusa tudo, 0 arquivos alterados", () => {
+  const naPrevia = previaDez.produtos.filter((p) => p.id >= 960 && p.id < 970);
+  assert.equal(naPrevia.length, 10, "a previa deveria ter os 10 produtos");
+  assert.ok(baixadorDez.pedidos.some((u) => u.includes("965.png")), "deveria ter tentado a foto grande");
+  assert.ok(erroDez, "deveria recusar em vez de publicar 9 de 10");
+  assert.equal(erroDez.message, `Uma foto da previa falhou (965: ${recusaTamanho.message}). Nada foi gravado. Rode a simulacao de novo.`);
+  assert.deepEqual(estadoDe(raizDez), antesDez);
+  assert.ok(!existe(raizDez, "scripts/bling/saida/.fotos-novas"), "preparo removido");
+  assert.equal(blingProibido.chamadas, 0);
 });
 
 fs.writeFileSync(path.join(raizVelha, "src/dados/catalogo-completo.json"), ler(raizVelha, "src/dados/catalogo-completo.json") + " ");

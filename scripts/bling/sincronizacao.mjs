@@ -574,9 +574,10 @@ function avaliarTrava({ aplicar, forcar, totalAtual, publicados, hostsFora, urls
  * Baixa as fotos que faltam para uma pasta de preparo, tira do catalogo o
  * produto que ficou sem foto valida, reavalia a trava e, se nada recusar,
  * publica fotos + catalogo + manifesto + mapa numa unica transacao. Fotos
- * orfas so saem depois do commit.
+ * orfas so saem depois do commit. Com `abortarEmFalha` (--da-previa), qualquer
+ * falha de download ou validacao aborta antes da promocao, sem gravar nada.
  */
-async function baixarEGravar({ arq, produtos, fotosBaixar, manifesto, baixarImagem, reavaliar, montar, mapa, aoRemover }) {
+async function baixarEGravar({ arq, produtos, fotosBaixar, manifesto, baixarImagem, reavaliar, montar, mapa, aoRemover, abortarEmFalha = false }) {
   const fotos = { baixadas: 0, reaproveitadas: 0, removidas: 0 };
   const avisosFotos = []; // { produtoId, ordem, motivo }
   const preparo = path.join(arq.saida, ".fotos-novas");
@@ -592,18 +593,20 @@ async function baixarEGravar({ arq, produtos, fotosBaixar, manifesto, baixarImag
         fotos.reaproveitadas++;
         continue;
       }
-      let baixada;
+      let baixada, motivo;
       try {
         baixada = await baixarImagem(f.link);
       } catch (e) {
-        if (!e?.imagemRecusada) throw e;
-        avisosFotos.push({ produtoId: f.produtoId, ordem: f.ordem, motivo: e.message });
-        invalidas.add(f);
-        continue;
+        if (!e?.imagemRecusada && !abortarEmFalha) throw e;
+        motivo = e?.message ?? String(e);
       }
-      const v = extensaoValidada(baixada?.dados, baixada?.tipo);
-      if (v.erro) {
-        avisosFotos.push({ produtoId: f.produtoId, ordem: f.ordem, motivo: v.erro });
+      const v = motivo ? {} : extensaoValidada(baixada?.dados, baixada?.tipo);
+      motivo ??= v.erro;
+      if (motivo) {
+        if (abortarEmFalha) {
+          throw new Error(`Uma foto da previa falhou (${f.produtoId}: ${semTravessao(motivo)}). Nada foi gravado. Rode a simulacao de novo.`);
+        }
+        avisosFotos.push({ produtoId: f.produtoId, ordem: f.ordem, motivo });
         invalidas.add(f);
         continue;
       }
@@ -1142,7 +1145,8 @@ export async function sincronizar({
  * Aplica exatamente o saida/previa.json da ultima simulacao, sem ler o Bling:
  * baixa as fotos listadas nela e grava pela mesma transacao. Recusa previa de
  * 24 h ou mais, ou se catalogo/manifesto/mapa mudaram desde a simulacao. Link
- * que nao baixa (403, expirado...) aborta pedindo nova simulacao.
+ * que nao baixa (403, expirado...) ou foto recusada (teto, MIME) aborta
+ * pedindo nova simulacao, sem tirar produto da previa.
  */
 async function aplicarDaPrevia({ arq, baixarImagem, forcar, agora, log }) {
   if (!fs.existsSync(arq.previa)) throw new Error(`Nao ha scripts/bling/saida/previa.json: ${RODE_DE_NOVO}.`);
@@ -1183,14 +1187,6 @@ async function aplicarDaPrevia({ arq, baixarImagem, forcar, agora, log }) {
 
   const reavaliar = (lista) =>
     avaliarTrava({ aplicar: true, forcar, totalAtual, publicados: lista.length, hostsFora: ap.hostsFora, urlsInvalidas: ap.urlsInvalidas });
-  const baixarDaPrevia = async (url) => {
-    try {
-      return await baixarImagem(url);
-    } catch (e) {
-      if (e?.imagemRecusada) throw e;
-      throw new Error(`${e?.message ?? e}. Os links da previa podem ter expirado: ${RODE_DE_NOVO}.`);
-    }
-  };
   const removidos = [];
   let r = { produtos, dif: reavaliar(produtos), fotos: { baixadas: 0, reaproveitadas: 0, removidas: 0 }, avisosFotos: [], avisosLimpeza: [] };
   if (!r.dif.recusa) {
@@ -1200,7 +1196,8 @@ async function aplicarDaPrevia({ arq, baixarImagem, forcar, agora, log }) {
       produtos,
       fotosBaixar: [...itemPor.values()],
       manifesto,
-      baixarImagem: baixarDaPrevia,
+      baixarImagem,
+      abortarEmFalha: true,
       reavaliar,
       montar: (lista) => montarCatalogo(arvore, finalizar(lista), catalogoPrevia.geradoEm),
       mapa: Object.keys(ap.novasEntradasMapa).length ? { ...mapaArquivo, ...ap.novasEntradasMapa } : null,
