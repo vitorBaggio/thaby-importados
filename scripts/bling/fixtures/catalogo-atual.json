@@ -1,0 +1,15 @@
+{
+ "geradoEm": "2026-08-04",
+ "categorias": [],
+ "produtos": [
+  { "id": 9001, "nome": "Serum Vitamina C Antigo", "slug": "serum-antigo-preservado", "marca": "Medicube", "preco": 1000, "categoriaId": 249699, "fotos": ["companies/7827/products_imgs/imported/velho.jpg"], "descricao": null, "codigo": "SKU-101", "ean": null },
+  { "id": 9002, "nome": "Batom Matte Rose", "slug": "batom-matte-rose", "marca": null, "preco": 5990, "categoriaId": 278575, "fotos": [], "descricao": null, "codigo": "SKU-102", "ean": null },
+  { "id": 9004, "nome": "Hidratante Labial", "slug": "hidratante-labial", "marca": null, "preco": 3000, "categoriaId": 278575, "fotos": [], "descricao": null, "codigo": "SKU-104", "ean": null },
+  { "id": 9005, "nome": "Perfume Antigo", "slug": "perfume-antigo", "marca": null, "preco": 30000, "categoriaId": 249695, "fotos": [], "descricao": null, "codigo": "SKU-105", "ean": null },
+  { "id": 9007, "nome": "Base Liquida", "slug": "base-liquida-fenty-antiga", "marca": "Fenty Beauty", "preco": 15990, "categoriaId": 278575, "fotos": [], "descricao": null, "codigo": "CAT-7", "ean": "7891234567895" },
+  { "id": 9011, "nome": "Vela Aromática Baunilha", "slug": "vela-aromatica-baunilha", "marca": null, "preco": 8000, "categoriaId": 249721, "fotos": [], "descricao": null, "codigo": "OUTRO-111", "ean": null },
+  { "id": 9999, "nome": "Produto Descontinuado", "slug": "produto-descontinuado", "marca": null, "preco": 1000, "categoriaId": 801248, "fotos": [], "descricao": null, "codigo": "SKU-999", "ean": null }
+ ],
+ "marcas": [],
+ "totais": { "produtos": 7, "comFoto": 1, "supercategorias": 0, "subcategorias": 0, "marcas": 0 }
+}

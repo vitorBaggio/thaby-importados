@@ -1,0 +1,77 @@
+{
+ "101": {
+  "id": 101, "nome": "SERUM VITAMINA C MEDICUBE 30ML", "codigo": "SKU-101", "preco": 12.9, "tipo": "P", "situacao": "A", "formato": "S",
+  "descricaoCurta": "<p>Serum com <b>vitamina C</b>&nbsp;para o dia.</p><p>Uso diario.</p>",
+  "imagemURL": "https://catalogo-mobile.s3.sa-east-1.amazonaws.com/companies/7827/products_imgs/imported/101a.jpg",
+  "gtin": "", "marca": "medicube", "categoria": { "id": 11 },
+  "estoque": { "minimo": 0, "maximo": 0, "crossdocking": 0, "localizacao": "", "saldoVirtualTotal": 5 },
+  "midia": { "video": { "url": "" }, "imagens": {
+   "externas": [
+    { "link": "https://catalogo-mobile.s3.sa-east-1.amazonaws.com/companies/7827/products_imgs/imported/101a.jpg" },
+    { "link": "https://catalogo-mobile.s3.sa-east-1.amazonaws.com/companies/7827/products_imgs/imported/101b.jpg" },
+    { "link": "https://catalogo-mobile.s3.sa-east-1.amazonaws.com/companies/7827/products_imgs/imported/101c.jpg" },
+    { "link": "https://catalogo-mobile.s3.sa-east-1.amazonaws.com/companies/7827/products_imgs/imported/101d.jpg" }
+   ],
+   "internas": [] } }
+ },
+ "104": {
+  "id": 104, "nome": "Hidratante Labial", "codigo": "SKU-104", "preco": 30, "tipo": "P", "situacao": "A", "formato": "S",
+  "descricaoCurta": "", "imagemURL": "", "gtin": "", "marca": "", "categoria": { "id": 12 },
+  "midia": { "video": { "url": "" }, "imagens": { "externas": [], "internas": [] } }
+ },
+ "107": {
+  "id": 107, "nome": "Base Liquida Fenty Beauty", "codigo": "SKU-NOVO-107", "preco": 189.9, "tipo": "P", "situacao": "A", "formato": "S",
+  "descricaoCurta": "Base de alta cobertura.",
+  "imagemURL": "https://orgbling.s3.amazonaws.com/imagens/107-principal.png?X-Amz-Expires=3600&X-Amz-Signature=aaa",
+  "gtin": "7891234567895", "marca": "Fenty Beauty", "categoria": { "id": 12 },
+  "midia": { "video": { "url": "" }, "imagens": {
+   "externas": [],
+   "internas": [
+    { "link": "https://orgbling.s3.amazonaws.com/imagens/107-principal.png?X-Amz-Expires=3600&X-Amz-Signature=aaa",
+      "linkMiniatura": "https://orgbling.s3.amazonaws.com/imagens/107-principal-mini.png?X-Amz-Signature=bbb",
+      "validade": "2026-10-01 10:00:00", "ordem": 1, "anexo": { "id": 555 }, "anexoVinculo": { "id": 9 } }
+   ] } }
+ },
+ "108": {
+  "id": 108, "nome": "Kit Shampoo Infantil", "codigo": "SKU-108", "preco": 0, "tipo": "P", "situacao": "A", "formato": "V",
+  "descricaoCurta": "", "imagemURL": "", "gtin": "", "marca": "Johnsons", "categoria": { "id": 21 },
+  "midia": { "video": { "url": "" }, "imagens": { "externas": [], "internas": [] } },
+  "variacoes": [
+   { "id": 1081, "nome": "Kit Shampoo Infantil Morango", "codigo": "SKU-108-M", "preco": 49.9, "tipo": "P", "situacao": "A", "formato": "S",
+     "estoque": { "saldoVirtualTotal": 0 },
+     "midia": { "video": { "url": "" }, "imagens": { "externas": [ { "link": "https://catalogo-mobile.s3.sa-east-1.amazonaws.com/companies/7827/products_imgs/imported/1081.jpg" } ], "internas": [] } },
+     "variacao": { "nome": "Sabor:Morango", "ordem": 1, "produtoPai": { "id": 108, "cloneInfo": true } } },
+   { "id": 1082, "nome": "Kit Shampoo Infantil Uva", "codigo": "SKU-108-U", "preco": 55, "tipo": "P", "situacao": "A", "formato": "S",
+     "midia": { "video": { "url": "" }, "imagens": { "externas": [ { "link": "https://catalogo-mobile.s3.sa-east-1.amazonaws.com/companies/7827/products_imgs/imported/1082.jpg" } ], "internas": [] } },
+     "variacao": { "nome": "Sabor:Uva", "ordem": 2, "produtoPai": { "id": 108, "cloneInfo": true } } },
+   { "id": 1083, "nome": "Kit Shampoo Infantil Melancia", "codigo": "SKU-108-X", "preco": 60, "tipo": "P", "situacao": "I", "formato": "S",
+     "estoque": { "saldoVirtualTotal": 9 },
+     "midia": { "video": { "url": "" }, "imagens": { "externas": [ { "link": "https://catalogo-mobile.s3.sa-east-1.amazonaws.com/companies/7827/products_imgs/imported/1083.jpg" } ], "internas": [] } },
+     "variacao": { "nome": "Sabor:Melancia", "ordem": 3, "produtoPai": { "id": 108, "cloneInfo": true } } }
+  ]
+ },
+ "109": {
+  "id": 109, "nome": "Chaveiro Torre Eiffel", "codigo": "SKU-109", "preco": 25, "tipo": "P", "situacao": "A", "formato": "S",
+  "descricaoCurta": "", "imagemURL": "https://catalogo-mobile.s3.sa-east-1.amazonaws.com/companies/7827/products_imgs/imported/109.jpg",
+  "gtin": "", "marca": "", "categoria": { "id": 30 },
+  "midia": { "video": { "url": "" }, "imagens": { "externas": [ { "link": "https://catalogo-mobile.s3.sa-east-1.amazonaws.com/companies/7827/products_imgs/imported/109.jpg" } ], "internas": [] } }
+ },
+ "110": {
+  "id": 110, "nome": "Caneca Sem Categoria", "codigo": "SKU-110", "preco": 45, "tipo": "P", "situacao": "A", "formato": "S",
+  "descricaoCurta": "", "imagemURL": "https://catalogo-mobile.s3.sa-east-1.amazonaws.com/companies/7827/products_imgs/imported/110.jpg",
+  "gtin": "", "marca": "", "categoria": { "id": 0 },
+  "midia": { "video": { "url": "" }, "imagens": { "externas": [ { "link": "https://catalogo-mobile.s3.sa-east-1.amazonaws.com/companies/7827/products_imgs/imported/110.jpg" } ], "internas": [] } }
+ },
+ "111": {
+  "id": 111, "nome": "VELA AROMATICA BAUNILHA", "codigo": "B-111", "preco": 80, "tipo": "P", "situacao": "A", "formato": "S",
+  "descricaoCurta": "", "imagemURL": "https://catalogo-mobile.s3.sa-east-1.amazonaws.com/companies/7827/products_imgs/imported/111.jpg",
+  "gtin": "", "marca": "bath and body works", "categoria": { "id": 13 },
+  "midia": { "video": { "url": "" }, "imagens": { "externas": [ { "link": "https://catalogo-mobile.s3.sa-east-1.amazonaws.com/companies/7827/products_imgs/imported/111.jpg" } ], "internas": [] } }
+ },
+ "112": {
+  "id": 112, "nome": "Serum Antigo Preservado", "codigo": "SKU-112", "preco": 99.9, "tipo": "P", "situacao": "A", "formato": "S",
+  "descricaoCurta": "", "imagemURL": "https://catalogo-mobile.s3.sa-east-1.amazonaws.com/companies/7827/products_imgs/imported/112.jpg",
+  "gtin": "", "marca": "", "categoria": { "id": 11 },
+  "midia": { "video": { "url": "" }, "imagens": { "externas": [ { "link": "https://catalogo-mobile.s3.sa-east-1.amazonaws.com/companies/7827/products_imgs/imported/112.jpg" } ], "internas": [] } }
+ }
+}

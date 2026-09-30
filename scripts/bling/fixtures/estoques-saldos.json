@@ -1,0 +1,3 @@
+[
+ { "produto": { "id": 112, "codigo": "SKU-112" }, "saldoFisicoTotal": 8, "saldoVirtualTotal": 7, "depositos": [{ "id": 1, "saldoFisico": 8, "saldoVirtual": 7 }] }
+]

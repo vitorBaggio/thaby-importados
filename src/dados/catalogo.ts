@@ -13,12 +13,17 @@
 import dados from "./catalogo-completo.json";
 import { itensSale, type ItemSale } from "./sale";
 import { slugify } from "@/lib/texto";
+import { asset } from "@/lib/asset";
 
 const PREFIXO_FOTO = "https://catalogo-mobile.s3.sa-east-1.amazonaws.com/";
 
-/** Recompõe a URL absoluta de uma foto a partir do caminho guardado. */
+/**
+ * Recompõe a URL de uma foto a partir do caminho guardado. Caminho com `/` é
+ * foto baixada do Bling para `public/produtos` (passa pelo basePath do export).
+ */
 export function urlFoto(caminho: string | null | undefined): string | null {
   if (!caminho) return null;
+  if (caminho.startsWith("/")) return asset(caminho);
   return caminho.startsWith("http") ? caminho : PREFIXO_FOTO + caminho;
 }
 

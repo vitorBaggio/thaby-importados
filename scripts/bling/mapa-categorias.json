@@ -1,0 +1,3 @@
+{
+ "_leiaMe": "Chave = id da categoria no Bling. Valor = { super, sub } com slugs de scripts/bling/categorias-site.json. A sincronizacao acrescenta aqui os casamentos automaticos por nome; o que nao casar vai para supercategoria-padrao/padrao (Outros Importados / Variados) e aparece como SEM MAPA no relatorio. Edite a mao para decidir."
+}

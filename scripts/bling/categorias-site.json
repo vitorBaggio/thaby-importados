@@ -1,0 +1,446 @@
+[
+ {
+  "id": 249680,
+  "nome": "Acessórios e Moda",
+  "nomeErp": "ACESSÓRIOS E MODA",
+  "slug": "acessorios-e-moda",
+  "imagem": "companies/7827/categories_images/27se9a32xodFo5A1KDNsRlvSffI0iRFQDGq0GkFk.png",
+  "super": true,
+  "subcategorias": [
+   {
+    "id": 249681,
+    "nome": "Bolsas Femininas",
+    "nomeErp": "BOLSAS FEMININAS",
+    "slug": "bolsas-femininas",
+    "imagem": "companies/7827/categories_images/bIjjn68Nlo9fS4XToGRtFQGVUhStLSMvEZGCdYkp.png",
+    "superId": 249680
+   },
+   {
+    "id": 278938,
+    "nome": "Bonés",
+    "nomeErp": "BONÉS",
+    "slug": "bones",
+    "imagem": "companies/7827/categories_images/xVoMiGjOTguS9QlsxPmrB8JO7KqTOWNGFRqgqH9C.png",
+    "superId": 249680
+   },
+   {
+    "id": 278833,
+    "nome": "Carteiras Femininas",
+    "nomeErp": "CARTEIRAS FEMININAS",
+    "slug": "carteiras-femininas",
+    "imagem": "companies/7827/categories_images/28fTdCBGOVNUjOJzHqtlF0d2Dn3qJiKvAjKJ67pm.png",
+    "superId": 249680
+   },
+   {
+    "id": 249727,
+    "nome": "Carteiras Masculinas",
+    "nomeErp": "CARTEIRAS MASCULINAS",
+    "slug": "carteiras-masculinas",
+    "imagem": "companies/7827/categories_images/OaQavGcCaTAAVkuXYTd2rU1dAe3owioh4o7uQzRD.png",
+    "superId": 249680
+   },
+   {
+    "id": 249758,
+    "nome": "Chaveiros",
+    "nomeErp": "CHAVEIROS",
+    "slug": "chaveiros",
+    "imagem": "companies/7827/categories_images/k7AnW1FxBSL50WhgPN8gcTAzzgJXVNmwfTDylYzB.png",
+    "superId": 249680
+   },
+   {
+    "id": 249748,
+    "nome": "Chinelo Feminino",
+    "nomeErp": "CHINELO FEMININO",
+    "slug": "chinelo-feminino",
+    "imagem": "companies/7827/categories_images/bJ5WEOaGhehRqBBCBUc46t0aGxmMp25vL6dhgYs9.png",
+    "superId": 249680
+   },
+   {
+    "id": 249683,
+    "nome": "Cintos Femininos",
+    "nomeErp": "CINTOS FEMININOS",
+    "slug": "cintos-femininos",
+    "imagem": "companies/7827/categories_images/8ha74x2vAgejPD0XxRgpLjFwQUmkhOKOxadrZJCL.png",
+    "superId": 249680
+   },
+   {
+    "id": 278931,
+    "nome": "Lenços e Pashminas",
+    "nomeErp": "LENÇOS E PASHMINAS",
+    "slug": "lencos-e-pashminas",
+    "imagem": "companies/7827/categories_images/ReQEzpkJMWVITH5UJZzIBYnxL6Rsi3zNse7iIpgY.png",
+    "superId": 249680
+   },
+   {
+    "id": 278933,
+    "nome": "Mochilas Femininas",
+    "nomeErp": "MOCHILAS FEMININAS",
+    "slug": "mochilas-femininas",
+    "imagem": "companies/7827/categories_images/8VbmeZvRCw60chhKyMfUaMSbE52lfvOyq3sk0FNf.png",
+    "superId": 249680
+   },
+   {
+    "id": 249731,
+    "nome": "Mochilas Infantis",
+    "nomeErp": "MOCHILAS INFANTIS",
+    "slug": "mochilas-infantis",
+    "imagem": "companies/7827/categories_images/0p4KmXjjrJawZBjE5Mhbt1LaDNDM5PCYm4fXASaH.png",
+    "superId": 249680
+   },
+   {
+    "id": 278945,
+    "nome": "Mochilas Masculinas",
+    "nomeErp": "MOCHILAS MASCULINAS",
+    "slug": "mochilas-masculinas",
+    "imagem": "companies/7827/categories_images/3cW5Sp8Ee0NnCo4a95VxmbMnzi4hQ1uX02YwuC75.png",
+    "superId": 249680
+   },
+   {
+    "id": 249746,
+    "nome": "Necessaries e Organizadores",
+    "nomeErp": "NECESSARIES E ORGANIZADORES",
+    "slug": "necessaries-e-organizadores",
+    "imagem": "companies/7827/categories_images/Sjr8TuJB4AIVzmGwg23KhyJ1TonGkW4t0gBLOul0.png",
+    "superId": 249680
+   },
+   {
+    "id": 278926,
+    "nome": "Óculos de Sol",
+    "nomeErp": "ÓCULOS DE SOL",
+    "slug": "oculos-de-sol",
+    "imagem": "companies/7827/categories_images/SO9X2akaRQWjaxWB4nHNru2ixnFkcjy9GtwQnpis.png",
+    "superId": 249680
+   },
+   {
+    "id": 278935,
+    "nome": "Óculos de Sol Infantil",
+    "nomeErp": "ÓCULOS DE SOL INFANTIL",
+    "slug": "oculos-de-sol-infantil",
+    "imagem": "companies/7827/categories_images/1xJCz54kJxdcJF80cwY6XJYSvfnFHPPT9ijJPgIV.png",
+    "superId": 249680
+   },
+   {
+    "id": 249686,
+    "nome": "Relógios Femininos",
+    "nomeErp": "RELÓGIOS FEMININOS",
+    "slug": "relogios-femininos",
+    "imagem": "companies/7827/categories_images/B8oHXk6SF6S40Pa2PghqHs8HBJIm7tHv55WCRNn6.png",
+    "superId": 249680
+   },
+   {
+    "id": 249733,
+    "nome": "Relógios Infantis",
+    "nomeErp": "RELÓGIOS INFANTIS",
+    "slug": "relogios-infantis",
+    "imagem": "companies/7827/categories_images/KZaYoBKsxoDLs9kaO1WGHgTXWhCXxQrJMaVnjg2T.png",
+    "superId": 249680
+   },
+   {
+    "id": 249726,
+    "nome": "Relógios Masculinos",
+    "nomeErp": "RELÓGIOS MASCULINOS",
+    "slug": "relogios-masculinos",
+    "imagem": "companies/7827/categories_images/211pq400HA3INEQZbMEBbSuior5VSBXODd8fUyjb.png",
+    "superId": 249680
+   }
+  ]
+ },
+ {
+  "id": 249724,
+  "nome": "Alimentação",
+  "nomeErp": "ALIMENTAÇÃO",
+  "slug": "alimentacao",
+  "imagem": "companies/7827/categories_images/X7ZHDMavd2h0pBOj3vKgYlmIw9WTUmGMoGnGP0pq.png",
+  "super": true,
+  "subcategorias": [
+   {
+    "id": 249752,
+    "nome": "Acessórios de Alimentação",
+    "nomeErp": "ACESSÓRIOS DE ALIMENTAÇÃO",
+    "slug": "acessorios-de-alimentacao",
+    "imagem": "companies/7827/categories_images/oTMG4n9kEJan02Iqvis8v9Oygznwh4WWGL4oWMCp.png",
+    "superId": 249724
+   },
+   {
+    "id": 249725,
+    "nome": "Guloseimas",
+    "nomeErp": "GULOSEIMAS",
+    "slug": "guloseimas",
+    "imagem": "companies/7827/categories_images/8JHUjT4iQULccNKbzoDTphCJzvmW7Bvh6pQ9hmv4.png",
+    "superId": 249724
+   }
+  ]
+ },
+ {
+  "id": 249687,
+  "nome": "Beleza",
+  "nomeErp": "BELEZA",
+  "slug": "beleza",
+  "imagem": "companies/7827/categories_images/QyKAiUAVH069wzaIoUB3TgUMbJ4VMFG6YtezBPgP.png",
+  "super": true,
+  "subcategorias": [
+   {
+    "id": 249707,
+    "nome": "Cabelos",
+    "nomeErp": "CABELOS",
+    "slug": "cabelos",
+    "imagem": "companies/7827/categories_images/iuMHRojKhqSDHDGmM4wKtycTFfJDEXTGX8PCg7cH.png",
+    "superId": 249687
+   },
+   {
+    "id": 249715,
+    "nome": "Cuidados Pessoais",
+    "nomeErp": "CUIDADOS PESSOAIS",
+    "slug": "cuidados-pessoais",
+    "imagem": "companies/7827/categories_images/9qzT5pahljsGirKwBvmj11YP8370pPuAUTQbTNQn.png",
+    "superId": 249687
+   },
+   {
+    "id": 278575,
+    "nome": "Maquiagem",
+    "nomeErp": "MAQUIAGEM",
+    "slug": "maquiagem",
+    "imagem": "companies/7827/categories_images/XXu4QycbWgxtIYNzf2aOhsUvZ0AU2AAF8FnY63Eb.png",
+    "superId": 249687
+   },
+   {
+    "id": 249695,
+    "nome": "Perfumes",
+    "nomeErp": "PERFUMES",
+    "slug": "perfumes",
+    "imagem": "companies/7827/categories_images/UxdzThxnTGY0Gq9DUegwExx9ifsHeOT4e30eEp9x.png",
+    "superId": 249687
+   },
+   {
+    "id": 249699,
+    "nome": "Skincare",
+    "nomeErp": "SKINCARE",
+    "slug": "skincare",
+    "imagem": "companies/7827/categories_images/sgLqaQlgSLLh8C3jPeX5KWHp16WdgbIKB50pFPWs.png",
+    "superId": 249687
+   }
+  ]
+ },
+ {
+  "id": 249720,
+  "nome": "Bem Estar e Estilo de Vida",
+  "nomeErp": "BEM ESTAR E ESTILO DE VIDA",
+  "slug": "bem-estar-e-estilo-de-vida",
+  "imagem": "companies/7827/categories_images/6H1EhkwXyaswe1NdV6MlOthNOVlUSpuiJsIfXknE.png",
+  "super": true,
+  "subcategorias": [
+   {
+    "id": 249721,
+    "nome": "Casa e Perfume",
+    "nomeErp": "CASA E PERFUME",
+    "slug": "casa-e-perfume",
+    "imagem": "companies/7827/categories_images/1NWjrpV3K1AUxU5R2cM9gDFdp23SwtdqHnLrj2Kw.png",
+    "superId": 249720
+   },
+   {
+    "id": 249751,
+    "nome": "Eletrodomésticos",
+    "nomeErp": "ELETRODOMÉSTICOS",
+    "slug": "eletrodomesticos",
+    "imagem": "companies/7827/categories_images/ZFNHE6NaId7xQiGqTTnGv5MsddD2ZU7PMkNEUmaY.png",
+    "superId": 249720
+   },
+   {
+    "id": 278696,
+    "nome": "Fragrâncias para Carro",
+    "nomeErp": "FRAGRÂNCIAS PARA CARRO",
+    "slug": "fragrancias-para-carro",
+    "imagem": "companies/7827/categories_images/hprIOQ8ZnrRPbYOrYJaxmI7bqiq1k7UJ6qUq0qip.png",
+    "superId": 249720
+   },
+   {
+    "id": 249722,
+    "nome": "Pet",
+    "nomeErp": "PET",
+    "slug": "pet",
+    "imagem": "companies/7827/categories_images/48pEYNlQuYPcVvKJXF3BUiMxNpZaUIjXQQh11Lzb.png",
+    "superId": 249720
+   },
+   {
+    "id": 249723,
+    "nome": "Saúde",
+    "nomeErp": "SAÚDE",
+    "slug": "saude",
+    "imagem": "companies/7827/categories_images/i0052eD0sAkKV668gopJ72DJOo3CJzM4zu83H2C4.png",
+    "superId": 249720
+   },
+   {
+    "id": 366706,
+    "nome": "Variados",
+    "nomeErp": "Geral",
+    "slug": "geral",
+    "imagem": null,
+    "superId": 249720
+   }
+  ]
+ },
+ {
+  "id": 249738,
+  "nome": "Infantil",
+  "nomeErp": "INFANTIL",
+  "slug": "infantil",
+  "imagem": "companies/7827/categories_images/NQvK5qQWdJ29kWxQ7C1YLMCOU42ne0Cez1BMBbiF.png",
+  "super": true,
+  "subcategorias": [
+   {
+    "id": 249739,
+    "nome": "Brinquedos",
+    "nomeErp": "BRINQUEDOS",
+    "slug": "brinquedos",
+    "imagem": "companies/7827/categories_images/LFG0WAp6hRMwgWKbpDBHm2QsFT8o6UsXa5Z6j3t5.png",
+    "superId": 249738
+   },
+   {
+    "id": 278552,
+    "nome": "Cuidados Pessoais",
+    "nomeErp": "CUIDADOS PESSOAIS",
+    "slug": "cuidados-pessoais-278552",
+    "imagem": "companies/7827/categories_images/Nt3LLkBKdCwTEgkJIvRp3rBvy3vAMbP9yLHyQ0YJ.png",
+    "superId": 249738
+   },
+   {
+    "id": 249745,
+    "nome": "Kit Beleza Infantil",
+    "nomeErp": "KIT BELEZA INFANTIL",
+    "slug": "kit-beleza-infantil",
+    "imagem": "companies/7827/categories_images/dGGfggQcpiy3tV5c6qdjHfhQPWmVTTBIrGAcAIAK.png",
+    "superId": 249738
+   },
+   {
+    "id": 249744,
+    "nome": "Maquiagem Infantil",
+    "nomeErp": "MAQUIAGEM INFANTIL",
+    "slug": "maquiagem-infantil",
+    "imagem": "companies/7827/categories_images/jAE8DfXjqQJH3yewzCtVRQFGIsf22pwGKwuMc29H.png",
+    "superId": 249738
+   }
+  ]
+ },
+ {
+  "id": 249735,
+  "nome": "Mamãe e Bebê",
+  "nomeErp": "MAMÃE E BEBÊ",
+  "slug": "mamae-e-bebe",
+  "imagem": "companies/7827/categories_images/Ys2MYszovgqoR4ej9PFa0YpvAAYF1rZPvT3OYkt5.png",
+  "super": true,
+  "subcategorias": [
+   {
+    "id": 249737,
+    "nome": "Cuidados para a Mamãe",
+    "nomeErp": "CUIDADOS PARA A MAMÃE",
+    "slug": "cuidados-para-a-mamae",
+    "imagem": "companies/7827/categories_images/BPuOB3VYubZ72YFlQVVaGRhRYeP3HS1C68csGJT9.png",
+    "superId": 249735
+   },
+   {
+    "id": 278831,
+    "nome": "Cuidados para o Bebê",
+    "nomeErp": "CUIDADOS PARA O BEBÊ",
+    "slug": "cuidados-para-o-bebe",
+    "imagem": "companies/7827/categories_images/PRI2KKePPpNAgwOFjVob3Kc0VahNJvcLWydNS39C.png",
+    "superId": 249735
+   }
+  ]
+ },
+ {
+  "id": 249734,
+  "nome": "Papelaria",
+  "nomeErp": "PAPELARIA",
+  "slug": "papelaria",
+  "imagem": "companies/7827/categories_images/LZz6w9QCdCDsFbSt6YTVtLM90SMU5dcgUm0jq7QX.png",
+  "super": true,
+  "subcategorias": [
+   {
+    "id": 278514,
+    "nome": "Diversos",
+    "nomeErp": "DIVERSOS",
+    "slug": "diversos",
+    "imagem": "companies/7827/categories_images/LpMdBpMFQBx9fmkzPvvkmBHQZczatVSNbzCyyU3N.png",
+    "superId": 249734
+   },
+   {
+    "id": 357616,
+    "nome": "Variados",
+    "nomeErp": "Geral",
+    "slug": "geral-357616",
+    "imagem": null,
+    "superId": 249734
+   }
+  ]
+ },
+ {
+  "id": 801247,
+  "nome": "Outros Importados",
+  "nomeErp": "SuperCategoria Padrão",
+  "slug": "supercategoria-padrao",
+  "imagem": null,
+  "super": true,
+  "subcategorias": [
+   {
+    "id": 278528,
+    "nome": "Diversos",
+    "nomeErp": "DIVERSOS",
+    "slug": "diversos-278528",
+    "imagem": null,
+    "superId": 801247
+   },
+   {
+    "id": 801248,
+    "nome": "Variados",
+    "nomeErp": "Padrão",
+    "slug": "padrao",
+    "imagem": null,
+    "superId": 801247
+   }
+  ]
+ },
+ {
+  "id": 249740,
+  "nome": "Tecnologia",
+  "nomeErp": "TECNOLOGIA",
+  "slug": "tecnologia",
+  "imagem": "companies/7827/categories_images/CjoBpLrbcjCk2KCzjbrSOViEqFQ4DIxhLyOXonrN.png",
+  "super": true,
+  "subcategorias": [
+   {
+    "id": 278550,
+    "nome": "Acessórios",
+    "nomeErp": "ACESSÓRIOS",
+    "slug": "acessorios",
+    "imagem": "companies/7827/categories_images/jnO701b7iRbIX2CUUjV6rIvRSM0KUy4PZBTFqY1K.png",
+    "superId": 249740
+   }
+  ]
+ },
+ {
+  "id": 249754,
+  "nome": "Vestuário",
+  "nomeErp": "VESTUÁRIO",
+  "slug": "vestuario",
+  "imagem": "companies/7827/categories_images/n3buDx9AURDL5I1qCceVk15lmmKY6cgJDML8Ew3D.png",
+  "super": true,
+  "subcategorias": [
+   {
+    "id": 249755,
+    "nome": "Vestuário Adulto",
+    "nomeErp": "VESTUÁRIO ADULTO",
+    "slug": "vestuario-adulto",
+    "imagem": "companies/7827/categories_images/HKfkt8Mi6UQr3FlsidJdZczI38lfIe9UKNPYCK8o.png",
+    "superId": 249754
+   },
+   {
+    "id": 249756,
+    "nome": "Vestuário Infantil",
+    "nomeErp": "VESTUÁRIO INFANTIL",
+    "slug": "vestuario-infantil",
+    "imagem": "companies/7827/categories_images/aYmFHncK3Hrg0DGDLsGfMrGgxe0JVx90uIQ39XqT.png",
+    "superId": 249754
+   }
+  ]
+ }
+]

@@ -1,0 +1,10 @@
+[
+ { "id": 10, "descricao": "BELEZA", "categoriaPai": { "id": 0 } },
+ { "id": 11, "descricao": "SKINCARE", "categoriaPai": { "id": 10 } },
+ { "id": 12, "descricao": "Maquiagem", "categoriaPai": { "id": 10 } },
+ { "id": 13, "descricao": "Perfumes", "categoriaPai": { "id": 10 } },
+ { "id": 20, "descricao": "INFANTIL", "categoriaPai": { "id": 0 } },
+ { "id": 21, "descricao": "CUIDADOS PESSOAIS", "categoriaPai": { "id": 20 } },
+ { "id": 22, "descricao": "Cuidados Pessoais", "categoriaPai": { "id": 0 } },
+ { "id": 30, "descricao": "Lembrancinhas de Viagem", "categoriaPai": { "id": 0 } }
+]

@@ -111,6 +111,24 @@ export async function blingGet(caminho, params = {}) {
   }
 }
 
+/**
+ * Baixa uma imagem de produto (GET simples). O link interno do Bling ja vem
+ * assinado e expira, por isso vai sem token e so e usado na sincronizacao.
+ */
+export async function baixarImagem(url) {
+  if (!/^https:\/\//i.test(url)) throw new Error(`Imagem recusada (link nao https): ${url.slice(0, 80)}`);
+  for (let tentativa = 1; ; tentativa++) {
+    const r = await fetch(url, { method: "GET" });
+    registrar("GET", `imagem ${new URL(url).host}`, r.status);
+    if (r.ok) return { dados: Buffer.from(await r.arrayBuffer()), tipo: r.headers.get("content-type") ?? "" };
+    if ((r.status === 429 || r.status >= 500) && tentativa < 3) {
+      await new Promise((res) => setTimeout(res, 1500 * tentativa));
+      continue;
+    }
+    throw new Error(`Download da imagem falhou (${r.status}): ${new URL(url).host}${new URL(url).pathname}`);
+  }
+}
+
 /** Trava de escrita: existe so para deixar explicito e testavel. */
 export function blingEscrever() {
   throw new Error("Proibido: a integracao com o Bling e somente leitura.");
