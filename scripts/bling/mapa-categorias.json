@@ -1,7 +1,208 @@
 {
- "_leiaMe": "Chave = id da categoria no Bling. Valor = { super, sub } com slugs de scripts/bling/categorias-site.json. A sincronizacao acrescenta aqui os casamentos automaticos por nome; o que nao casar vai para supercategoria-padrao/padrao (Outros Importados / Variados) e aparece como SEM MAPA no relatorio. Edite a mao para decidir.",
- "11874667": { "super": "bem-estar-e-estilo-de-vida", "sub": "geral", "nomeBling": "BEM ESTAR E ESTILO DE VIDA" },
- "11874698": { "super": "papelaria", "sub": "diversos", "nomeBling": "PAPELARIA" },
- "11904893": { "super": "bem-estar-e-estilo-de-vida", "sub": "saude", "nomeBling": "SUPLEMENTOS" },
- "12361463": { "super": "bem-estar-e-estilo-de-vida", "sub": "saude", "nomeBling": "SUPLEMENTOS > DIVERSOS" }
+ "11874595": {
+  "super": "acessorios-e-moda",
+  "sub": "bolsas-femininas",
+  "nomeBling": "BOLSAS FEMININAS"
+ },
+ "11874596": {
+  "super": "acessorios-e-moda",
+  "sub": "carteiras-femininas",
+  "nomeBling": "CARTEIRAS FEMININAS"
+ },
+ "11874597": {
+  "super": "acessorios-e-moda",
+  "sub": "cintos-femininos",
+  "nomeBling": "CINTOS FEMININOS"
+ },
+ "11874598": {
+  "super": "acessorios-e-moda",
+  "sub": "lencos-e-pashminas",
+  "nomeBling": "LENÇOS E PASHMINAS"
+ },
+ "11874599": {
+  "super": "acessorios-e-moda",
+  "sub": "oculos-de-sol",
+  "nomeBling": "ÓCULOS DE SOL"
+ },
+ "11874600": {
+  "super": "acessorios-e-moda",
+  "sub": "relogios-femininos",
+  "nomeBling": "RELÓGIOS FEMININOS"
+ },
+ "11874603": {
+  "super": "beleza",
+  "sub": "maquiagem",
+  "nomeBling": "MAQUIAGEM"
+ },
+ "11874612": {
+  "super": "beleza",
+  "sub": "perfumes",
+  "nomeBling": "PERFUMES"
+ },
+ "11874616": {
+  "super": "beleza",
+  "sub": "skincare",
+  "nomeBling": "SKINCARE"
+ },
+ "11874641": {
+  "super": "beleza",
+  "sub": "cabelos",
+  "nomeBling": "CABELOS"
+ },
+ "11874651": {
+  "super": "beleza",
+  "sub": "cuidados-pessoais",
+  "nomeBling": "CUIDADOS PESSOAIS"
+ },
+ "11874667": {
+  "super": "bem-estar-e-estilo-de-vida",
+  "sub": "geral",
+  "nomeBling": "BEM ESTAR E ESTILO DE VIDA"
+ },
+ "11874668": {
+  "super": "bem-estar-e-estilo-de-vida",
+  "sub": "casa-e-perfume",
+  "nomeBling": "CASA E PERFUME"
+ },
+ "11874670": {
+  "super": "bem-estar-e-estilo-de-vida",
+  "sub": "pet",
+  "nomeBling": "PET"
+ },
+ "11874672": {
+  "super": "bem-estar-e-estilo-de-vida",
+  "sub": "saude",
+  "nomeBling": "SAÚDE"
+ },
+ "11874675": {
+  "super": "alimentacao",
+  "sub": "guloseimas",
+  "nomeBling": "GULOSEIMAS"
+ },
+ "11874677": {
+  "super": "acessorios-e-moda",
+  "sub": "relogios-masculinos",
+  "nomeBling": "RELÓGIOS MASCULINOS"
+ },
+ "11874678": {
+  "super": "acessorios-e-moda",
+  "sub": "carteiras-masculinas",
+  "nomeBling": "CARTEIRAS MASCULINAS"
+ },
+ "11874687": {
+  "super": "acessorios-e-moda",
+  "sub": "mochilas-masculinas",
+  "nomeBling": "MOCHILAS MASCULINAS"
+ },
+ "11874688": {
+  "super": "acessorios-e-moda",
+  "sub": "mochilas-infantis",
+  "nomeBling": "MOCHILAS INFANTIS"
+ },
+ "11874691": {
+  "super": "acessorios-e-moda",
+  "sub": "oculos-de-sol-infantil",
+  "nomeBling": "ÓCULOS DE SOL INFANTIL"
+ },
+ "11874693": {
+  "super": "acessorios-e-moda",
+  "sub": "relogios-infantis",
+  "nomeBling": "RELÓGIOS INFANTIS"
+ },
+ "11874698": {
+  "super": "papelaria",
+  "sub": "diversos",
+  "nomeBling": "PAPELARIA"
+ },
+ "11874702": {
+  "super": "mamae-e-bebe",
+  "sub": "cuidados-para-o-bebe",
+  "nomeBling": "CUIDADOS PARA O BEBÊ"
+ },
+ "11874703": {
+  "super": "mamae-e-bebe",
+  "sub": "cuidados-para-a-mamae",
+  "nomeBling": "CUIDADOS PARA A MAMÃE"
+ },
+ "11874714": {
+  "super": "infantil",
+  "sub": "brinquedos",
+  "nomeBling": "BRINQUEDOS"
+ },
+ "11874772": {
+  "super": "infantil",
+  "sub": "maquiagem-infantil",
+  "nomeBling": "MAQUIAGEM INFANTIL"
+ },
+ "11874773": {
+  "super": "infantil",
+  "sub": "kit-beleza-infantil",
+  "nomeBling": "KIT BELEZA INFANTIL"
+ },
+ "11874775": {
+  "super": "acessorios-e-moda",
+  "sub": "necessaries-e-organizadores",
+  "nomeBling": "NECESSARIES E ORGANIZADORES"
+ },
+ "11874783": {
+  "super": "acessorios-e-moda",
+  "sub": "chinelo-feminino",
+  "nomeBling": "CHINELO FEMININO"
+ },
+ "11904893": {
+  "super": "bem-estar-e-estilo-de-vida",
+  "sub": "saude",
+  "nomeBling": "SUPLEMENTOS"
+ },
+ "11941999": {
+  "super": "bem-estar-e-estilo-de-vida",
+  "sub": "eletrodomesticos",
+  "nomeBling": "ELETRODOMÉSTICOS"
+ },
+ "12078250": {
+  "super": "alimentacao",
+  "sub": "acessorios-de-alimentacao",
+  "nomeBling": "ACESSÓRIOS DE ALIMENTAÇÃO"
+ },
+ "12085415": {
+  "super": "vestuario",
+  "sub": "vestuario-adulto",
+  "nomeBling": "VESTUÁRIO ADULTO"
+ },
+ "12085417": {
+  "super": "vestuario",
+  "sub": "vestuario-infantil",
+  "nomeBling": "VESTUÁRIO INFANTIL"
+ },
+ "12220870": {
+  "super": "acessorios-e-moda",
+  "sub": "chaveiros",
+  "nomeBling": "CHAVEIROS"
+ },
+ "12221963": {
+  "super": "bem-estar-e-estilo-de-vida",
+  "sub": "fragrancias-para-carro",
+  "nomeBling": "FRAGRÂNCIAS PARA CARRO"
+ },
+ "12361460": {
+  "super": "tecnologia",
+  "sub": "acessorios",
+  "nomeBling": "ACESSÓRIOS"
+ },
+ "12361462": {
+  "super": "papelaria",
+  "sub": "diversos",
+  "nomeBling": "DIVERSOS"
+ },
+ "12361463": {
+  "super": "bem-estar-e-estilo-de-vida",
+  "sub": "saude",
+  "nomeBling": "SUPLEMENTOS > DIVERSOS"
+ },
+ "12361495": {
+  "super": "infantil",
+  "sub": "cuidados-pessoais-278552",
+  "nomeBling": "CUIDADOS PESSOAIS"
+ },
+ "_leiaMe": "Chave = id da categoria no Bling. Valor = { super, sub } com slugs de scripts/bling/categorias-site.json. A sincronizacao acrescenta aqui os casamentos automaticos por nome; o que nao casar vai para supercategoria-padrao/padrao (Outros Importados / Variados) e aparece como SEM MAPA no relatorio. Edite a mao para decidir."
 }
