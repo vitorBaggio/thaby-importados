@@ -7,9 +7,21 @@
  * Regras (definidas pelo dono): entra no site so produto ativo, do tipo produto,
  * com estoque > 0 e com pelo menos 1 imagem. O resto sai. Nada e gravado se
  * qualquer leitura do Bling falhar.
+ *
+ * Politica de variacoes: o site publica o PAI (produto unico, sem seletor de
+ * variacao) quando ao menos uma variacao ativa, do tipo produto, com estoque > 0
+ * e com imagem (propria ou do pai) cumpre as regras. O estoque publicado e a soma
+ * dessas variacoes; o estoque do proprio pai e ignorado. Pai inativo nao publica,
+ * mesmo com variacao elegivel. Variacao nunca vira produto separado.
+ *
+ * Imagens: `midia.imagens.internas[]` (link assinado, com `validade`) sao
+ * baixadas para public/produtos; `externas[]` sao usadas direto, exceto as http,
+ * que tambem sao baixadas (o site so serve https). A origem vem sempre dos
+ * metadados de midia do detalhe, nunca de adivinhar pela URL.
  */
 import fs from "node:fs";
 import path from "node:path";
+import { matchRemotePattern } from "next/dist/shared/lib/match-remote-pattern.js";
 import { slugify, normalizarNome, capitalizar, normalizarMarca, limparHtml, centavos } from "./texto.mjs";
 
 /**
@@ -29,7 +41,19 @@ export const DESTINO_SEM_MAPA = { super: "supercategoria-padrao", sub: "padrao" 
 const LIMITE = 100;
 const MAX_PAGINAS = 1000;
 const PREFIXO_S3 = "https://catalogo-mobile.s3.sa-east-1.amazonaws.com/";
-const ARQUIVO_FOTO = /^\d+-\d+\.[a-z0-9]+$/;
+/** Unico formato de arquivo que a sincronizacao le, grava ou apaga em public/produtos. */
+const ARQUIVO_FOTO = /^\d+-\d+\.(jpg|png|webp|gif)$/;
+const EXT_TIPO = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/gif": "gif" };
+const ASSINATURA = {
+  jpg: (b) => b.length >= 3 && b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff,
+  png: (b) => b.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])),
+  gif: (b) => /^GIF8[79]a$/.test(b.subarray(0, 6).toString("latin1")),
+  webp: (b) => b.subarray(0, 4).toString("latin1") === "RIFF" && b.subarray(8, 12).toString("latin1") === "WEBP",
+};
+
+const SEM_IMAGEM = "sem imagem";
+const SEM_ORIGEM = "sem imagem (imagemURL sem origem nos metadados de midia do Bling)";
+const FOTO_INVALIDA = "sem imagem (nenhuma foto valida no download)";
 
 export function caminhos(raiz) {
   return {
@@ -53,19 +77,47 @@ const numero = (v) => (v == null || v === "" || !Number.isFinite(Number(v)) ? nu
 const temTexto = (v) => typeof v === "string" && v.trim() !== "";
 const semQuery = (url) => url.split("?")[0];
 const gtinValido = (g) => (temTexto(g) && /^\d{8,14}$/.test(g.trim()) ? g.trim() : null);
+const idValido = (id) => Number.isSafeInteger(id) && id > 0;
+
+/**
+ * Caminho de uma foto dentro de `pasta`. Nome fora do padrao `id-ordem.ext` ou
+ * que resolva para fora da pasta aborta: nunca le, grava, reusa ou apaga fora dela.
+ */
+function caminhoFoto(pasta, arquivo) {
+  const destino = path.resolve(pasta, String(arquivo));
+  if (typeof arquivo !== "string" || !ARQUIVO_FOTO.test(arquivo) || path.dirname(destino) !== path.resolve(pasta)) {
+    throw new Error(`Nome de foto invalido: ${JSON.stringify(arquivo)}. Abortado, nada foi gravado.`);
+  }
+  return destino;
+}
 
 /* ------------------------------------------------------------------ */
 /* Leitura do Bling                                                   */
 /* ------------------------------------------------------------------ */
 
-/** Pagina ate acabar. Qualquer pagina que falhe de vez propaga o erro. */
+/**
+ * Pagina ate acabar. Pagina com menos de LIMITE itens termina. Pagina VAZIA
+ * depois de pagina cheia so termina se a seguinte tambem vier vazia; se a
+ * seguinte tiver itens, a lista veio furada e aborta. Qualquer pagina que falhe
+ * de vez propaga o erro.
+ */
 async function paginar(get, caminho, params) {
-  const todos = [];
-  for (let pagina = 1; pagina <= MAX_PAGINAS; pagina++) {
+  const pedir = async (pagina) => {
     const r = await get(caminho, { ...params, pagina, limite: LIMITE });
     if (!Array.isArray(r?.data)) throw new Error(`Resposta inesperada do Bling em ${caminho} (pagina ${pagina}, sem "data").`);
-    todos.push(...r.data);
-    if (r.data.length < LIMITE) return todos;
+    return r.data;
+  };
+  const todos = [];
+  for (let pagina = 1; pagina <= MAX_PAGINAS; pagina++) {
+    const dados = await pedir(pagina);
+    if (!dados.length && pagina > 1) {
+      if ((await pedir(pagina + 1)).length) {
+        throw new Error(`${caminho}: pagina ${pagina} veio vazia, mas a pagina ${pagina + 1} tem itens (lista incompleta). Abortado, nada foi gravado.`);
+      }
+      return todos;
+    }
+    todos.push(...dados);
+    if (dados.length < LIMITE) return todos;
   }
   throw new Error(`${caminho}: passou de ${MAX_PAGINAS} paginas; abortado por seguranca.`);
 }
@@ -81,7 +133,10 @@ async function listarProdutos(get, deposito) {
     for (const filtroSaldoEstoque of [0, 1, 2]) {
       const params = { criterio, tipo: "T", filtroSaldoEstoque };
       if (deposito != null) params.filtroSaldoEstoqueDeposito = deposito;
-      for (const p of await paginar(get, "/produtos", params)) if (p?.id != null) porId.set(p.id, p);
+      for (const p of await paginar(get, "/produtos", params)) {
+        if (!idValido(p?.id)) throw new Error(`Produto com id invalido na lista do Bling: ${JSON.stringify(p?.id)}. Abortado, nada foi gravado.`);
+        porId.set(p.id, p);
+      }
     }
   }
   return porId;
@@ -105,44 +160,68 @@ async function completarSaldos(get, ids, saldos, deposito) {
 /* Imagens                                                            */
 /* ------------------------------------------------------------------ */
 
-function deImagemURL(url) {
-  return url.startsWith(PREFIXO_S3) ? { tipo: "externa", link: url } : { tipo: "interna", link: url, chave: semQuery(url) };
-}
-
 /**
  * Externas (permanentes) primeiro, depois internas (temporarias, tem `validade`)
- * pela ordem do Bling. Sem midia no detalhe, cai para o `imagemURL`.
+ * pela ordem do Bling. `baixar` = vai para public/produtos (interna ou externa
+ * http). Sem midia no detalhe, o `imagemURL` sozinho nao diz a origem: a foto
+ * nao e usada e `ambigua` explica por que o produto saiu.
  */
-function imagensDe(p, imagemURLReserva) {
-  const img = p?.midia?.imagens ?? {};
+function imagensDe(d, imagemURLReserva) {
+  const img = d?.midia?.imagens ?? {};
   const externas = (img.externas ?? [])
-    .filter((i) => temTexto(i?.link))
-    .map((i) => ({ tipo: "externa", link: i.link.trim() }));
+    .filter((i) => temTexto(i?.link) && /^https?:\/\//i.test(i.link.trim()))
+    .map((i) => {
+      const link = i.link.trim();
+      return /^http:/i.test(link) ? { tipo: "externa", baixar: true, link, chave: `url:${link}` } : { tipo: "externa", baixar: false, link };
+    });
   const internas = (img.internas ?? [])
     .filter((i) => temTexto(i?.link))
     .sort((a, b) => (a.ordem ?? 0) - (b.ordem ?? 0))
     .map((i) => ({
       tipo: "interna",
+      baixar: true,
       link: i.link.trim(),
       chave: i.anexo?.id != null ? `anexo:${i.anexo.id}` : semQuery(i.link.trim()),
     }));
-  const todas = [...externas, ...internas];
-  const reserva = [p?.imagemURL, imagemURLReserva].find(temTexto);
-  if (!todas.length && reserva) todas.push(deImagemURL(reserva.trim()));
-  return todas;
+  const imagens = [...externas, ...internas];
+  const reserva = [d?.imagemURL, imagemURLReserva].find(temTexto);
+  return { imagens, ambigua: !imagens.length && reserva ? reserva.trim() : null };
 }
 
-const EXT_TIPO = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/gif": "gif", "image/avif": "avif" };
+/** So para a previa: o nome final sai do Content-Type validado no download. */
 function extensaoDaUrl(url) {
-  const m = /\.(jpe?g|png|webp|gif|avif)$/i.exec(semQuery(url));
+  const m = /\.(jpe?g|png|webp|gif)$/i.exec(semQuery(url));
   return m ? m[1].toLowerCase().replace("jpeg", "jpg") : null;
 }
 
-function dominiosPermitidos(arquivo) {
+/** Extensao pelo Content-Type aceito, conferida pela assinatura dos primeiros bytes. */
+function extensaoValidada(dados, tipo) {
+  const mime = String(tipo ?? "").split(";")[0].trim().toLowerCase();
+  const ext = EXT_TIPO[mime];
+  if (!ext) return { erro: `tipo "${mime || "vazio"}" nao e imagem aceita (jpeg, png, webp, gif)` };
+  if (!ASSINATURA[ext](Buffer.from(dados ?? []))) return { erro: `conteudo nao confere com ${mime}` };
+  return { ext };
+}
+
+/** `images.remotePatterns` reais do next.config.ts (objetos literais com strings). */
+function padroesRemotos(arquivo) {
   if (!fs.existsSync(arquivo)) return [];
   const txt = fs.readFileSync(arquivo, "utf8");
-  const re = /hostname:\s*["']([^"']+)["'](?:\s*,\s*pathname:\s*["']([^"']+)["'])?/g;
-  return [...txt.matchAll(re)].map((m) => ({ hostname: m[1], prefixo: (m[2] ?? "/").replace(/\*+$/, "") }));
+  const m = /remotePatterns\s*:\s*\[/.exec(txt);
+  if (!m) return [];
+  const inicio = m.index + m[0].length;
+  let fim = inicio;
+  for (let prof = 1; fim < txt.length && prof > 0; fim++) {
+    if (txt[fim] === "[") prof++;
+    else if (txt[fim] === "]") prof--;
+  }
+  return [...txt.slice(inicio, fim).matchAll(/\{([^{}]*)\}/g)]
+    .map(([, corpo]) => {
+      const padrao = {};
+      for (const [, k, v] of corpo.matchAll(/\b(protocol|hostname|port|pathname|search)\s*:\s*["'`]([^"'`]*)["'`]/g)) padrao[k] = v;
+      return padrao;
+    })
+    .filter((padrao) => padrao.hostname);
 }
 
 /* ------------------------------------------------------------------ */
@@ -208,7 +287,8 @@ function caminhoCategoria(idCat, catBling) {
 /**
  * @param {object} o
  * @param {(caminho: string, params?: object) => Promise<any>} o.blingGet  leitura do Bling
- * @param {(url: string) => Promise<{dados: Buffer, tipo: string}>} o.baixarImagem  so usado com aplicar
+ * @param {(url: string) => Promise<{dados: Buffer, tipo: string}>} o.baixarImagem  so usado com aplicar;
+ *   erro com `imagemRecusada: true` pula a foto, qualquer outro aborta
  * @param {string} o.raiz  raiz do projeto
  */
 export async function sincronizar({
@@ -235,7 +315,12 @@ export async function sincronizar({
   const arvore = lerJson(arq.categoriasSite);
   const mapaArquivo = lerJsonOpcional(arq.mapa, {});
   const manifesto = lerJsonOpcional(arq.manifestoFotos, {});
-  const permitidos = dominiosPermitidos(arq.nextConfig);
+  for (const [k, m] of Object.entries(manifesto)) {
+    if (!/^\d+-\d+$/.test(k)) throw new Error(`Manifesto de fotos com chave invalida: ${JSON.stringify(k)}. Abortado, nada foi gravado.`);
+    caminhoFoto(arq.pastaFotos, m?.arquivo);
+  }
+  const padroes = padroesRemotos(arq.nextConfig);
+  const liberada = (url) => padroes.some((padrao) => matchRemotePattern(padrao, url));
   const site = indexarSite(arvore);
 
   /* 1. Leitura completa do Bling (nada e gravado ate o fim) ---------- */
@@ -275,6 +360,7 @@ export async function sincronizar({
   const variacoesSemSaldo = [];
   for (const pai of pais) {
     for (const v of detalhes.get(pai.id).variacoes ?? []) {
+      if (!idValido(v?.id)) throw new Error(`Variacao com id invalido no produto ${pai.id}: ${JSON.stringify(v?.id)}. Abortado, nada foi gravado.`);
       if (v.situacao !== "A" || (v.tipo ?? "P") !== "P") continue;
       const s = deposito == null ? (numero(v?.estoque?.saldoVirtualTotal) ?? saldoDaLista(linhasVariacao.get(v.id))) : null;
       if (s != null) saldos.set(v.id, s);
@@ -291,29 +377,34 @@ export async function sincronizar({
     const estoque = saldos.get(p.id);
     if (!(estoque > 0)) return { p, motivo: "sem estoque", estoque };
     const d = detalhes.get(p.id);
-    const imagens = imagensDe(d, p.imagemURL);
-    if (!imagens.length) return { p, d, motivo: "sem imagem", estoque };
+    const { imagens, ambigua } = imagensDe(d, p.imagemURL);
+    if (!imagens.length) return { p, d, motivo: ambigua ? SEM_ORIGEM : SEM_IMAGEM, estoque };
     return { p, d, motivo: null, estoque, imagens, preco: p.preco ?? d.preco };
   });
 
   function avaliarPai(pai) {
     const d = detalhes.get(pai.id);
-    const imagensPai = imagensDe(d, pai.imagemURL);
+    const fotosPai = imagensDe(d, pai.imagemURL);
     const vs = d.variacoes ?? [];
     const elegiveis = [];
     let algumaComEstoque = false;
+    let ambigua = fotosPai.ambigua;
     for (const v of vs) {
       if (v.situacao !== "A" || (v.tipo ?? "P") !== "P") continue;
       const estoque = saldos.get(v.id) ?? 0;
       if (!(estoque > 0)) continue;
       algumaComEstoque = true;
       // A variacao herda a foto do pai: no Bling ela costuma ficar so no pai.
-      const imagens = imagensDe(v, linhasVariacao.get(v.id)?.imagemURL);
-      if (!imagens.length && !imagensPai.length) continue;
-      elegiveis.push({ v, estoque, imagens });
+      const fotosVar = imagensDe(v, linhasVariacao.get(v.id)?.imagemURL);
+      ambigua ||= fotosVar.ambigua;
+      if (!fotosVar.imagens.length && !fotosPai.imagens.length) continue;
+      elegiveis.push({ v, estoque, imagens: fotosVar.imagens });
     }
     const variacoes = { total: vs.length, elegiveis: elegiveis.length };
-    if (!elegiveis.length) return { p: pai, d, motivo: algumaComEstoque ? "sem imagem" : "sem estoque", variacoes };
+    if (!elegiveis.length) {
+      const motivo = !algumaComEstoque ? "sem estoque" : ambigua ? SEM_ORIGEM : SEM_IMAGEM;
+      return { p: pai, d, motivo, variacoes };
+    }
     const precosVar = elegiveis.map((e) => numero(e.v.preco)).filter((x) => x > 0);
     return {
       p: pai,
@@ -321,12 +412,13 @@ export async function sincronizar({
       motivo: null,
       variacoes,
       estoque: elegiveis.reduce((t, e) => t + e.estoque, 0),
-      imagens: imagensPai.length ? imagensPai : elegiveis[0].imagens,
+      imagens: fotosPai.imagens.length ? fotosPai.imagens : elegiveis[0].imagens,
       preco: numero(pai.preco) > 0 ? pai.preco : precosVar.length ? Math.min(...precosVar) : null,
     };
   }
 
   const publicaveis = avaliados.filter((a) => !a.motivo);
+  const avaliadoPorId = new Map(avaliados.map((a) => [a.p.id, a]));
 
   /* 3. Categorias --------------------------------------------------- */
   const novasEntradasMapa = {};
@@ -401,37 +493,41 @@ export async function sincronizar({
     if (c) slugsUsados.add(c.site.slug);
   }
   const hostsExternos = new Map();
-  const fotosInternas = []; // { produtoId, ordem, link, chave, arquivo }
-  const usoFotos = { externa: 0, interna: 0, mista: 0 };
+  const fotosBaixar = []; // { produtoId, ordem, link, chave, arquivo, origem }
+  const usoFotos = { externa: 0, interna: 0, mista: 0 }; // externa = usada direto; interna = baixada
+  let externasHttp = 0;
 
-  const produtos = publicaveis.map((a) => {
+  let produtos = publicaveis.map((a) => {
     const { p, d } = a;
     const c = casamento.get(p.id);
     let slug = c?.site.slug;
     if (!slug) {
       let base = slugify(p.nome) || "produto";
       if (base.length > 60) base = base.slice(0, 60).replace(/-+$/, "");
-      slug = slugsUsados.has(base) ? `${base}-${p.id}` : base;
+      slug = base;
+      for (let n = 0; slugsUsados.has(slug); n++) slug = n === 0 ? `${base}-${p.id}` : `${base}-${p.id}-${n}`;
       slugsUsados.add(slug);
     }
 
     const tipos = new Set();
     const fotos = a.imagens.slice(0, MAX_FOTOS).map((img, i) => {
-      tipos.add(img.tipo);
-      if (img.tipo === "externa") {
+      tipos.add(img.baixar ? "interna" : "externa");
+      if (!img.baixar) {
         const u = new URL(img.link);
         const h = hostsExternos.get(u.host) ?? { produtos: 0, fora: 0 };
         h.produtos++;
-        if (!permitidos.some((x) => x.hostname === u.host && u.pathname.startsWith(x.prefixo))) h.fora++;
+        if (!liberada(u)) h.fora++;
         hostsExternos.set(u.host, h);
         return img.link.startsWith(PREFIXO_S3) ? img.link.slice(PREFIXO_S3.length) : img.link;
       }
+      if (img.tipo === "externa") externasHttp++;
       const ordem = i + 1;
       const anterior = manifesto[`${p.id}-${ordem}`];
       const arquivo =
         anterior?.chave === img.chave ? anterior.arquivo : `${p.id}-${ordem}.${extensaoDaUrl(img.link) ?? "jpg"}`;
-      const item = { produtoId: p.id, ordem, link: img.link, chave: img.chave, arquivo };
-      fotosInternas.push(item);
+      caminhoFoto(arq.pastaFotos, arquivo);
+      const item = { produtoId: p.id, ordem, link: img.link, chave: img.chave, arquivo, origem: img.tipo };
+      fotosBaixar.push(item);
       return item; // trocado pelo caminho local no fim
     });
     usoFotos[tipos.size > 1 ? "mista" : [...tipos][0]]++;
@@ -449,6 +545,15 @@ export async function sincronizar({
       ean: gtinValido(d.gtin),
     };
   });
+
+  // Slugs herdados + novos: qualquer repeticao aborta antes de gravar.
+  const donoSlug = new Map();
+  for (const p of produtos) {
+    if (donoSlug.has(p.slug)) {
+      throw new Error(`Slug duplicado "${p.slug}" (produtos ${donoSlug.get(p.slug)} e ${p.id}). Abortado, nada foi gravado.`);
+    }
+    donoSlug.set(p.slug, p.id);
+  }
 
   const caminhoLocal = (f) => `/produtos/${f.arquivo}`;
   const finalizar = () =>
@@ -488,83 +593,134 @@ export async function sincronizar({
 
   /* 6. Diferencas com o site atual --------------------------------- */
   const casadoPorSite = new Map([...casamento].map(([idBling, c]) => [c.site.id, { idBling, ...c }]));
-  const avaliadoPorId = new Map(avaliados.map((a) => [a.p.id, a]));
-  const entraram = produtos.filter((p) => !casamento.has(p.id));
-  const sairam = atual.produtos
-    .map((s) => {
-      const c = casadoPorSite.get(s.id);
-      const a = c && avaliadoPorId.get(c.idBling);
-      if (a && !a.motivo) return null;
-      return { nome: s.nome, codigo: s.codigo, motivo: a ? a.motivo : "nao existe mais" };
-    })
-    .filter(Boolean);
-  const precoMudou = produtos
-    .map((p) => ({ p, antes: casamento.get(p.id)?.site.preco ?? null }))
-    .filter(({ p, antes }) => casamento.has(p.id) && antes !== p.preco)
-    .map(({ p, antes }) => ({ nome: p.nome, codigo: p.codigo, antes, depois: p.preco, dif: Math.abs((p.preco ?? 0) - (antes ?? 0)) }))
-    .sort((a, b) => b.dif - a.dif);
-  const porCriterio = { codigo: 0, gtin: 0, nome: 0 };
-  for (const p of produtos) {
-    const c = casamento.get(p.id);
-    if (c) porCriterio[c.criterio]++;
-  }
-
   const totalAtual = atual.produtos.length;
-  const queda = totalAtual ? (totalAtual - produtos.length) / totalAtual : 0;
   const hostsFora = [...hostsExternos].filter(([, h]) => h.fora > 0).map(([host]) => host);
-  let recusa = null;
-  if (aplicar && !forcar) {
-    if (queda > QUEDA_MAXIMA) {
-      recusa =
-        `O site cairia de ${totalAtual} para ${produtos.length} produtos (queda de ${pct(queda)}, limite ${pct(QUEDA_MAXIMA)}). ` +
-        "Nada foi gravado. Confira o relatorio e, se estiver certo, rode de novo com --aplicar --forcar.";
-    } else if (hostsFora.length) {
-      recusa =
-        `Fotos externas em dominio nao liberado no next.config.ts (${hostsFora.join(", ")}). ` +
-        "Adicione em images.remotePatterns ou rode com --forcar. Nada foi gravado.";
+
+  // Recalculado se o download tirar produtos do catalogo.
+  function diferencas() {
+    const entraram = produtos.filter((p) => !casamento.has(p.id));
+    const sairam = atual.produtos
+      .map((s) => {
+        const c = casadoPorSite.get(s.id);
+        const a = c && avaliadoPorId.get(c.idBling);
+        if (a && !a.motivo) return null;
+        return { nome: s.nome, codigo: s.codigo, motivo: a ? a.motivo : "nao existe mais" };
+      })
+      .filter(Boolean);
+    const precoMudou = produtos
+      .map((p) => ({ p, antes: casamento.get(p.id)?.site.preco ?? null }))
+      .filter(({ p, antes }) => casamento.has(p.id) && antes !== p.preco)
+      .map(({ p, antes }) => ({ nome: p.nome, codigo: p.codigo, antes, depois: p.preco, dif: Math.abs((p.preco ?? 0) - (antes ?? 0)) }))
+      .sort((a, b) => b.dif - a.dif);
+    const porCriterio = { codigo: 0, gtin: 0, nome: 0 };
+    for (const p of produtos) {
+      const c = casamento.get(p.id);
+      if (c) porCriterio[c.criterio]++;
     }
+    const queda = totalAtual ? (totalAtual - produtos.length) / totalAtual : 0;
+    let recusa = null;
+    if (aplicar && !forcar) {
+      if (queda > QUEDA_MAXIMA) {
+        recusa =
+          `O site cairia de ${totalAtual} para ${produtos.length} produtos (queda de ${pct(queda)}, limite ${pct(QUEDA_MAXIMA)}). ` +
+          "Nada foi gravado. Esta primeira sincronizacao pode passar de 30% ao retirar produtos antigos sem imagem. " +
+          "Revise os motivos em SAIRAM no relatorio antes de usar --forcar. Se estiver certo, rode de novo com --aplicar --forcar.";
+      } else if (hostsFora.length) {
+        recusa =
+          `Fotos externas https fora de images.remotePatterns do next.config.ts (protocolo, host e caminho): ${hostsFora.join(", ")}. ` +
+          "Adicione o padrao em remotePatterns ou rode com --forcar. Nada foi gravado.";
+      }
+    }
+    return { entraram, sairam, precoMudou, porCriterio, queda, recusa };
   }
+  let dif = diferencas();
 
   /* 7. Gravacao (so depois de TODA a leitura dar certo) ------------- */
   const fotos = { baixadas: 0, reaproveitadas: 0, removidas: 0 };
-  let catalogoFinal;
-  if (aplicar && !recusa) {
-    fs.mkdirSync(arq.pastaFotos, { recursive: true });
-    const novoManifesto = {};
-    for (const f of fotosInternas) {
-      const destinoArq = path.join(arq.pastaFotos, f.arquivo);
-      if (manifesto[`${f.produtoId}-${f.ordem}`]?.chave === f.chave && fs.existsSync(destinoArq)) {
-        fotos.reaproveitadas++;
-      } else {
-        const { dados, tipo } = await baixarImagem(f.link);
-        if (!extensaoDaUrl(f.link)) f.arquivo = `${f.produtoId}-${f.ordem}.${EXT_TIPO[tipo.split(";")[0].trim()] ?? "jpg"}`;
-        fs.writeFileSync(path.join(arq.pastaFotos, f.arquivo), dados);
+  const avisosFotos = []; // { produtoId, ordem, motivo }
+  const novasIds = Object.keys(novasEntradasMapa);
+  const arqMapaProposto = path.join(arq.saida, "mapa-categorias-proposto.json");
+  const mapaCompleto = () => ({ ...mapaArquivo, ...novasEntradasMapa });
+  let gravou = false;
+
+  if (aplicar && !dif.recusa) {
+    // Downloads vao para uma pasta de preparo; public/produtos so muda se tudo der certo.
+    const preparo = path.join(arq.saida, ".fotos-novas");
+    fs.rmSync(preparo, { recursive: true, force: true });
+    fs.mkdirSync(preparo, { recursive: true });
+    try {
+      const invalidas = new Set();
+      for (const f of fotosBaixar) {
+        const anterior = manifesto[`${f.produtoId}-${f.ordem}`];
+        if (anterior?.chave === f.chave && fs.existsSync(caminhoFoto(arq.pastaFotos, anterior.arquivo))) {
+          f.arquivo = anterior.arquivo;
+          f.reaproveitada = true;
+          fotos.reaproveitadas++;
+          continue;
+        }
+        let baixada;
+        try {
+          baixada = await baixarImagem(f.link);
+        } catch (e) {
+          if (!e?.imagemRecusada) throw e;
+          avisosFotos.push({ produtoId: f.produtoId, ordem: f.ordem, motivo: e.message });
+          invalidas.add(f);
+          continue;
+        }
+        const v = extensaoValidada(baixada?.dados, baixada?.tipo);
+        if (v.erro) {
+          avisosFotos.push({ produtoId: f.produtoId, ordem: f.ordem, motivo: v.erro });
+          invalidas.add(f);
+          continue;
+        }
+        f.arquivo = `${f.produtoId}-${f.ordem}.${v.ext}`;
+        fs.writeFileSync(caminhoFoto(preparo, f.arquivo), baixada.dados);
         fotos.baixadas++;
       }
-      novoManifesto[`${f.produtoId}-${f.ordem}`] = { chave: f.chave, arquivo: f.arquivo };
-    }
-    catalogoFinal = montarCatalogo(finalizar());
-    gravarJson(arq.catalogo, catalogoFinal);
-    gravarJson(arq.manifestoFotos, novoManifesto, 1);
-    const emUso = new Set(Object.values(novoManifesto).map((m) => m.arquivo));
-    for (const nome of fs.readdirSync(arq.pastaFotos)) {
-      if (ARQUIVO_FOTO.test(nome) && !emUso.has(nome)) {
-        fs.unlinkSync(path.join(arq.pastaFotos, nome));
-        fotos.removidas++;
-      }
-    }
-  } else {
-    catalogoFinal = montarCatalogo(finalizar());
-  }
 
-  const novasIds = Object.keys(novasEntradasMapa);
-  if (novasIds.length) {
-    const mapa = { ...mapaArquivo };
-    for (const id of novasIds) mapa[id] = novasEntradasMapa[id];
-    gravarJson(arq.mapa, mapa, 1);
+      if (invalidas.size) {
+        produtos = produtos
+          .map((p) => ({ ...p, fotos: p.fotos.filter((f) => !invalidas.has(f)) }))
+          .filter((p) => {
+            if (p.fotos.length) return true;
+            avaliadoPorId.get(p.id).motivo = FOTO_INVALIDA;
+            return false;
+          });
+        dif = diferencas();
+      }
+
+      if (!dif.recusa) {
+        const validas = fotosBaixar.filter((f) => !invalidas.has(f));
+        fs.mkdirSync(arq.pastaFotos, { recursive: true });
+        for (const f of validas) {
+          if (!f.reaproveitada) fs.renameSync(caminhoFoto(preparo, f.arquivo), caminhoFoto(arq.pastaFotos, f.arquivo));
+        }
+        const novoManifesto = Object.fromEntries(validas.map((f) => [`${f.produtoId}-${f.ordem}`, { chave: f.chave, arquivo: f.arquivo }]));
+        gravarJson(arq.catalogo, montarCatalogo(finalizar()));
+        gravarJson(arq.manifestoFotos, novoManifesto, 1);
+        if (novasIds.length) gravarJson(arq.mapa, mapaCompleto(), 1);
+        fs.rmSync(arqMapaProposto, { force: true });
+        const emUso = new Set(validas.map((f) => f.arquivo));
+        for (const nome of fs.readdirSync(arq.pastaFotos)) {
+          if (ARQUIVO_FOTO.test(nome) && !emUso.has(nome)) {
+            fs.unlinkSync(caminhoFoto(arq.pastaFotos, nome));
+            fotos.removidas++;
+          }
+        }
+        gravou = true;
+      }
+    } finally {
+      fs.rmSync(preparo, { recursive: true, force: true });
+    }
   }
+  const catalogoFinal = montarCatalogo(finalizar());
+  const { entraram, sairam, precoMudou, porCriterio, queda, recusa } = dif;
+
+  // Sem gravacao (simulacao ou recusa), o mapa real nao muda: a proposta fica em saida/.
+  if (!gravou && novasIds.length) gravarJson(arqMapaProposto, mapaCompleto(), 1);
 
   const modo = !aplicar ? "simulacao" : recusa ? "recusada" : "aplicada";
+  const idsPublicados = new Set(produtos.map((p) => p.id));
   const relatorio = montarRelatorio({
     modo,
     hoje,
@@ -576,7 +732,7 @@ export async function sincronizar({
       ativos: topo.filter((p) => p.situacao === "A").length,
       inativos: topo.filter((p) => p.situacao !== "A").length,
       ativosProduto: ativosP.length,
-      comEstoque: avaliados.filter((a) => !a.motivo || a.motivo === "sem imagem").length,
+      comEstoque: avaliados.filter((a) => !a.motivo || a.motivo.startsWith(SEM_IMAGEM)).length,
       publicados: produtos.length,
       atual: totalAtual,
       queda,
@@ -584,19 +740,22 @@ export async function sincronizar({
     variacoes: {
       linhasNaLista: linhasVariacao.size,
       pais: pais.length,
-      paisPublicados: publicaveis.filter((a) => a.variacoes).length,
+      paisPublicados: publicaveis.filter((a) => a.variacoes && idsPublicados.has(a.p.id)).length,
       total: pais.reduce((t, p) => t + (detalhes.get(p.id).variacoes?.length ?? 0), 0),
       elegiveis: avaliados.reduce((t, a) => t + (a.variacoes?.elegiveis ?? 0), 0),
     },
     porCriterio,
     usoFotos,
-    fotosInternas: fotosInternas.length,
+    externasHttp,
+    fotosBaixar: fotosBaixar.length,
     fotos,
+    avisosFotos,
     hostsExternos,
     entraram,
     sairam,
     semMapa: [...semMapa.values()],
     novasEntradasMapa: novasIds.length,
+    mapaGravado: gravou,
     precoMudou,
     chamadas,
     segundos: (Date.now() - inicio) / 1000,
@@ -606,7 +765,20 @@ export async function sincronizar({
   gravarJson(path.join(arq.saida, "previa.json"), catalogoFinal, 1);
   fs.writeFileSync(path.join(arq.saida, "relatorio.md"), relatorio);
 
-  return { modo, recusa, catalogo: catalogoFinal, relatorio, entraram, sairam, porCriterio, usoFotos, fotos, chamadas, semMapa: [...semMapa.values()] };
+  return {
+    modo,
+    recusa,
+    catalogo: catalogoFinal,
+    relatorio,
+    entraram,
+    sairam,
+    porCriterio,
+    usoFotos,
+    fotos,
+    avisosFotos,
+    chamadas,
+    semMapa: [...semMapa.values()],
+  };
 }
 
 /* ------------------------------------------------------------------ */
@@ -642,6 +814,7 @@ function montarRelatorio(r) {
     "",
     "## Variacoes",
     "",
+    "- Politica: o pai e publicado quando ao menos uma variacao ativa, com estoque > 0 e com imagem (propria ou do pai) cumpre as regras. Pai inativo nao publica. Variacao nao vira produto separado; o estoque do pai e ignorado.",
     `- Produtos pai com variacoes (ativos): ${r.variacoes.pais}; publicados: ${r.variacoes.paisPublicados}`,
     `- Variacoes: ${r.variacoes.total}; elegiveis: ${r.variacoes.elegiveis}; linhas de variacao na lista: ${r.variacoes.linhasNaLista}`,
     "- Divida: o site ainda nao tem seletor de variacao. O pai aparece como produto unico, com estoque somado das variacoes elegiveis.",
@@ -655,17 +828,29 @@ function montarRelatorio(r) {
     "",
     "## Fotos",
     "",
-    `- Produtos so com imagem externa: ${r.usoFotos.externa}`,
-    `- Produtos so com imagem interna (baixada para public/produtos): ${r.usoFotos.interna}`,
+    `- Produtos so com imagem externa https (usada direto): ${r.usoFotos.externa}`,
+    `- Produtos so com imagem baixada para public/produtos (interna do Bling ou externa http): ${r.usoFotos.interna}`,
     `- Produtos com as duas: ${r.usoFotos.mista}`,
-    `- Imagens internas: ${r.fotosInternas}` +
+    `- Imagens a baixar: ${r.fotosBaixar} (das quais externas http: ${r.externasHttp})` +
       (r.modo === "aplicada"
         ? ` (baixadas: ${r.fotos.baixadas}; reaproveitadas: ${r.fotos.reaproveitadas}; arquivos antigos removidos: ${r.fotos.removidas})`
-        : " (serao baixadas no --aplicar)"),
-    "- Dominios de imagem externa:",
+        : r.modo === "simulacao"
+          ? " (serao baixadas no --aplicar)"
+          : ""),
+    "- Dominios de imagem externa https:",
     ...([...r.hostsExternos].map(
-      ([host, h]) => `  - ${host}: ${h.produtos} fotos${h.fora ? `, ${h.fora} FORA do next.config.ts (adicionar em remotePatterns)` : ", liberado"}`,
+      ([host, h]) => `  - ${host}: ${h.produtos} fotos${h.fora ? `, ${h.fora} FORA de remotePatterns do next.config.ts` : ", liberado"}`,
     ).concat(r.hostsExternos.size ? [] : ["  - nenhum"])),
+    ...(r.avisosFotos.length
+      ? [
+          "",
+          `### Fotos puladas no download (${r.avisosFotos.length})`,
+          "",
+          "Produto sem nenhuma foto valida sai como \"sem imagem\".",
+          "",
+          ...r.avisosFotos.map((a) => `- AVISO: produto ${a.produtoId}, foto ${a.ordem}: ${semTravessao(a.motivo)}`),
+        ]
+      : []),
     "",
     `## ENTRARAM (${r.entraram.length})`,
     "",
@@ -682,7 +867,14 @@ function montarRelatorio(r) {
     ...(r.semMapa.length
       ? r.semMapa.map((c) => `- SEM MAPA: ${semTravessao(c.caminho)}${c.idCat ? ` (id ${c.idCat})` : ""}: ${c.motivo}; ${c.produtos.length} produto(s)`)
       : ["- nenhuma"]),
-    ...(r.novasEntradasMapa ? ["", `Casamentos automaticos novos gravados no mapa: ${r.novasEntradasMapa}.`] : []),
+    ...(r.novasEntradasMapa
+      ? [
+          "",
+          r.mapaGravado
+            ? `Casamentos automaticos novos gravados no mapa: ${r.novasEntradasMapa}.`
+            : `Casamentos automaticos novos propostos (NAO gravados no mapa): ${r.novasEntradasMapa}. Veja scripts/bling/saida/mapa-categorias-proposto.json; entram no mapa no proximo --aplicar.`,
+        ]
+      : []),
     "",
     `## Precos que mudaram (top 20 de ${r.precoMudou.length})`,
     "",

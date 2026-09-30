@@ -111,16 +111,56 @@ export async function blingGet(caminho, params = {}) {
   }
 }
 
+/** Teto de uma imagem baixada e tempo maximo do download (resposta + corpo). */
+export const MAX_BYTES = 10 * 1024 * 1024;
+export const TIMEOUT_IMAGEM_MS = 30_000;
+
+/** Erro de uma imagem especifica: a sincronizacao pula a foto em vez de abortar. */
+function imagemRecusada(msg) {
+  const e = new Error(msg);
+  e.imagemRecusada = true;
+  return e;
+}
+
+/**
+ * Le o corpo contando bytes em streaming: recusa Content-Length acima do teto
+ * sem ler nada e cancela a leitura assim que passar do teto (mesmo sem header).
+ */
+export async function lerCorpoLimitado(r, max = MAX_BYTES) {
+  const declarado = Number(r.headers.get("content-length"));
+  if (Number.isFinite(declarado) && declarado > max) {
+    await r.body?.cancel();
+    throw imagemRecusada(`Imagem acima do teto de ${max} bytes (Content-Length ${declarado}).`);
+  }
+  if (!r.body) return Buffer.alloc(0);
+  const leitor = r.body.getReader();
+  const partes = [];
+  let total = 0;
+  for (;;) {
+    const { done, value } = await leitor.read();
+    if (done) break;
+    total += value.byteLength;
+    if (total > max) {
+      await leitor.cancel();
+      throw imagemRecusada(`Imagem acima do teto de ${max} bytes (leitura interrompida).`);
+    }
+    partes.push(value);
+  }
+  return Buffer.concat(partes);
+}
+
 /**
  * Baixa uma imagem de produto (GET simples). O link interno do Bling ja vem
  * assinado e expira, por isso vai sem token e so e usado na sincronizacao.
+ * Aceita http porque imagem externa http e copiada para public/produtos (o site
+ * so serve https).
  */
 export async function baixarImagem(url) {
-  if (!/^https:\/\//i.test(url)) throw new Error(`Imagem recusada (link nao https): ${url.slice(0, 80)}`);
+  if (!/^https?:\/\//i.test(url)) throw new Error(`Imagem recusada (link nao http/https): ${url.slice(0, 80)}`);
   for (let tentativa = 1; ; tentativa++) {
-    const r = await fetch(url, { method: "GET" });
+    const r = await fetch(url, { method: "GET", signal: AbortSignal.timeout(TIMEOUT_IMAGEM_MS) });
     registrar("GET", `imagem ${new URL(url).host}`, r.status);
-    if (r.ok) return { dados: Buffer.from(await r.arrayBuffer()), tipo: r.headers.get("content-type") ?? "" };
+    if (r.ok) return { dados: await lerCorpoLimitado(r), tipo: r.headers.get("content-type") ?? "" };
     if ((r.status === 429 || r.status >= 500) && tentativa < 3) {
       await new Promise((res) => setTimeout(res, 1500 * tentativa));
       continue;
