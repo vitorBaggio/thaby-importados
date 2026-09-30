@@ -65,6 +65,7 @@ const ASSINATURA = {
 const SEM_IMAGEM = "sem imagem";
 const URL_INVALIDA = "sem imagem (imagemURL invalida, nao e http/https)";
 const FOTO_INVALIDA = "sem imagem (nenhuma foto valida no download)";
+const CATEGORIA_EXCLUIDA = "categoria excluida";
 const RODE_DE_NOVO = "rode a simulacao de novo (node scripts/bling/atualizar.mjs) e depois --aplicar --da-previa";
 
 export function caminhos(raiz) {
@@ -514,7 +515,7 @@ function caminhoCategoria(idCat, catBling) {
 const finalizar = (lista) =>
   lista.map((p) => ({ ...p, fotos: p.fotos.map((f) => (typeof f === "string" ? f : `/produtos/${f.arquivo}`)) }));
 
-function montarCatalogo(arvore, lista, hoje) {
+export function montarCatalogo(arvore, lista, hoje) {
   const porSub = new Map();
   for (const p of lista) porSub.set(p.categoriaId, (porSub.get(p.categoriaId) ?? 0) + 1);
   const categorias = arvore
@@ -761,7 +762,15 @@ export async function sincronizar({
   await completarSaldos(get, variacoesSemSaldo, saldos, deposito);
 
   /* 2. Regras ------------------------------------------------------- */
+  // Categoria do Bling marcada "excluir" no mapa (ex.: Suplementos) nunca vai para o site.
+  const excluida = (d) => mapaArquivo[numero(d?.categoria?.id)]?.excluir === true;
   const avaliados = topo.map((p) => {
+    const a = avaliar(p);
+    if (!a.motivo && excluida(a.d)) a.motivo = CATEGORIA_EXCLUIDA;
+    return a;
+  });
+
+  function avaliar(p) {
     if (p.situacao !== "A") return { p, motivo: "inativo" };
     if (p.tipo !== "P") return { p, motivo: "servico" };
     if (p.formato === "V") return avaliarPai(p);
@@ -771,7 +780,7 @@ export async function sincronizar({
     const { imagens, invalida } = imagensDe(d, p.imagemURL);
     if (!imagens.length) return { p, d, motivo: invalida ? URL_INVALIDA : SEM_IMAGEM, urlInvalida: invalida, estoque };
     return { p, d, motivo: null, estoque, imagens, preco: p.preco ?? d.preco };
-  });
+  }
 
   function avaliarPai(pai) {
     const d = detalhes.get(pai.id);
@@ -1056,8 +1065,9 @@ export async function sincronizar({
       ativos: topo.filter((p) => p.situacao === "A").length,
       inativos: topo.filter((p) => p.situacao !== "A").length,
       ativosProduto: ativosP.length,
-      comEstoque: avaliados.filter((a) => !a.motivo || a.motivo.startsWith(SEM_IMAGEM)).length,
+      comEstoque: avaliados.filter((a) => !a.motivo || a.motivo.startsWith(SEM_IMAGEM) || a.motivo === CATEGORIA_EXCLUIDA).length,
       publicados: produtos.length,
+      excluidos: avaliados.filter((a) => a.motivo === CATEGORIA_EXCLUIDA).length,
       atual: totalAtual,
       queda,
     },
@@ -1285,7 +1295,8 @@ function montarRelatorio(r) {
     `- Ativos: ${f.ativos} (inativos: ${f.inativos})`,
     `- Ativos do tipo produto: ${f.ativosProduto}`,
     `- Com estoque > 0: ${f.comEstoque}`,
-    `- Com estoque e imagem: ${f.publicados}`,
+    `- Com estoque e imagem: ${f.publicados + f.excluidos}`,
+    `- Fora por categoria excluida no mapa: ${f.excluidos}`,
     `- Publicados: ${f.publicados} (site atual: ${f.atual}; ${f.queda === 0 ? "sem variacao" : `${f.queda > 0 ? "queda" : "alta"} de ${pct(Math.abs(f.queda))}`})`,
     "",
     "## Novidades",

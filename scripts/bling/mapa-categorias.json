@@ -152,7 +152,8 @@
  "11904893": {
   "super": "bem-estar-e-estilo-de-vida",
   "sub": "saude",
-  "nomeBling": "SUPLEMENTOS"
+  "nomeBling": "SUPLEMENTOS",
+  "excluir": true
  },
  "11941999": {
   "super": "bem-estar-e-estilo-de-vida",
@@ -197,7 +198,8 @@
  "12361463": {
   "super": "bem-estar-e-estilo-de-vida",
   "sub": "saude",
-  "nomeBling": "SUPLEMENTOS > DIVERSOS"
+  "nomeBling": "SUPLEMENTOS > DIVERSOS",
+  "excluir": true
  },
  "12361495": {
   "super": "infantil",

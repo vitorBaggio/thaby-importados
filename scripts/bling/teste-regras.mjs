@@ -1305,6 +1305,35 @@ await teste("somente leitura: no cliente, o unico metodo nao GET e o POST de /oa
   assert.equal(comMetodo.filter(([, , m]) => m !== "GET").length, 1);
 });
 
+/* ------------------------------------------------------------------ */
+/* Categoria excluida (PROJ-103: Suplementos fora do site)            */
+/* ------------------------------------------------------------------ */
+
+const comCategoria = (item, idCat) => ({ ...item, detalhe: { ...item.detalhe, categoria: { id: idCat } } });
+const suplemento = comCategoria(produtoExtra(960, "Melatonina Teste", { codigo: "SUP-960" }), 11904893);
+const suplementoDiversos = comCategoria(produtoExtra(961, "Omega Teste", { codigo: "SUP-961" }), 12361463);
+const saudeFica = comCategoria(produtoExtra(962, "Termometro Teste", { codigo: "SAU-962" }), 11874672);
+const raizExcluir = novaRaiz({
+  produtosExtras: [{ id: 9960, nome: "Melatonina Teste", slug: "melatonina-teste", marca: null, preco: 1000, categoriaId: 249723, fotos: [], descricao: null, codigo: "SUP-960", ean: null }],
+});
+const simExcluir = await sincronizar({
+  blingGet: blingFalso(montarExtras([suplemento, suplementoDiversos, saudeFica])).blingGet,
+  baixarImagem: baixadorFalso().baixarImagem,
+  raiz: raizExcluir,
+  hoje: "2026-09-30",
+});
+
+await teste('categoria marcada "excluir" no mapa: produto sai com motivo "categoria excluida"', () => {
+  const mapa = JSON.parse(ler(raizExcluir, "scripts/bling/mapa-categorias.json"));
+  assert.equal(mapa["11904893"]?.excluir, true, "SUPLEMENTOS precisa estar marcada excluir");
+  assert.equal(mapa["12361463"]?.excluir, true, "SUPLEMENTOS > DIVERSOS precisa estar marcada excluir");
+  assert.equal(mapa["11874672"]?.excluir, undefined, "SAUDE continua no site");
+  assert.equal(porCodigo(simExcluir, "SUP-960"), undefined);
+  assert.equal(porCodigo(simExcluir, "SUP-961"), undefined);
+  assert.equal(simExcluir.sairam.find((s) => s.codigo === "SUP-960")?.motivo, "categoria excluida");
+  assert.equal(porCodigo(simExcluir, "SAU-962")?.categoriaId, 249723, "produto da categoria SAUDE continua na sub saude");
+});
+
 for (const r of raizes) fs.rmSync(r, { recursive: true, force: true });
 console.log(falhas ? `\n${falhas} teste(s) falharam.` : "\nTodos os testes passaram.");
 process.exitCode = falhas ? 1 : 0;

@@ -1,10 +1,11 @@
 "use client";
 
-import { useDeferredValue, useMemo, useState } from "react";
+import { Suspense, useDeferredValue, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion } from "motion/react";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import { cn } from "@/lib/cn";
-import { slugify } from "@/lib/texto";
+import { casaBusca, indiceDeBusca, partesDaBusca } from "@/lib/busca";
 import { CartaoProduto } from "./CartaoProduto";
 import { BotaoLink } from "@/componentes/ui/Botao";
 import { linkWhatsApp } from "@/dados/empresa";
@@ -50,6 +51,9 @@ export function VitrineCatalogo({
     setVisiveis(LOTE);
   }
 
+  // Texto de busca normalizado uma vez por peça, não a cada letra digitada.
+  const indices = useMemo(() => new Map(produtos.map((p) => [p.id, indiceDeBusca(p)])), [produtos]);
+
   const resultado = useMemo(() => {
     let lista = produtos;
 
@@ -57,13 +61,9 @@ export function VitrineCatalogo({
       lista = lista.filter((p) => mapaSuper[p.categoriaId] === superAtiva);
     }
 
-    const alvo = slugify(termoAdiado);
-    if (alvo) {
-      const partes = alvo.split("-").filter(Boolean);
-      lista = lista.filter((p) => {
-        const indice = slugify(`${p.nome} ${p.marca ?? ""}`);
-        return partes.every((parte) => indice.includes(parte));
-      });
+    const partes = partesDaBusca(termoAdiado);
+    if (partes.length) {
+      lista = lista.filter((p) => casaBusca(indices.get(p.id) ?? "", partes));
     }
 
     if (ordenacao === "curadoria") return lista;
@@ -84,7 +84,7 @@ export function VitrineCatalogo({
         break;
     }
     return ordenada;
-  }, [produtos, superAtiva, termoAdiado, ordenacao, mapaSuper]);
+  }, [produtos, indices, superAtiva, termoAdiado, ordenacao, mapaSuper]);
 
   const mostrados = resultado.slice(0, visiveis);
   const restam = resultado.length - mostrados.length;
@@ -92,6 +92,11 @@ export function VitrineCatalogo({
 
   return (
     <div>
+      {/* Só este pedaço lê a URL: a vitrine continua pré-renderizada no export estático. */}
+      <Suspense fallback={null}>
+        <BuscaDaUrl aoLer={setTermo} />
+      </Suspense>
+
       <div className="sticky top-[4.5rem] z-30 -mx-6 border-b border-marinho-500/10 bg-fundo/85 px-6 py-5 backdrop-blur-xl md:-mx-10 md:px-10 lg:top-[5rem]">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex w-full items-center gap-3 lg:max-w-md">
@@ -262,6 +267,15 @@ export function VitrineCatalogo({
       )}
     </div>
   );
+}
+
+/** `/catalogo?busca=termo` (vindo da lupa do cabeçalho) preenche o campo de busca. */
+function BuscaDaUrl({ aoLer }: { aoLer: (termo: string) => void }) {
+  const busca = useSearchParams().get("busca");
+  useEffect(() => {
+    if (busca != null) aoLer(busca);
+  }, [busca, aoLer]);
+  return null;
 }
 
 function Chip({

@@ -28,14 +28,7 @@ export function urlFoto(caminho: string | null | undefined): string | null {
   return caminho.startsWith("http") ? caminho : PREFIXO_FOTO + caminho;
 }
 
-/** Formata centavos como moeda brasileira. Sem valor, devolve null. */
-export function precoFormatado(centavos: number | null | undefined): string | null {
-  if (centavos == null || centavos <= 0) return null;
-  return (centavos / 100).toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  });
-}
+export { precoFormatado } from "@/lib/preco";
 
 /* ------------------------------------------------------------------ */
 /* Tipos                                                              */

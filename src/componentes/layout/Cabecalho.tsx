@@ -8,6 +8,7 @@ import { Menu, ShoppingBag, X } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { NOME_CABECALHO } from "@/lib/transicoes";
 import { Logo } from "@/componentes/marca/Logo";
+import { BuscaCabecalho } from "./BuscaCabecalho";
 import { useOrcamento } from "@/componentes/orcamento/ContextoOrcamento";
 import { empresa, linkWhatsApp, mensagensPadrao } from "@/dados/empresa";
 
@@ -104,6 +105,7 @@ export function Cabecalho() {
           </nav>
 
           <div className="flex items-center gap-2 md:gap-4">
+            <BuscaCabecalho />
             <BotaoOrcamento quantidade={quantidadeTotal} aoClicar={abrir} />
 
             <a
