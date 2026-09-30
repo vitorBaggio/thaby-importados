@@ -4,6 +4,8 @@
  *   node scripts/bling/atualizar.mjs              simulacao: grava so scripts/bling/saida/
  *   node scripts/bling/atualizar.mjs --aplicar    grava src/dados/catalogo-completo.json e baixa fotos internas
  *   node scripts/bling/atualizar.mjs --aplicar --forcar   ignora a trava de queda > 30%
+ *   node scripts/bling/atualizar.mjs --aplicar --da-previa   aplica saida/previa.json da ultima
+ *       simulacao (menos de 24 h) sem reler o Bling; so baixa as fotos listadas nela
  *
  * Regras e detalhes em sincronizacao.mjs. Relatorio em scripts/bling/saida/relatorio.md.
  */
@@ -12,11 +14,15 @@ import { fileURLToPath } from "node:url";
 import { blingGet, baixarImagem } from "./cliente.mjs";
 import { sincronizar } from "./sincronizacao.mjs";
 
-const FLAGS = new Set(["--aplicar", "--forcar"]);
+const FLAGS = new Set(["--aplicar", "--forcar", "--da-previa"]);
 const args = process.argv.slice(2);
 const desconhecidas = args.filter((a) => !FLAGS.has(a));
 if (desconhecidas.length) {
-  console.error(`Opcao desconhecida: ${desconhecidas.join(" ")}. Use --aplicar e/ou --forcar.`);
+  console.error(`Opcao desconhecida: ${desconhecidas.join(" ")}. Use --aplicar, --forcar e/ou --da-previa.`);
+  process.exit(2);
+}
+if (args.includes("--da-previa") && !args.includes("--aplicar")) {
+  console.error("--da-previa so funciona junto com --aplicar.");
   process.exit(2);
 }
 
@@ -29,6 +35,7 @@ try {
     raiz,
     aplicar: args.includes("--aplicar"),
     forcar: args.includes("--forcar"),
+    daPrevia: args.includes("--da-previa"),
     log: (m) => console.log(m),
   });
   const total = [...r.chamadas.values()].reduce((t, n) => t + n, 0);

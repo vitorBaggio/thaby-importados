@@ -1,3 +1,7 @@
 {
- "_leiaMe": "Chave = id da categoria no Bling. Valor = { super, sub } com slugs de scripts/bling/categorias-site.json. A sincronizacao acrescenta aqui os casamentos automaticos por nome; o que nao casar vai para supercategoria-padrao/padrao (Outros Importados / Variados) e aparece como SEM MAPA no relatorio. Edite a mao para decidir."
+ "_leiaMe": "Chave = id da categoria no Bling. Valor = { super, sub } com slugs de scripts/bling/categorias-site.json. A sincronizacao acrescenta aqui os casamentos automaticos por nome; o que nao casar vai para supercategoria-padrao/padrao (Outros Importados / Variados) e aparece como SEM MAPA no relatorio. Edite a mao para decidir.",
+ "11874667": { "super": "bem-estar-e-estilo-de-vida", "sub": "geral", "nomeBling": "BEM ESTAR E ESTILO DE VIDA" },
+ "11874698": { "super": "papelaria", "sub": "diversos", "nomeBling": "PAPELARIA" },
+ "11904893": { "super": "bem-estar-e-estilo-de-vida", "sub": "saude", "nomeBling": "SUPLEMENTOS" },
+ "12361463": { "super": "bem-estar-e-estilo-de-vida", "sub": "saude", "nomeBling": "SUPLEMENTOS > DIVERSOS" }
 }

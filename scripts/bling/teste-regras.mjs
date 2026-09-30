@@ -12,8 +12,13 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as acorn from "acorn";
+import sharp from "sharp";
 import * as cliente from "./cliente.mjs";
-import { sincronizar } from "./sincronizacao.mjs";
+import * as sinc from "./sincronizacao.mjs";
+
+const { sincronizar } = sinc;
+/** Regras de Novidades do site (compartilhadas com a sincronizacao). */
+const regrasNovidade = await import("../../src/dados/novidades.mjs").catch(() => ({}));
 
 const AQUI = path.dirname(fileURLToPath(import.meta.url));
 const RAIZ_REPO = path.resolve(AQUI, "../..");
@@ -34,7 +39,11 @@ async function teste(nome, fn) {
 /* Bling falso                                                        */
 /* ------------------------------------------------------------------ */
 
-function blingFalso({ extras = [], detalhesExtras = {}, falharEm, paginaVazia } = {}) {
+/**
+ * `inclusoes`: id -> AAAA-MM-DD de inclusao no Bling (listagem com dataInclusaoInicial).
+ * `expoeData`: a lista devolve `dataInclusao` (a especificacao nao documenta o campo).
+ */
+function blingFalso({ extras = [], detalhesExtras = {}, falharEm, paginaVazia, inclusoes = {}, expoeData = false } = {}) {
   const categorias = fixture("categorias.json");
   const lista = [...fixture("produtos-lista.json"), ...extras];
   const detalhes = { ...fixture("produtos-detalhe.json"), ...detalhesExtras };
@@ -49,6 +58,12 @@ function blingFalso({ extras = [], detalhesExtras = {}, falharEm, paginaVazia } 
     if (falharEm?.(caminho, params)) throw new Error(`Bling GET ${caminho} falhou (500): erro simulado`);
     if (paginaVazia?.(caminho, params)) return { data: [] };
     if (caminho === "/categorias/produtos") return { data: pagina(categorias, params) };
+    if (caminho === "/produtos" && params.dataInclusaoInicial != null) {
+      const itens = lista
+        .filter((p) => p.situacao === "A" && inclusoes[p.id] && inclusoes[p.id] >= params.dataInclusaoInicial)
+        .map((p) => (expoeData ? { ...p, dataInclusao: `${inclusoes[p.id]} 10:00:00` } : p));
+      return { data: pagina(itens, params) };
+    }
     if (caminho === "/produtos") {
       const situacao = { 2: "A", 3: "I" }[params.criterio];
       const itens = lista.filter((p) => p.situacao === situacao && faixa(saldoReal(p)) === params.filtroSaldoEstoque);
@@ -124,12 +139,20 @@ async function erroDe(fn) {
 
 const S3 = "https://catalogo-mobile.s3.sa-east-1.amazonaws.com/companies/7827/products_imgs/imported/";
 /** Produto simples ativo com estoque, para a lista e para o detalhe do Bling falso. */
-function produtoExtra(id, nome, { imagens = { externas: [{ link: `${S3}${id}.jpg` }], internas: [] }, imagemURL = "", codigo } = {}) {
+function produtoExtra(
+  id,
+  nome,
+  { imagens = { externas: [{ link: `${S3}${id}.jpg` }], internas: [] }, imagemURL = "", codigo, preco = 10, descricaoCurta = "", descricaoComplementar, marca = "" } = {},
+) {
   const lista = {
-    id, nome, codigo: codigo ?? `X-${id}`, preco: 10, estoque: { saldoVirtualTotal: 1 },
-    tipo: "P", situacao: "A", formato: "S", descricaoCurta: "", imagemURL,
+    id, nome, codigo: codigo ?? `X-${id}`, preco, estoque: { saldoVirtualTotal: 1 },
+    tipo: "P", situacao: "A", formato: "S", descricaoCurta, imagemURL,
   };
-  const detalhe = { ...lista, gtin: "", marca: "", categoria: { id: 0 }, ...(imagens ? { midia: { imagens } } : {}) };
+  const detalhe = {
+    ...lista, gtin: "", marca, categoria: { id: 0 },
+    ...(descricaoComplementar != null ? { descricaoComplementar } : {}),
+    ...(imagens ? { midia: { imagens } } : {}),
+  };
   return { lista, detalhe };
 }
 const montarExtras = (itens) => ({
@@ -256,10 +279,12 @@ await teste("simulacao nao grava o mapa; casamentos automaticos vao para saida/m
   assert.match(sim.relatorio, /propostos \(NAO gravados no mapa\): 4/);
 });
 
-await teste("imagem so interna: caminho local planejado, sem link temporario na previa", () => {
+await teste("imagem so interna: caminho local planejado; link temporario so no bloco de aplicacao da previa", () => {
   const p = porCodigo(sim, "SKU-NOVO-107");
   assert.deepEqual(p.fotos, ["/produtos/107-1.png"]);
-  assert.ok(!ler(raiz, "scripts/bling/saida/previa.json").includes("orgbling"));
+  const { aplicacao, ...catalogoPrevia } = JSON.parse(ler(raiz, "scripts/bling/saida/previa.json"));
+  assert.ok(!JSON.stringify(catalogoPrevia).includes("orgbling"));
+  assert.ok(aplicacao.fotos.some((f) => f.produtoId === 107 && f.link.includes("orgbling")));
   assert.deepEqual(sim.usoFotos, { externa: 6, interna: 1, mista: 0 });
 });
 
@@ -555,10 +580,30 @@ await teste("externa http: e baixada para public/produtos e aplica sem --forcar"
   assert.ok(!ler(raizFotos, "src/dados/catalogo-completo.json").includes("http://"));
 });
 
-await teste("so imagemURL sem midia no detalhe: nao baixa nem adivinha a origem; sai com motivo", () => {
-  assert.ok(!baixadorFotos.pedidos.some((u) => u.includes("cdn.example.test")));
-  assert.equal(fotosDe(fotosApl, 941), undefined);
-  assert.equal(fotosApl.sairam.find((s) => s.codigo === "X-941")?.motivo, "sem imagem (imagemURL sem origem nos metadados de midia do Bling)");
+await teste("so imagemURL sem midia no detalhe: origem desconhecida, baixada, validada e publicada local", () => {
+  assert.ok(baixadorFotos.pedidos.includes("https://cdn.example.test/foto.png"), "deveria baixar o imagemURL");
+  assert.deepEqual(fotosDe(fotosApl, 941), ["/produtos/941-1.png"]);
+  assert.deepEqual(fs.readFileSync(path.join(raizFotos, "public/produtos/941-1.png")), PNG);
+  assert.equal(fotosApl.catalogo.produtos.find((p) => p.id === 941)?.slug, "so-imagemurl", "casado pelo codigo, slug mantido");
+  assert.ok(!fotosApl.sairam.some((s) => s.codigo === "X-941"));
+  assert.ok(!ler(raizFotos, "src/dados/catalogo-completo.json").includes("cdn.example.test"));
+  assert.match(fotosApl.relatorio, /imagemURL \(origem desconhecida, baixada e validada\): 1/);
+});
+
+const raizUrlRuim = novaRaiz();
+const antesUrlRuim = ler(raizUrlRuim, "src/dados/catalogo-completo.json");
+const blingUrlRuim = () => blingFalso(montarExtras([produtoExtra(942, "Url Ruim", { imagens: null, imagemURL: "ftp://x.test/foto.png" })])).blingGet;
+const urlRuim = await sincronizarOuErro({ blingGet: blingUrlRuim(), baixarImagem: baixadorFalso().baixarImagem, raiz: raizUrlRuim, aplicar: true });
+const depoisUrlRuim = ler(raizUrlRuim, "src/dados/catalogo-completo.json");
+const urlRuimForcada = await sincronizarOuErro({ blingGet: blingUrlRuim(), baixarImagem: baixadorFalso().baixarImagem, raiz: raizUrlRuim, aplicar: true, forcar: true });
+
+await teste("imagemURL invalida sem midia: recusa o --aplicar com diagnostico (nao vira 'sem imagem' calado)", () => {
+  assert.equal(urlRuim.modo, "recusada", urlRuim.erro?.message ?? "");
+  assert.match(urlRuim.recusa, /imagemURL invalida.*942/);
+  assert.equal(depoisUrlRuim, antesUrlRuim);
+  assert.match(urlRuim.relatorio, /### imagemURL invalida \(1\)/);
+  assert.equal(urlRuimForcada.modo, "aplicada", urlRuimForcada.erro?.message ?? "");
+  assert.equal(fotosDe(urlRuimForcada, 942), undefined);
 });
 
 await teste("MIME: extensao vem do Content-Type validado (url .jpg, conteudo png = .png)", () => {
@@ -628,6 +673,437 @@ await teste("download: timeout de 30 s no GET da imagem", () => {
 });
 
 /* ------------------------------------------------------------------ */
+/* AVIF                                                               */
+/* ------------------------------------------------------------------ */
+
+const caixa = (tipo, corpo) => {
+  const cab = Buffer.alloc(8);
+  cab.writeUInt32BE(8 + corpo.length);
+  cab.write(tipo, 4, "latin1");
+  return Buffer.concat([cab, corpo]);
+};
+const ftyp = (principal, ...compat) => caixa("ftyp", Buffer.concat([Buffer.from(principal), Buffer.alloc(4), ...compat.map((m) => Buffer.from(m))]));
+const AVIF_MONTADO = Buffer.concat([ftyp("avif", "avif", "mif1", "miaf"), caixa("meta", Buffer.alloc(4)), caixa("mdat", Buffer.from("AVIF"))]);
+const AVIF_SHARP = await sharp({ create: { width: 8, height: 8, channels: 3, background: "#c33" } }).avif().toBuffer();
+const MP4 = Buffer.concat([ftyp("isom", "isom", "mp42"), caixa("moov", Buffer.alloc(4))]);
+const avifInterna = (id) => ({
+  externas: [],
+  internas: [{ link: `https://orgbling.s3.amazonaws.com/imagens/${id}.avif?X-Amz-Signature=a${id}`, validade: "2026-10-01 10:00:00", ordem: 1, anexo: { id: id * 10 } }],
+});
+const raizAvif = novaRaiz();
+const avif = await sincronizarOuErro({
+  blingGet: blingFalso(
+    montarExtras([
+      produtoExtra(980, "Avif Montado", { imagens: avifInterna(980) }),
+      produtoExtra(981, "Avif Sharp", { imagens: avifInterna(981) }),
+      produtoExtra(982, "Avif Que E Png", { imagens: avifInterna(982) }),
+      produtoExtra(983, "Avif Que E Mp4", { imagens: avifInterna(983) }),
+      produtoExtra(984, "Avif Truncado", { imagens: avifInterna(984) }),
+    ]),
+  ).blingGet,
+  baixarImagem: baixadorFalso({
+    "980.avif": { dados: AVIF_MONTADO, tipo: "image/avif" },
+    "981.avif": { dados: AVIF_SHARP, tipo: "image/avif" },
+    "982.avif": { dados: PNG, tipo: "image/avif" },
+    "983.avif": { dados: MP4, tipo: "image/avif" },
+    "984.avif": { dados: AVIF_SHARP.subarray(0, AVIF_SHARP.length - 10), tipo: "image/avif" },
+  }).baixarImagem,
+  raiz: raizAvif,
+  aplicar: true,
+});
+
+await teste("AVIF valido (ISO-BMFF com marca avif) entra como .avif", () => {
+  assert.equal(avif.modo, "aplicada", avif.erro?.message ?? avif.recusa ?? "");
+  assert.deepEqual(fotosDe(avif, 980), ["/produtos/980-1.avif"]);
+  assert.deepEqual(fotosDe(avif, 981), ["/produtos/981-1.avif"]);
+  assert.deepEqual(fs.readFileSync(path.join(raizAvif, "public/produtos/981-1.avif")), AVIF_SHARP);
+});
+
+await teste("AVIF invalido (PNG, MP4 ou truncado com image/avif) e pulado com aviso", () => {
+  for (const id of [982, 983, 984]) assert.equal(fotosDe(avif, id), undefined, `produto ${id} nao deveria publicar`);
+  assert.deepEqual(avif.avisosFotos.map((a) => a.produtoId).sort(), [982, 983, 984]);
+  assert.match(avif.relatorio, /AVISO: produto 983, foto 1: conteudo nao confere com image\/avif/);
+});
+
+const raizAvifAntigo = novaRaiz({ manifesto: { "107-1": { chave: "anexo:555", arquivo: "107-1.avif" } } });
+fs.mkdirSync(path.join(raizAvifAntigo, "public/produtos"), { recursive: true });
+fs.writeFileSync(path.join(raizAvifAntigo, "public/produtos/107-1.avif"), AVIF_SHARP);
+const baixadorAvifAntigo = baixadorFalso();
+const avifAntigo = await sincronizarOuErro({ blingGet: blingFalso().blingGet, baixarImagem: baixadorAvifAntigo.baixarImagem, raiz: raizAvifAntigo, aplicar: true });
+
+await teste("manifesto antigo com .avif nao aborta e a foto e reaproveitada", () => {
+  assert.equal(avifAntigo.modo, "aplicada", avifAntigo.erro?.message ?? avifAntigo.recusa ?? "");
+  assert.equal(baixadorAvifAntigo.pedidos.length, 0);
+  assert.deepEqual(fotosDe(avifAntigo, 107), ["/produtos/107-1.avif"]);
+  assert.ok(existe(raizAvifAntigo, "public/produtos/107-1.avif"));
+});
+
+/* ------------------------------------------------------------------ */
+/* Gravacao atomica                                                   */
+/* ------------------------------------------------------------------ */
+
+/** Todo o estado persistente (caminho -> bytes), fora a pasta de saida. */
+function estadoDe(r) {
+  const saida = path.join("scripts", "bling", "saida");
+  return Object.fromEntries(
+    fs
+      .readdirSync(r, { recursive: true })
+      .filter((rel) => !rel.startsWith(saida) && fs.statSync(path.join(r, rel)).isFile())
+      .sort()
+      .map((rel) => [rel, fs.readFileSync(path.join(r, rel))]),
+  );
+}
+
+/** Troca `fs[nome]` por uma versao que lanca quando `falhar(args, n)` for verdadeiro. */
+async function comFalha(nome, falhar, fn) {
+  const original = fs[nome];
+  let n = 0;
+  fs[nome] = (...args) => {
+    if (falhar(args, ++n)) throw Object.assign(new Error(`falha injetada em ${nome}(${path.basename(String(args[1] ?? args[0]))})`), { code: "EIO" });
+    return original.apply(fs, args);
+  };
+  try {
+    return await fn();
+  } finally {
+    fs[nome] = original;
+  }
+}
+
+const foraDaSaida = (destino) => !String(destino).includes(path.join("scripts", "bling", "saida"));
+/** Estado anterior com catalogo, manifesto, mapa e foto 107-1.png ja publicados. */
+async function raizPublicada() {
+  const r = novaRaiz();
+  await sincronizar({ blingGet: blingFalso().blingGet, baixarImagem: baixadorFalso().baixarImagem, raiz: r, aplicar: true, hoje: "2026-09-30" });
+  return r;
+}
+/** Proxima sincronizacao: 107 com foto nova (outros bytes, mesmo nome) + 3 produtos novos com foto interna. */
+const blingSeguinte = () => {
+  const novo107 = structuredClone(fixture("produtos-detalhe.json")["107"]);
+  novo107.midia.imagens.internas[0].anexo = { id: 556 };
+  const { extras, detalhesExtras } = montarExtras([960, 961, 962].map((id) => produtoExtra(id, `Novo ${id}`, { imagens: interna(id, `${id}.png`) })));
+  return blingFalso({ extras, detalhesExtras: { ...detalhesExtras, 107: novo107 } }).blingGet;
+};
+const PNG_NOVO = Buffer.concat([PNG, Buffer.from("-NOVO")]);
+const aplicarSeguinte = (r) =>
+  sincronizar({ blingGet: blingSeguinte(), baixarImagem: baixadorFalso({ orgbling: { dados: PNG_NOVO, tipo: "image/png" } }).baixarImagem, raiz: r, aplicar: true, hoje: "2026-09-30" });
+
+const raizAtom1 = await raizPublicada();
+const antesAtom1 = estadoDe(raizAtom1);
+let promocoes1 = 0;
+const erroAtom1 = await comFalha("renameSync", ([, destino]) => foraDaSaida(destino) && ++promocoes1 === 2, () => erroDe(() => aplicarSeguinte(raizAtom1)));
+
+await teste("atomica: falha no 2o rename da promocao restaura tudo (bytes identicos)", () => {
+  assert.ok(erroAtom1, "deveria ter lancado");
+  assert.match(erroAtom1.message, /falha injetada em renameSync/);
+  assert.deepEqual(estadoDe(raizAtom1), antesAtom1);
+  assert.ok(!existe(raizAtom1, "scripts/bling/saida/.transacao"), "diario/copias deveriam sumir");
+});
+
+const raizAtom2 = await raizPublicada();
+const antesAtom2 = estadoDe(raizAtom2);
+const erroAtom2 = await comFalha("renameSync", ([, destino]) => String(destino).endsWith("fotos-baixadas.json") && foraDaSaida(destino), () => erroDe(() => aplicarSeguinte(raizAtom2)));
+
+await teste("atomica: falha ao gravar o manifesto (depois de fotos e catalogo) restaura tudo", () => {
+  assert.ok(erroAtom2, "deveria ter lancado");
+  assert.deepEqual(estadoDe(raizAtom2), antesAtom2);
+  assert.ok(!existe(raizAtom2, "public/produtos/960-1.png"), "foto criada deveria ser removida");
+});
+
+const raizAtom3 = await raizPublicada();
+const antesAtom3 = estadoDe(raizAtom3);
+const erroAtom3 = await comFalha("openSync", ([arq, flag]) => String(arq).endsWith("fotos-baixadas.json") && flag === "w", () => erroDe(() => aplicarSeguinte(raizAtom3)));
+
+await teste("atomica: falha ao preparar o manifesto temporario nao toca em nada", () => {
+  assert.ok(erroAtom3, "deveria ter lancado");
+  assert.deepEqual(estadoDe(raizAtom3), antesAtom3);
+});
+
+// O proprio desfazer falha (ou o processo morre): o diario fica e a proxima execucao desfaz.
+const raizAtom4 = await raizPublicada();
+const antesAtom4 = estadoDe(raizAtom4);
+let promocoes4 = 0;
+const erroAtom4 = await comFalha("renameSync", ([, destino]) => foraDaSaida(destino) && ++promocoes4 >= 2, () => erroDe(() => aplicarSeguinte(raizAtom4)));
+const meioAtom4 = estadoDe(raizAtom4);
+const logsAtom4 = [];
+await sincronizar({ blingGet: blingFalso().blingGet, baixarImagem: baixadorFalso().baixarImagem, raiz: raizAtom4, hoje: "2026-09-30", log: (m) => logsAtom4.push(m) });
+
+await teste("atomica: diario de transacao interrompida e desfeito na execucao seguinte", () => {
+  assert.ok(erroAtom4, "deveria ter lancado");
+  assert.match(erroAtom4.message, /proxima execucao desfaz/);
+  assert.notDeepEqual(meioAtom4, antesAtom4, "cenario deveria deixar estado parcial");
+  assert.deepEqual(estadoDe(raizAtom4), antesAtom4);
+  assert.ok(logsAtom4.some((m) => /interrompida/.test(m)));
+  assert.ok(!existe(raizAtom4, "scripts/bling/saida/.transacao"));
+});
+
+const raizAtom5 = await raizPublicada();
+const atom5 = await aplicarSeguinte(raizAtom5);
+await teste("atomica: sem falha, publica a foto nova sobre a antiga e so entao limpa orfas", () => {
+  assert.equal(atom5.modo, "aplicada");
+  assert.deepEqual(fs.readFileSync(path.join(raizAtom5, "public/produtos/107-1.png")), PNG_NOVO);
+  for (const id of [960, 961, 962]) assert.ok(existe(raizAtom5, `public/produtos/${id}-1.png`));
+  assert.ok(!existe(raizAtom5, "scripts/bling/saida/.transacao"));
+});
+
+/* ------------------------------------------------------------------ */
+/* Ritmo das chamadas ao Bling                                        */
+/* ------------------------------------------------------------------ */
+
+function relogioFalso() {
+  const r = { t: 0, esperas: [] };
+  r.agora = () => r.t;
+  r.esperar = async (ms) => {
+    r.esperas.push(ms);
+    r.t += ms;
+  };
+  return r;
+}
+const resposta = (status, cab = {}) => new Response(status === 200 ? "{}" : null, { status, headers: cab });
+
+await teste("ritmo: intervalo minimo de 700 ms entre requisicoes", async () => {
+  assert.equal(cliente.INTERVALO_MIN_MS, 700);
+  const rel = relogioFalso();
+  const ritmo = cliente.criarRitmo(rel);
+  await ritmo.aguardarVez();
+  await ritmo.aguardarVez();
+  rel.t += 300;
+  await ritmo.aguardarVez();
+  assert.deepEqual(rel.esperas, [700, 400]);
+});
+
+await teste("ritmo: 429 sem Retry-After faz backoff exponencial ate 30 s, no maximo 8 tentativas", async () => {
+  const rel = relogioFalso();
+  const ritmo = cliente.criarRitmo(rel);
+  let n = 0;
+  const r = await cliente.pedirNoRitmo(ritmo, async () => resposta(++n <= 7 ? 429 : 200), rel);
+  assert.equal(r.status, 200);
+  assert.equal(n, 8);
+  assert.deepEqual(rel.esperas, [1000, 2000, 4000, 8000, 16000, 30000, 30000]);
+  let m = 0;
+  const falhou = await cliente.pedirNoRitmo(cliente.criarRitmo(relogioFalso()), async () => (m++, resposta(429)), relogioFalso());
+  assert.equal(falhou.status, 429);
+  assert.equal(m, 8);
+});
+
+await teste("ritmo: respeita Retry-After (segundos e data HTTP)", async () => {
+  const rel = relogioFalso();
+  let n = 0;
+  await cliente.pedirNoRitmo(cliente.criarRitmo(rel), async () => (++n === 1 ? resposta(429, { "retry-after": "3" }) : resposta(200)), rel);
+  assert.deepEqual(rel.esperas, [3000]);
+  assert.equal(cliente.esperaAposRecusa(1, new Date(10_000 + 5000).toUTCString(), 10_000), 5000);
+  assert.equal(cliente.esperaAposRecusa(4, null), 8000);
+});
+
+await teste("ritmo: 429 aumenta o intervalo em 25% (teto 2 s); 50 respostas 200 seguidas reduzem aos poucos", async () => {
+  const ritmo = cliente.criarRitmo(relogioFalso());
+  ritmo.limitado();
+  assert.equal(ritmo.intervalo(), 875);
+  ritmo.limitado();
+  assert.equal(ritmo.intervalo(), 1093.75);
+  for (let i = 0; i < 49; i++) ritmo.sucesso();
+  assert.equal(ritmo.intervalo(), 1093.75);
+  ritmo.sucesso();
+  assert.equal(ritmo.intervalo(), 875);
+  for (let i = 0; i < 100; i++) ritmo.sucesso();
+  assert.equal(ritmo.intervalo(), 700, "nunca abaixo do minimo");
+  for (let i = 0; i < 20; i++) ritmo.limitado();
+  assert.equal(ritmo.intervalo(), 2000);
+  for (let i = 0; i < 49; i++) ritmo.sucesso();
+  ritmo.limitado();
+  for (let i = 0; i < 49; i++) ritmo.sucesso();
+  assert.equal(ritmo.intervalo(), 2000, "429 zera a contagem de 200 seguidas");
+});
+
+/* ------------------------------------------------------------------ */
+/* Novidades                                                          */
+/* ------------------------------------------------------------------ */
+
+const blingNovidades = blingFalso({ ...montarExtras([produtoExtra(990, "Novo Recente")]), inclusoes: { 101: "2026-09-20", 107: "2026-09-10", 990: "2026-09-29", 105: "2026-09-25" } });
+const simNovidades = await sincronizar({ blingGet: blingNovidades.blingGet, baixarImagem: baixadorFalso().baixarImagem, raiz: novaRaiz(), hoje: "2026-09-30" });
+const blingComData = blingFalso({ inclusoes: { 101: "2026-09-20" }, expoeData: true });
+const simComData = await sincronizar({ blingGet: blingComData.blingGet, baixarImagem: baixadorFalso().baixarImagem, raiz: novaRaiz(), hoje: "2026-09-30" });
+
+await teste("novidades: UMA listagem /produtos criterio=2 com dataInclusaoInicial = hoje - 15 dias", () => {
+  const c = blingNovidades.chamadas.filter((x) => x.caminho === "/produtos" && x.params.dataInclusaoInicial != null);
+  assert.equal(c.length, 1);
+  assert.equal(c[0].params.criterio, 2);
+  assert.equal(c[0].params.dataInclusaoInicial, "2026-09-15");
+  assert.equal(c[0].params.pagina, 1);
+});
+
+await teste("novidades: publicados incluidos recentemente ganham novidadeAte; sem data na lista usa hoje + 15", () => {
+  assert.equal(porCodigo(simNovidades, "SKU-101").novidadeAte, "2026-10-15");
+  assert.equal(simNovidades.catalogo.produtos.find((p) => p.id === 990).novidadeAte, "2026-10-15");
+  assert.equal(porCodigo(simNovidades, "SKU-109").novidadeAte, undefined);
+  assert.equal(porCodigo(simNovidades, "SKU-NOVO-107").novidadeAte, undefined, "incluido antes da janela nao entra");
+  assert.match(simNovidades.relatorio, /Entraram em Novidades: 2/);
+  assert.match(simNovidades.relatorio, /nao traz a data de inclusao.*hoje \+ 15/);
+});
+
+await teste("novidades: com data de inclusao na lista, novidadeAte = inclusao + 15", () => {
+  assert.equal(porCodigo(simComData, "SKU-101").novidadeAte, "2026-10-05");
+  assert.match(simComData.relatorio, /Entraram em Novidades: 1/);
+});
+
+await teste("novidades (site): DIAS_NOVIDADE = 15 num lugar so, compartilhado com a sincronizacao", () => {
+  assert.equal(regrasNovidade.DIAS_NOVIDADE, 15);
+  assert.equal(regrasNovidade.somarDias("2026-09-30", -15), "2026-09-15");
+  assert.equal(regrasNovidade.somarDias("2026-12-25", 15), "2027-01-09");
+  assert.equal(regrasNovidade.dataNaLoja(new Date("2026-10-01T02:00:00Z")), "2026-09-30", "fuso America/Sao_Paulo");
+  assert.ok(!/DIAS_NOVIDADE\s*=/.test(fs.readFileSync(path.join(AQUI, "sincronizacao.mjs"), "utf8")));
+});
+
+await teste("novidades (site): vigente = novidadeAte >= data do build; catalogo antigo mantem os 60 maiores ids", () => {
+  const { selecionarNovidades } = regrasNovidade;
+  const antigos = Array.from({ length: 70 }, (_, i) => ({ id: i + 1 }));
+  const semCampo = selecionarNovidades(antigos, "2026-09-30", 60);
+  assert.equal(semCampo.porData, false);
+  assert.equal(semCampo.lista.length, 60);
+  assert.equal(semCampo.lista[0].id, 70);
+  const comCampo = [{ id: 1, novidadeAte: "2026-09-29" }, { id: 2, novidadeAte: "2026-09-30" }, { id: 3, novidadeAte: "2026-10-10" }, { id: 4 }];
+  const vigentes = selecionarNovidades(comCampo, "2026-09-30", 60);
+  assert.equal(vigentes.porData, true);
+  assert.deepEqual(vigentes.lista.map((p) => p.id), [3, 2]);
+  const vencidos = selecionarNovidades([{ id: 1, novidadeAte: "2026-09-01" }, { id: 2 }], "2026-09-30", 60);
+  assert.deepEqual(vencidos, { porData: true, lista: [] }, "com o campo mas nada vigente: estado vazio");
+});
+
+await teste("novidades (site): pagina /novidades tem estado vazio com link para o catalogo", () => {
+  const pagina = fs.readFileSync(path.join(RAIZ_REPO, "src/app/novidades/page.tsx"), "utf8");
+  assert.match(pagina, /Novidades chegando em breve/);
+  assert.match(pagina, /href="\/catalogo"/);
+});
+
+/* ------------------------------------------------------------------ */
+/* Descricao, marca, mapa de categorias e alerta de preco             */
+/* ------------------------------------------------------------------ */
+
+const siteTextos = [
+  { id: 8201, nome: "Site Desc", slug: "site-desc", marca: "Medicube", preco: 1000, categoriaId: 801248, fotos: [], descricao: "Descricao que ja esta no site.", codigo: "TXT-3", ean: null },
+  { id: 8202, nome: "Alerta Alta", slug: "alerta-alta", marca: null, preco: 2998, categoriaId: 801248, fotos: [], descricao: null, codigo: "ALERTA-1", ean: null },
+  { id: 8203, nome: "Alerta Baixa", slug: "alerta-baixa", marca: null, preco: 100000, categoriaId: 801248, fotos: [], descricao: null, codigo: "ALERTA-2", ean: null },
+  { id: 8204, nome: "Sem Alerta", slug: "sem-alerta", marca: null, preco: 1000, categoriaId: 801248, fotos: [], descricao: null, codigo: "ALERTA-3", ean: null },
+];
+const simTextos = await sincronizar({
+  blingGet: blingFalso(
+    montarExtras([
+      produtoExtra(1001, "Com Curta", { codigo: "TXT-1", descricaoCurta: "<p>Curta boa</p>", descricaoComplementar: "<p>Nao usar</p>" }),
+      produtoExtra(1002, "Com Complementar", { codigo: "TXT-2", descricaoCurta: "<p> </p>", descricaoComplementar: "<b>Texto</b> complementar" }),
+      produtoExtra(1003, "Do Site", { codigo: "TXT-3" }),
+      produtoExtra(1004, "Sem Nada", { codigo: "TXT-4", marca: "tirtir" }),
+      produtoExtra(1005, "Alerta Alta", { codigo: "ALERTA-1", preco: 780 }),
+      produtoExtra(1006, "Alerta Baixa", { codigo: "ALERTA-2", preco: 150 }),
+      produtoExtra(1007, "Sem Alerta", { codigo: "ALERTA-3", preco: 20 }),
+    ]),
+  ).blingGet,
+  baixarImagem: baixadorFalso().baixarImagem,
+  raiz: novaRaiz({ produtosExtras: siteTextos }),
+  hoje: "2026-09-30",
+});
+const pTexto = (codigo) => porCodigo(simTextos, codigo);
+
+await teste("descricao: curta limpa > complementar limpa > a do site > null", () => {
+  assert.equal(pTexto("TXT-1").descricao, "Curta boa");
+  assert.equal(pTexto("TXT-2").descricao, "Texto complementar");
+  assert.equal(pTexto("TXT-3").descricao, "Descricao que ja esta no site.");
+  assert.equal(pTexto("TXT-4").descricao, null);
+  assert.match(simTextos.relatorio, /Descricao curta do Bling: \d+/);
+  assert.match(simTextos.relatorio, /Descricao complementar do Bling: 1\b/);
+  assert.match(simTextos.relatorio, /Descricao mantida do site: 1\b/);
+});
+
+await teste("marca: sem marca no Bling mantem a do site (mesmo casamento do slug)", () => {
+  assert.equal(pTexto("TXT-3").marca, "Medicube");
+  assert.equal(pTexto("TXT-4").marca, "TIRTIR");
+  assert.equal(pTexto("TXT-1").marca, null);
+  assert.match(simTextos.relatorio, /Marca mantida do site: 1\b/);
+});
+
+await teste("preco: ALERTA DE PRECO no topo para variacao > 5x ou < 1/5 (nao bloqueia)", () => {
+  const topo = simTextos.relatorio.split("## Totais")[0];
+  assert.match(topo, /ALERTA DE PRECO/);
+  assert.match(topo, /Alerta Alta \(codigo ALERTA-1\): R\$ 29,98 para R\$ 780,00/);
+  assert.match(topo, /Alerta Baixa \(codigo ALERTA-2\): R\$ 1000,00 para R\$ 150,00/);
+  assert.ok(!topo.includes("ALERTA-3"));
+});
+
+await teste("mapa de categorias do dono aponta para slugs reais do site", () => {
+  const mapa = JSON.parse(fs.readFileSync(path.join(AQUI, "mapa-categorias.json"), "utf8"));
+  const arvore = JSON.parse(fs.readFileSync(path.join(AQUI, "categorias-site.json"), "utf8"));
+  const esperado = {
+    11904893: ["bem-estar-e-estilo-de-vida", "saude"],
+    12361463: ["bem-estar-e-estilo-de-vida", "saude"],
+    11874698: ["papelaria", "diversos"],
+    11874667: ["bem-estar-e-estilo-de-vida", "geral"],
+  };
+  for (const [id, [sup, sub]] of Object.entries(esperado)) {
+    assert.deepEqual([mapa[id]?.super, mapa[id]?.sub], [sup, sub], `id ${id}`);
+    const s = arvore.find((x) => x.slug === sup);
+    assert.ok(s?.subcategorias.some((f) => f.slug === sub), `${sup}/${sub} nao existe no site`);
+  }
+  assert.equal(mapa["4341353"], undefined, "4341353 segue para o padrao");
+});
+
+/* ------------------------------------------------------------------ */
+/* --da-previa                                                        */
+/* ------------------------------------------------------------------ */
+
+const T0 = Date.parse("2026-09-30T12:00:00Z");
+const HORA = 3600_000;
+const blingProibido = { chamadas: 0, blingGet: async () => { blingProibido.chamadas++; throw new Error("nao devia ler o Bling"); } };
+
+const raizPrevia = novaRaiz();
+await sincronizar({ blingGet: blingFalso().blingGet, baixarImagem: baixadorFalso().baixarImagem, raiz: raizPrevia, hoje: "2026-09-30", agora: () => T0 });
+const previaSalva = JSON.parse(ler(raizPrevia, "scripts/bling/saida/previa.json"));
+const baixadorPrevia = baixadorFalso();
+const daPrevia = await sincronizarOuErro({ blingGet: blingProibido.blingGet, baixarImagem: baixadorPrevia.baixarImagem, raiz: raizPrevia, aplicar: true, daPrevia: true, agora: () => T0 + 23 * HORA });
+
+await teste("--da-previa: aplica exatamente a previa da simulacao, sem ler o Bling", () => {
+  assert.equal(daPrevia.modo, "aplicada", daPrevia.erro?.message ?? daPrevia.recusa ?? "");
+  assert.equal(blingProibido.chamadas, 0);
+  const { aplicacao, ...catalogoPrevia } = previaSalva;
+  assert.ok(aplicacao);
+  assert.deepEqual(JSON.parse(ler(raizPrevia, "src/dados/catalogo-completo.json")), catalogoPrevia);
+  assert.deepEqual(baixadorPrevia.pedidos.map((u) => u.includes("orgbling")), [true]);
+  assert.deepEqual(fs.readFileSync(path.join(raizPrevia, "public/produtos/107-1.png")), PNG);
+  assert.deepEqual(JSON.parse(ler(raizPrevia, "scripts/bling/mapa-categorias.json"))["11"], { super: "beleza", sub: "skincare", nomeBling: "SKINCARE" });
+  assert.match(daPrevia.relatorio, /da previa/i);
+});
+
+const raizVelha = novaRaiz();
+await sincronizar({ blingGet: blingFalso().blingGet, baixarImagem: baixadorFalso().baixarImagem, raiz: raizVelha, hoje: "2026-09-30", agora: () => T0 });
+const antesVelha = estadoDe(raizVelha);
+const erroVelha = await erroDe(() => sincronizar({ blingGet: blingProibido.blingGet, baixarImagem: baixadorFalso().baixarImagem, raiz: raizVelha, aplicar: true, daPrevia: true, agora: () => T0 + 25 * HORA }));
+
+await teste("--da-previa: previa com 24 h ou mais e recusada", () => {
+  assert.ok(erroVelha, "deveria recusar");
+  assert.match(erroVelha.message, /24 h/);
+  assert.match(erroVelha.message, /rode a simulacao de novo/);
+  assert.deepEqual(estadoDe(raizVelha), antesVelha);
+  assert.equal(blingProibido.chamadas, 0);
+});
+
+const baixador403 = baixadorFalso({ orgbling: new Error("Download da imagem falhou (403): orgbling.s3.amazonaws.com/imagens/107.png") });
+const erro403 = await erroDe(() => sincronizar({ blingGet: blingProibido.blingGet, baixarImagem: baixador403.baixarImagem, raiz: raizVelha, aplicar: true, daPrevia: true, agora: () => T0 + HORA }));
+
+await teste("--da-previa: link expirado (403) aborta pedindo nova simulacao, nada gravado", () => {
+  assert.ok(erro403, "deveria abortar");
+  assert.match(erro403.message, /403/);
+  assert.match(erro403.message, /rode a simulacao de novo/);
+  assert.deepEqual(estadoDe(raizVelha), antesVelha);
+});
+
+fs.writeFileSync(path.join(raizVelha, "src/dados/catalogo-completo.json"), ler(raizVelha, "src/dados/catalogo-completo.json") + " ");
+const erroMudou = await erroDe(() => sincronizar({ blingGet: blingProibido.blingGet, baixarImagem: baixadorFalso().baixarImagem, raiz: raizVelha, aplicar: true, daPrevia: true, agora: () => T0 + HORA }));
+const erroSemAplicar = await erroDe(() => sincronizar({ blingGet: blingProibido.blingGet, baixarImagem: baixadorFalso().baixarImagem, raiz: raizVelha, daPrevia: true, agora: () => T0 + HORA }));
+
+await teste("--da-previa: recusa se o catalogo mudou depois da simulacao, e exige --aplicar", () => {
+  assert.match(erroMudou?.message ?? "", /mudaram depois da simulacao/);
+  assert.match(erroSemAplicar?.message ?? "", /--aplicar/);
+  assert.equal(blingProibido.chamadas, 0);
+});
+
+/* ------------------------------------------------------------------ */
 /* Somente leitura                                                    */
 /* ------------------------------------------------------------------ */
 
@@ -687,17 +1163,22 @@ function usosDeRede(fonte, arquivo) {
         break;
       case "MemberExpression":
         if (no.computed && literal(no.property) === "fetch") achados.push("fetch por indice");
+        if (no.computed && literal(no.property) === "getBuiltinModule") achados.push("getBuiltinModule por indice");
         if (no.computed && no.object.type === "Identifier" && GLOBAIS.has(no.object.name) && literal(no.property) == null) {
           achados.push(`${no.object.name}[...] dinamico`);
         }
         break;
-      case "Property":
-        if (!no.computed && (no.key.name ?? no.key.value) === "method" && literal(no.value) != null && literal(no.value).toUpperCase() !== "GET") {
+      case "Property": {
+        // `method: "X"`, `"method": "X"` e `["method"]: "X"`.
+        const chave = no.computed ? literal(no.key) : (no.key.name ?? no.key.value);
+        if (chave === "method" && literal(no.value) != null && literal(no.value).toUpperCase() !== "GET") {
           achados.push(`method ${literal(no.value)}`);
         }
         break;
+      }
       case "Identifier":
-        if (["fetch", "XMLHttpRequest", "WebSocket", "EventSource"].includes(no.name)) achados.push(no.name);
+        // getBuiltinModule abre qualquer modulo nativo (https, child_process...) sem import.
+        if (["fetch", "XMLHttpRequest", "WebSocket", "EventSource", "getBuiltinModule"].includes(no.name)) achados.push(no.name);
         if (!/^Import(Default|Namespace)?Specifier$/.test(pai?.type)) usos.push([no, pai, avo]);
         break;
     }
@@ -730,6 +1211,9 @@ await teste("somente leitura (AST): nenhum arquivo de scripts/bling alem do clie
   assert.ok(["sincronizacao.mjs", "atualizar.mjs", "teste-regras.mjs", "autorizar.mjs"].every((f) => arquivosBling.includes(f)));
   const achados = arquivosBling.flatMap((f) => usosDeRede(fonteDe(f), f).map((a) => `${f}: ${a}`));
   assert.deepEqual(achados, []);
+  // Importado pela sincronizacao, fora de scripts/bling.
+  const novidades = path.join(RAIZ_REPO, "src/dados/novidades.mjs");
+  assert.deepEqual(usosDeRede(fs.readFileSync(novidades, "utf8"), novidades), []);
 });
 
 const MUTACOES = [
@@ -741,6 +1225,7 @@ const MUTACOES = [
   ["exec curl no autorizar", "autorizar.mjs", (s) => `${s}\nexec("curl -X PATCH https://api.bling.com.br/Api/v3/produtos/1");\n`],
   ["import() dinamico de https", "atualizar.mjs", (s) => `${s}\nawait import("node:https");\n`],
   ["require de axios", "atualizar.mjs", (s) => `${s}\nconst ax = require("axios");\n`],
+  ["getBuiltinModule + method computado", "sincronizacao.mjs", (s) => `${s}\nprocess.getBuiltinModule("https").request("https://x", {["method"]:"PATCH"});\n`],
 ];
 for (const [nome, arquivo, mutar] of MUTACOES) {
   await teste(`somente leitura (AST): mutacao "${nome}" em ${arquivo} e detectada`, () => {

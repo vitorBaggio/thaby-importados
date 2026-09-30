@@ -14,6 +14,7 @@ import dados from "./catalogo-completo.json";
 import { itensSale, type ItemSale } from "./sale";
 import { slugify } from "@/lib/texto";
 import { asset } from "@/lib/asset";
+import { DIAS_NOVIDADE, dataNaLoja, selecionarNovidades } from "./novidades.mjs";
 
 const PREFIXO_FOTO = "https://catalogo-mobile.s3.sa-east-1.amazonaws.com/";
 
@@ -73,6 +74,8 @@ type ProdutoBruto = {
   descricao: string | null;
   codigo: string | null;
   ean: string | null;
+  /** AAAA-MM-DD: fica em Novidades até esta data (gravado pela sincronização do Bling). */
+  novidadeAte?: string;
 };
 
 export type Produto = ProdutoBruto & {
@@ -520,17 +523,24 @@ const resumir = (p: Produto): ProdutoResumo => ({
 
 export const vitrineResumo: ProdutoResumo[] = vitrine.map(resumir);
 
-/** Quantas peças a aba Novidades mostra. */
+/** Quantas peças a aba Novidades mostra no catálogo antigo, sem data de inclusão. */
 export const QTD_NOVIDADES = 60;
 
+export { DIAS_NOVIDADE };
+
 /**
- * O cadastro não tem data de entrada, mas os ids do catálogo operacional são
- * crescentes: as novidades são os maiores ids. Depois do corte, foto primeiro
- * (sort estável, então cada grupo segue do mais novo para o mais antigo).
+ * Novidades = incluídos no Bling nos últimos DIAS_NOVIDADE dias: produtos com
+ * `novidadeAte` >= data do build (o produto continua também na categoria dele).
+ * Catálogo antigo, sem nenhum `novidadeAte`, mantém o critério dos maiores ids
+ * (crescentes no catálogo operacional). Com o campo e nada vigente, a lista
+ * fica vazia e a página mostra o estado vazio. Foto primeiro (sort estável).
  */
-export const novidades: Produto[] = fotoPrimeiro(
-  [...produtos].sort((a, b) => b.id - a.id).slice(0, QTD_NOVIDADES),
-);
+const selecaoNovidades = selecionarNovidades(produtos, dataNaLoja(), QTD_NOVIDADES);
+
+/** true quando o catálogo já traz `novidadeAte` (sincronizado do Bling). */
+export const novidadesPorData = selecaoNovidades.porData;
+
+export const novidades: Produto[] = fotoPrimeiro(selecaoNovidades.lista);
 
 export const novidadesResumo: ProdutoResumo[] = novidades.map(resumir);
 

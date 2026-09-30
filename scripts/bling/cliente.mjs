@@ -84,7 +84,75 @@ async function tokenValido() {
   return pedirToken({ grant_type: "refresh_token", refresh_token: t.refresh_token });
 }
 
-let ultima = 0;
+/*
+ * Ritmo. Na 1a leitura real, 400 ms entre chamadas deu 1.084 respostas 429 em
+ * 54 min. Agora: no minimo 700 ms; cada 429 alarga o intervalo em 25% (teto
+ * 2 s) e 50 respostas ok seguidas o estreitam de novo, aos poucos.
+ */
+export const INTERVALO_MIN_MS = 700;
+export const INTERVALO_MAX_MS = 2000;
+export const FATOR_429 = 1.25;
+export const OK_PARA_REDUZIR = 50;
+/** Tentativas por chamada (a 1a + 7 repeticoes) em 429 ou 5xx. */
+export const MAX_TENTATIVAS = 8;
+export const TETO_ESPERA_MS = 30_000;
+
+const dormir = (ms) => new Promise((res) => setTimeout(res, ms));
+
+/** Intervalo adaptativo entre chamadas. `agora`/`esperar` trocaveis nos testes. */
+export function criarRitmo({ agora = Date.now, esperar = dormir } = {}) {
+  let intervalo = INTERVALO_MIN_MS;
+  let ultima = -Infinity;
+  let seguidas = 0;
+  return {
+    intervalo: () => intervalo,
+    async aguardarVez() {
+      const espera = ultima + intervalo - agora();
+      if (espera > 0) await esperar(espera);
+      ultima = agora();
+    },
+    sucesso() {
+      if (++seguidas < OK_PARA_REDUZIR) return;
+      seguidas = 0;
+      intervalo = Math.max(INTERVALO_MIN_MS, intervalo / FATOR_429);
+    },
+    limitado() {
+      seguidas = 0;
+      intervalo = Math.min(INTERVALO_MAX_MS, intervalo * FATOR_429);
+    },
+  };
+}
+
+/** Espera antes de repetir: Retry-After (segundos ou data HTTP) se vier; senao 1 s, 2 s, 4 s... ate 30 s. */
+export function esperaAposRecusa(tentativa, retryAfter, agora = Date.now()) {
+  const valor = String(retryAfter ?? "").trim();
+  if (/^\d+(\.\d+)?$/.test(valor)) return Number(valor) * 1000;
+  const quando = valor ? Date.parse(valor) : NaN;
+  if (Number.isFinite(quando)) return Math.max(0, quando - agora);
+  return Math.min(TETO_ESPERA_MS, 1000 * 2 ** (tentativa - 1));
+}
+
+/**
+ * Faz `pedir()` no ritmo; em 429 ou 5xx espera e repete, ate MAX_TENTATIVAS.
+ * Devolve a resposta ok ou a ultima recusada (quem chama monta o erro).
+ */
+export async function pedirNoRitmo(ritmo, pedir, { agora = Date.now, esperar = dormir } = {}) {
+  for (let tentativa = 1; ; tentativa++) {
+    await ritmo.aguardarVez();
+    const r = await pedir();
+    if (r.ok) {
+      ritmo.sucesso();
+      return r;
+    }
+    if (r.status === 429) ritmo.limitado();
+    if ((r.status !== 429 && r.status < 500) || tentativa >= MAX_TENTATIVAS) return r;
+    await r.body?.cancel();
+    await esperar(esperaAposRecusa(tentativa, r.headers.get("retry-after"), agora()));
+  }
+}
+
+const ritmoBling = criarRitmo();
+
 /** GET na API do Bling. Unico metodo exposto: leitura. */
 export async function blingGet(caminho, params = {}) {
   const qs = new URLSearchParams();
@@ -93,22 +161,15 @@ export async function blingGet(caminho, params = {}) {
     else if (v != null) qs.append(k, String(v));
   }
   const url = `${API}${caminho}${qs.size ? `?${qs}` : ""}`;
-  for (let tentativa = 1; ; tentativa++) {
-    // Limite do Bling: 3 req/s. Mantemos ~2,5 req/s.
-    const espera = ultima + 400 - Date.now();
-    if (espera > 0) await new Promise((res) => setTimeout(res, espera));
-    ultima = Date.now();
+  const r = await pedirNoRitmo(ritmoBling, async () => {
     const token = await tokenValido();
-    const r = await fetch(url, { method: "GET", headers: { Authorization: `Bearer ${token}`, Accept: "application/json" } });
-    registrar("GET", caminho, r.status);
-    if (r.ok) return r.json();
-    if ((r.status === 429 || r.status >= 500) && tentativa < 5) {
-      await new Promise((res) => setTimeout(res, 1500 * tentativa));
-      continue;
-    }
-    const txt = await r.text();
-    throw new Error(`Bling GET ${caminho} falhou (${r.status}): ${txt.slice(0, 300)}`);
-  }
+    const resposta = await fetch(url, { method: "GET", headers: { Authorization: `Bearer ${token}`, Accept: "application/json" } });
+    registrar("GET", caminho, resposta.status);
+    return resposta;
+  });
+  if (r.ok) return r.json();
+  const txt = await r.text();
+  throw new Error(`Bling GET ${caminho} falhou (${r.status}): ${txt.slice(0, 300)}`);
 }
 
 /** Teto de uma imagem baixada e tempo maximo do download (resposta + corpo). */
