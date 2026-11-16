@@ -2,14 +2,12 @@ import type { Metadata } from "next";
 import { CabecalhoPagina } from "@/componentes/layout/CabecalhoPagina";
 import { VitrineCatalogo } from "@/componentes/catalogo/VitrineCatalogo";
 import { Migalhas } from "@/componentes/seo/DadosEstruturados";
-import { BotaoLink } from "@/componentes/ui/Botao";
 import {
   vitrineResumo,
   categoriasResumo,
   mapaSubParaSuper,
   totais,
 } from "@/dados/catalogo";
-import { linkWhatsApp, mensagensPadrao } from "@/dados/empresa";
 
 export const metadata: Metadata = {
   title: "Catálogo",
@@ -33,15 +31,6 @@ export default function PaginaCatalogo() {
         sobrescrita={`${totais.produtos.toLocaleString("pt-BR")} peças · ${totais.marcas} marcas`}
         titulo="O acervo, peça por peça."
         apoio="Tudo o que temos disponível para você escolher e se apaixonar. Nosso estoque gira rápido, então confirme sempre pelo WhatsApp."
-        extra={
-          <BotaoLink
-            href={linkWhatsApp(mensagensPadrao.catalogo)}
-            variante="contorno"
-            externo
-          >
-            Pedir catálogo completo
-          </BotaoLink>
-        }
       />
 
       <div className="area pb-28 pt-10 md:pb-36">
